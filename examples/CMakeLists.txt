@@ -1,0 +1,2 @@
+add_library(basic_behavior basic_behavior.cpp)
+target_link_libraries(basic_behavior api)
