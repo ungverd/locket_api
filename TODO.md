@@ -2,4 +2,5 @@
 * Provide interface for outputting text to console/UART.
 * Implement sequences
 * Add missing handlers/interfaces to the Behavior. 
+* Add unit-tests.
  
