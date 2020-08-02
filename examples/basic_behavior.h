@@ -10,6 +10,7 @@ public:
     using Behavior::Behavior;
 
     void OnStarted() override;
+    void EverySecond() override;
     void OnPillConnected(PillManager<IdOnlyState>* manager) override;
     void OnPillDisconnected() override;
 

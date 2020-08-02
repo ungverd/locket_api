@@ -5,6 +5,10 @@ void BasicBehavior::OnStarted() {
     led->StartOrRestart(RgbLedSequence());
 }
 
+void BasicBehavior::EverySecond() {
+    std::cout << "Second passed" << std::endl;
+}
+
 void BasicBehavior::OnPillConnected(PillManager<IdOnlyState>* manager) {
     pill_manager = manager;
 }
