@@ -7,3 +7,4 @@ add_library(emulator
         fake_pill_manager.cpp
 )
 target_link_libraries(emulator api)
+target_include_directories(emulator INTERFACE .)

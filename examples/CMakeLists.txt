@@ -1,2 +1,5 @@
 add_library(basic_behavior basic_behavior.cpp)
 target_link_libraries(basic_behavior api)
+
+add_executable(basic_behavior_emulator basic_behavior_emulator.cpp)
+target_link_libraries(basic_behavior_emulator basic_behavior emulator)
