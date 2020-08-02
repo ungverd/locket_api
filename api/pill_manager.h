@@ -3,6 +3,8 @@
 
 #include "common_states.h"
 
+// Allows to reading/writing to pill.
+// See Behavior::OnPillConnected and Behavior::OnPillDisconnected method comments.
 template <typename PillState = IdOnlyState>
 class PillManager {
 public:
