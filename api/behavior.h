@@ -55,6 +55,12 @@ public:
     //   }
     virtual void OnPillConnected(PillManager<PillState>* manager) {}
     virtual void OnPillDisconnected() {}
+
+    //
+    // Button-handling events.
+    //
+    // For now, only single-button presses are supported (no combinations, no long presses, etc).
+    virtual void OnButtonPressed(uint16_t button_index) {}
 };
 
 #endif //LOCKET_API_BEHAVIOR_H
