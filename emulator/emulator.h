@@ -3,6 +3,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
+#include <atomic>
 #include <chrono>
 #include <sstream>
 #include <string>
@@ -28,9 +29,11 @@ private:
 
 template<typename PillState, typename RadioPacket>
 void Emulator<PillState, RadioPacket>::Run() {
+    std::atomic<bool> stopping_execution = false;
+
     behavior->OnStarted();
     std::thread every_second_timer([&](){
-        while (true) {
+        while (!stopping_execution) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             std::lock_guard l(behavior_mutex);
             behavior->EverySecond();
@@ -93,6 +96,8 @@ void Emulator<PillState, RadioPacket>::Run() {
             behavior->OnDipSwitchChanged(dip_value);
         }
     }
+    stopping_execution = true;
+    every_second_timer.join()
 }
 
 #pragma clang diagnostic pop
