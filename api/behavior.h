@@ -66,6 +66,11 @@ public:
     // For now, only single-button presses are supported (no combinations, no long presses, etc).
     virtual void OnButtonPressed(uint16_t button_index) {}
 
+    // TODO(aeremin) Add DIP switch handler.
+    // TODO(aeremin) Add interface with interacting with vibro.
+    // TODO(aeremin) Add interface with interacting with beeper.
+    // TODO(aeremin) Add radio handler and RadioManager member.
+
 protected:
     // Use this to control LED.
     RgbLed* const led;
