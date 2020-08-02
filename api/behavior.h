@@ -2,6 +2,7 @@
 #define LOCKET_API_BEHAVIOR_H
 
 #include "common_states.h"
+#include "led.h"
 #include "pill_manager.h"
 
 // Business logic developer needs to
@@ -9,7 +10,10 @@
 //    See common_states.h for the examples.
 //    If something more complex is needed - define your own struct (e.g. ThatGamePillState).
 // 2) Create a class implementing Behavior interface, e.g.
-//    class ThatGameBehavior: public Behavior<ThatGamePillState, EmptyState> { ... };
+//    class ThatGameBehavior: public Behavior<ThatGamePillState, EmptyState> {
+//    public:
+//        using Behavior::Behavior; // This is magic needed to inherit a constructor, just do it.
+//    };
 //    (this is for the case when custom struct ThatGamePillState describes pills content and there is no radio).
 // 3) Override On[Something] methods if you want to react on corresponding events, e.g.
 //    class ThatGameBehavior: public Behavior<ThatGamePillState, EmptyState> {
@@ -61,6 +65,16 @@ public:
     //
     // For now, only single-button presses are supported (no combinations, no long presses, etc).
     virtual void OnButtonPressed(uint16_t button_index) {}
+
+protected:
+    // Use this to control LED.
+    RgbLed* const led;
+
+public:
+    // Concrete Behavior implementations should either inherit it by having
+    //     using Behavior::Behavior;
+    // in their public section, or (advanced mode) define their own constructor and call this one there.
+    Behavior(RgbLed* led): led(led) {}
 };
 
 #endif //LOCKET_API_BEHAVIOR_H
