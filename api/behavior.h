@@ -47,7 +47,7 @@ public:
     // If you only need to read pill content - just do
     //   manager->ReadPill() in OnPillConnected to get contents.
     // If you need to read/write "later" (e.g. on button press) - define a
-    //   PillManager<PillState>* pill_manager = nullptr;
+    //   PillManager<IdOnlyState>* pill_manager = nullptr;
     // member of your Behavior class, do a
     //   pill_manager = manager;
     // in a OnPillConnected,
