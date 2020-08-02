@@ -1,9 +1,9 @@
 #ifndef LOCKET_API_BASIC_BEHAVIOR_H
 #define LOCKET_API_BASIC_BEHAVIOR_H
 
-#include "behavior.h"
 #include "pill_manager.h"
 #include <iostream>
+#include "behavior.h"
 
 class BasicBehavior: public Behavior<IdOnlyState, IdOnlyState> {
 public:

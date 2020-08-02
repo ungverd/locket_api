@@ -97,7 +97,7 @@ void Emulator<PillState, RadioPacket>::Run() {
         }
     }
     stopping_execution = true;
-    every_second_timer.join()
+    every_second_timer.join();
 }
 
 #pragma clang diagnostic pop

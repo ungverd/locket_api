@@ -1,4 +1,4 @@
-add_library(basic_behavior basic_behavior.cpp)
+add_library(basic_behavior basic_behavior.cpp try_giganda.h try_giganda.cpp)
 target_link_libraries(basic_behavior api)
 
 add_executable(basic_behavior_emulator basic_behavior_emulator.cpp)
