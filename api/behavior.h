@@ -53,7 +53,7 @@ public:
     // in a OnPillConnected,
     //   pill_manager = nullptr;
     // in OnPillDisconnected.
-    // It will give you a nice invariant - pill is connected if and only if pill_manager != nullptr. So in e.g.
+    // It will give you a nice way to check if pill is connected by checking if pill_manager != nullptr. So in e.g.
     // OnButtonPressed you can do
     //   if (pill_manager) {
     //     pill_manager->WritePill(...)
