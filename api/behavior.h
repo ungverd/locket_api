@@ -66,7 +66,10 @@ public:
     // For now, only single-button presses are supported (no combinations, no long presses, etc).
     virtual void OnButtonPressed(uint16_t button_index) {}
 
-    // TODO(aeremin) Add DIP switch handler.
+    // DIP switch event. Will be called if any of toggles on DIP switch are flipped.
+    // To get the ON/OFF state of the specific switch, use GetSwitchState from the utility.h.
+    virtual void OnDipSwitchChanged(uint16_t dip_value_mask) {}
+
     // TODO(aeremin) Add interface with interacting with vibro.
     // TODO(aeremin) Add interface with interacting with beeper.
     // TODO(aeremin) Add radio handler and RadioManager member.

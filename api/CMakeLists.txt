@@ -4,5 +4,7 @@ target_sources(api INTERFACE
         behavior.h
         led.h
         pill_manager.h
+        utility.h
+        utility.cpp
 )
 target_include_directories(api INTERFACE .)

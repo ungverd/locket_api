@@ -13,6 +13,7 @@ public:
     void EverySecond() override;
     void OnPillConnected(PillManager<IdOnlyState>* manager) override;
     void OnPillDisconnected() override;
+    void OnDipSwitchChanged(uint16_t dip_value_mask) override;
 
 private:
     PillManager<IdOnlyState>* pill_manager;
