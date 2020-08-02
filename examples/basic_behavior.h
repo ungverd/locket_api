@@ -17,6 +17,7 @@ public:
 
 private:
     PillManager<IdOnlyState>* pill_manager;
+    uint32_t seconds_counter = 0;
 };
 
 #endif //LOCKET_API_BASIC_BEHAVIOR_H
