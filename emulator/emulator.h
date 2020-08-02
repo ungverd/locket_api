@@ -1,7 +1,5 @@
 #ifndef LOCKET_API_EMULATOR_EMULATOR_H
 #define LOCKET_API_EMULATOR_EMULATOR_H
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "EndlessLoop"
 
 #include <atomic>
 #include <chrono>
@@ -102,5 +100,4 @@ void Emulator<PillState, RadioPacket>::Run() {
     every_second_timer.join();
 }
 
-#pragma clang diagnostic pop
 #endif //LOCKET_API_EMULATOR_EMULATOR_H
