@@ -32,6 +32,7 @@ template<typename PillState, typename RadioPacket>
 void Emulator<PillState, RadioPacket>::Run() {
     std::atomic<bool> stopping_execution = false;
 
+    behavior->OnDipSwitchChanged(dip_value);
     behavior->OnStarted();
     std::thread every_second_timer([&](){
         while (!stopping_execution) {

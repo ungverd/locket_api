@@ -33,6 +33,9 @@ public:
     //
 
     // Will be called after startup initialization is complete.
+    // Note: it is guaranteed that OnDipSwitchChanged will be called once before calling OnStarted. So you can
+    // init thing like device kind/id/etc. in OnDipSwitchChanged and then use them in OnStarted (e.g. to show different
+    // startup indications).
     virtual void OnStarted() {};
 
     // Will be called once per second.
