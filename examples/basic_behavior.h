@@ -16,7 +16,7 @@ public:
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
 
 private:
-    PillManager<IdOnlyState>* pill_manager;
+    PillManager<IdOnlyState>* pill_manager = nullptr;
     uint32_t seconds_counter = 0;
 };
 
