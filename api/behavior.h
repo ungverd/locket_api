@@ -2,6 +2,7 @@
 #define LOCKET_API_BEHAVIOR_H
 
 #include "common_states.h"
+#include "pill_manager.h"
 
 // Business logic developer needs to
 // 1) Figure out what kind of data needs to be stored on the pill and which one needs to be transmitted over radio.
@@ -23,8 +24,37 @@
 template <typename PillState = EmptyState, typename RadioPacket = EmptyState>
 class Behavior {
 public:
+    //
+    // General events
+    //
+
     // Will be called after startup initialization is complete.
     virtual void OnStarted() {};
+
+    // Will be called once per second.
+    virtual void EverySecond() {};
+
+    //
+    // Pill-related events
+    //
+    // If you only need to read pill content - just do
+    //   manager->ReadPill() in this method to get contents.
+    // If you need to read/write "later" (e.g. on button press) - define a
+    //   PillManager<PillState>* pill_manager = nullptr;
+    // member of your Behavior class, do a
+    //   pill_manager = manager;
+    // in a OnPillConnected,
+    //   pill_manager = nullptr;
+    // in OnPillDisconnected.
+    // It will give you a nice invariant - pill is connected if and only if pill_manager != nullptr. So in e.g.
+    // OnButtonPressed you can do
+    //   if (pill_manager) {
+    //     pill_manager->WritePill(...)
+    //   } else {
+    //     // Pill not connected, don't do anything/indicate an error.
+    //   }
+    virtual void OnPillConnected(PillManager<PillState>* manager) {}
+    virtual void OnPillDisconnected() {}
 };
 
 #endif //LOCKET_API_BEHAVIOR_H
