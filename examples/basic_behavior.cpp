@@ -1,5 +1,5 @@
-#include <utility.h>
 #include "basic_behavior.h"
+#include "utility.h"
 
 void BasicBehavior::OnStarted() {
     std::cout << "Started execution!" << std::endl;
