@@ -9,6 +9,7 @@
 #include <string>
 #include <thread>
 #include <mutex>
+#include <iostream>
 
 #include "behavior.h"
 #include "fake_pill_manager.h"
