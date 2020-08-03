@@ -10,15 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install ARM toolchain
+        run: sudo apt-get install gcc-arm-none-eabi
       - name: mkdir pc
         run: mkdir build_pc
       - name: cmake build pc
         run: cmake -Bbuild_pc -H.
       - name: cmake make pc
         run: cmake --build build_pc/ --target all
-      - uses: fiam/arm-none-eabi-gcc@v1
-        with:
-          release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
       - name: mkdir arm
         run: mkdir build_arm
       - name: cmake build arm
