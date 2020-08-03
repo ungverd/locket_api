@@ -3,7 +3,7 @@
 #include "player_type.h"
 #include <stdio.h>
 #include "qhsm.h"
-#include "glue.h"
+#include "Glue.h"
 
 void Player_Died(Health* me) {
     State_Save(DEAD);

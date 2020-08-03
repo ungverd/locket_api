@@ -10,9 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: mkdir
-        run: mkdir build
-      - name: cmake build
-        run: cmake -Bbuild -H.
-      - name: cmake make
-        run: cmake --build build/ --target all
+      - name: mkdir pc
+        run: mkdir build_pc
+      - name: cmake build pc
+        run: cmake -Bbuild_pc -H.
+      - name: cmake make pc
+        run: cmake --build build_pc/ --target all
+      - uses: fiam/arm-none-eabi-gcc@v1
+        with:
+          release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
+      - name: mkdir arm
+        run: mkdir build_arm
+      - name: cmake build arm
+        run: cmake -DCMAKE_TOOLCHAIN_FILE=embedded/toolchain.cmake -Bbuild_arm -H.
+      - name: cmake make arm
+        run: cmake --build build_arm/ --target all

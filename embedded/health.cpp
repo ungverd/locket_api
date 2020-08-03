@@ -3,7 +3,7 @@
 #include "eventHandlers.h"
 #include <stdint.h>
 #include "Glue.h"
-#include "Shell.h"
+#include "shell.h"
 
 
 //#include "stdio.h"
