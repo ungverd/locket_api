@@ -6,6 +6,7 @@ target_sources(api INTERFACE
         led.h
         logger.h
         pill_manager.h
+        sequences.h
         utility.h
         utility.cpp
 )
