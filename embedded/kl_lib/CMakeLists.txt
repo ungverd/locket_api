@@ -8,6 +8,7 @@ add_library(kl_lib
 )
 
 target_link_libraries(kl_lib
+  api
   chibios
 )
 

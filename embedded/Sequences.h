@@ -1,7 +1,7 @@
 /*
  * Sequences.h
  *
- *  Created on: 09 ÿíâ. 2015 ã.
+ *  Created on: 09 ï¿½ï¿½ï¿½. 2015 ï¿½.
  *      Author: Kreyl
  */
 
@@ -9,303 +9,39 @@
 
 #include "ChunkTypes.h"
 
-#if 0 // ============================ LED blink ================================
-const LedChunk_t lsqIdle[] = {
-        {csSetup, 0, clBlack},
-        {csEnd}
-};
-
-const LedChunk_t lsqError[] = {
-        {csSetup, 0, clRed},
-        {csWait, 4005},
-        {csSetup, 0, clBlack},
-        {csEnd}
-};
-
-// ======= Adding / removing IDs ========
-// ==== Access ====
-#define LSQ_ACCESS_ADD_CLR      clGreen
-#define LSQ_ACCESS_REMOVE_CLR   clRed
-const LedChunk_t lsqAddingAccessWaiting[] = {
-        {csSetup, 0, LSQ_ACCESS_ADD_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqAddingAccessNew[] = {
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, LSQ_ACCESS_ADD_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqAddingAccessError[] = {
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, LSQ_ACCESS_ADD_CLR},
-        {csEnd}
-};
-
-const LedChunk_t lsqRemovingAccessWaiting[] = {
-        {csSetup, 0, LSQ_ACCESS_REMOVE_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqRemovingAccessNew[] = {
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, LSQ_ACCESS_REMOVE_CLR},
-        {csEnd}
-};
-
-// ==== Adder ====
-#define LSQ_ADDER_ADD_CLR       clBlue
-#define LSQ_ADDER_REMOVE_CLR    clMagenta
-const LedChunk_t lsqAddingAdderWaiting[] = {
-        {csSetup, 0, LSQ_ADDER_ADD_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqAddingAdderNew[] = {
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, LSQ_ADDER_ADD_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqAddingAdderError[] = {
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, LSQ_ADDER_ADD_CLR},
-        {csEnd}
-};
-
-const LedChunk_t lsqRemovingAdderWaiting[] = {
-        {csSetup, 0, LSQ_ADDER_REMOVE_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqRemovingAdderNew[] = {
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, LSQ_ADDER_REMOVE_CLR},
-        {csEnd}
-};
-
-// ==== Remover ====
-#define LSQ_REMOVER_ADD_CLR     clCyan
-#define LSQ_REMOVER_REMOVE_CLR  clYellow
-const LedChunk_t lsqAddingRemoverWaiting[] = {
-        {csSetup, 0, LSQ_REMOVER_ADD_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqAddingRemoverNew[] = {
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, LSQ_REMOVER_ADD_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqAddingRemoverError[] = {
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, clRed},
-        {csWait, 99},
-        {csSetup, 0, clBlack},
-        {csWait, 99},
-        {csSetup, 0, LSQ_REMOVER_ADD_CLR},
-        {csEnd}
-};
-
-const LedChunk_t lsqRemovingRemoverWaiting[] = {
-        {csSetup, 0, LSQ_REMOVER_REMOVE_CLR},
-        {csEnd}
-};
-const LedChunk_t lsqRemovingRemoverNew[] = {
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, LSQ_REMOVER_REMOVE_CLR},
-        {csEnd}
-};
-
-// ==== Erase all ====
-const LedChunk_t lsqEraseAll[] = {
-        {csSetup, 0, clRed},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, clRed},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, clRed},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, clRed},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-        {csEnd}
-};
-
-// General
-const LedChunk_t lsqBlinkGreen[] = {
-        {csSetup, 0, clGreen},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-        {csEnd}
-};
-
-const LedChunk_t lsqBlinkGreenX2[] = {
-        {csSetup, 0, clGreen},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-        {csWait, 180},
-        {csSetup, 0, clGreen},
-        {csWait, 180},
-        {csSetup, 0, clBlack},
-//        {csWait, 999},
-//        {csGoto, 0}
-        {csEnd}
-};
-#endif
-
-#if 1 // ============================ LED RGB ==================================
-#define LOW_BRTNESS     4
-//const LedRGBChunk_t lsqModeTxStart[] = {
-//        {csSetup, 0, clYellow},
-//        {csWait, 207},
-//        {csSetup, 0, clBlack},
-//        {csWait, 207},
-//        {csSetup, 0, clYellow},
-//        {csWait, 207},
-//        {csSetup, 0, clBlack},
-//        {csEnd}
-//};
-
-//const LedRGBChunk_t lsqTx[] {
-//        {csSetup, 0, clYellow},
-//        {csEnd}
-//};
-
 const LedRGBChunk_t lsqStart[] = {
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 207},
-        {csSetup, 0, clGreen},
+        {csSetup, 0, kGreen},
         {csWait, 207},
-        {csSetup, 0, clBlue},
+        {csSetup, 0, kBlue},
         {csWait, 207},
-//        {csSetup, 0, clBlack},
         {csSetup, 0, {0,4,0}},
         {csEnd},
 };
 
 const LedRGBChunk_t lsqFailure[] = {
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 99},
-        {csSetup, 0, clBlack},
+        {csSetup, 0, kBlack},
         {csWait, 99},
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 99},
-        {csSetup, 0, clBlack},
+        {csSetup, 0, kBlack},
         {csWait, 99},
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 99},
-        {csSetup, 0, clBlack},
+        {csSetup, 0, kBlack},
         {csEnd}
-};
-
-const LedRGBChunk_t lsqBlinkB[] = {
-        {csSetup, 0, clBlue},
-        {csWait, 36},
-//        {csSetup, 0, clBlack},
-        {csSetup, 0, {0,4,0}},
-        {csEnd},
-};
-
-const LedRGBChunk_t lsqBlinkR[] = {
-        {csSetup, 0, clRed},
-        {csWait, 99},
-//        {csSetup, 0, clBlack},
-        {csSetup, 0, {0,4,0}},
-        {csEnd},
-};
-
-const LedRGBChunk_t lsqRx[] = {
-        {csSetup, 0, clBlue},
-        {csWait, 207},
-        {csSetup, 0, {0,7,0}},
-        {csEnd},
 };
 
 const LedRGBChunk_t lsqSearch[] = {
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 99},
-        {csSetup, 0, clBlack},
+        {csSetup, 0, kBlack},
         {csEnd},
 };
 
-// ==== Pill ====
-//const LedRGBChunk_t lsqPillCure[] = {
-//        {csSetup, 0, clGreen},
-//        {csWait, 999},
-//        {csSetup, 0, clBlack},
-//        {csEnd},
-//};
-//const LedRGBChunk_t lsqPillPanacea[] = {
-//        {csSetup, 0, clWhite},
-//        {csWait, 999},
-//        {csSetup, 0, clBlack},
-//        {csEnd},
-//};
-//const LedRGBChunk_t lsqPillBad[] = {
-//        {csSetup, 0, clRed},
-//        {csWait, 999},
-//        {csSetup, 0, clBlack},
-//        {csEnd},
-//};
-
-#endif
-
-#if 0 // =========================== LED Smooth ================================
-#define LED_TOP_BRIGHTNESS  255
-
-const LedSmoothChunk_t lsqFadeIn[] = {
-        {csSetup, 630, LED_TOP_BRIGHTNESS},
-        {csEnd}
-};
-const LedSmoothChunk_t lsqFadeOut[] = {
-        {csSetup, 630, 0},
-        {csEnd}
-};
-const LedSmoothChunk_t lsqEnterActive[] = {
-        {csSetup, 0, LED_TOP_BRIGHTNESS},
-        {csEnd}
-};
-const LedSmoothChunk_t lsqEnterIdle[] = {
-        {csSetup, 360, 0},
-        {csEnd}
-};
-
-#endif
 
 #if 1 // ============================= Beeper ==================================
 #define BEEP_VOLUME     2   // Maximum 10
@@ -481,46 +217,4 @@ const BaseChunk_t vsqCataclysm[] = {
         {csGoto, 2}
 };
 
-/*
-const BaseChunk_t vsqError[] = {
-        {csSetup, VIBRO_VOLUME},
-        {csWait, 999},
-        {csSetup, 0},
-        {csEnd}
-};
-
-const BaseChunk_t vsqSingle[] = {
-        {csSetup, VIBRO_VOLUME},
-        {csWait, VIBRO_SHORT_MS},
-        {csSetup, 0},
-        {csWait, 1800},
-        {csGoto, 0}
-};
-const BaseChunk_t vsqPair[] = {
-        {csSetup, VIBRO_VOLUME},
-        {csWait, VIBRO_SHORT_MS},
-        {csSetup, 0},
-        {csWait, 99},
-        {csSetup, VIBRO_VOLUME},
-        {csWait, VIBRO_SHORT_MS},
-        {csSetup, 0},
-        {csWait, 1350},
-        {csGoto, 0}
-};
-const BaseChunk_t vsqMany[] = {
-        {csSetup, VIBRO_VOLUME},
-        {csWait, VIBRO_SHORT_MS},
-        {csSetup, 0},
-        {csWait, 99},
-        {csSetup, VIBRO_VOLUME},
-        {csWait, VIBRO_SHORT_MS},
-        {csSetup, 0},
-        {csWait, 99},
-        {csSetup, VIBRO_VOLUME},
-        {csWait, VIBRO_SHORT_MS},
-        {csSetup, 0},
-        {csWait, 1008},
-        {csGoto, 0}
-};
-*/
 #endif

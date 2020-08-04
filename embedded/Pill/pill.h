@@ -1,7 +1,7 @@
 /*
  * pill.h
  *
- *  Created on: 22 мая 2014 г.
+ *  Created on: 22 пїЅпїЅпїЅ 2014 пїЅ.
  *      Author: g.kruglov
  */
 
@@ -10,7 +10,7 @@
 #include "color.h"
 
 //__unused
-//static const Color_t GetPillColor(PillType_t PillType) {
+//static const Color GetPillColor(PillType_t PillType) {
 //    switch(PillType) {
 //        case ptCure:      return clDarkYellow; break;
 //        case ptPanacea:   return clDarkWhite; break;

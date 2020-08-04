@@ -1,7 +1,7 @@
 /*
  * ChunkTypes.h
  *
- *  Created on: 08 ÿíâ. 2015 ã.
+ *  Created on: 08 ï¿½ï¿½ï¿½. 2015 ï¿½.
  *      Author: Kreyl
  */
 
@@ -32,19 +32,7 @@ struct BaseChunk_t {
 // RGB LED chunk
 struct LedRGBChunk_t {
     BaseChunk_Vars;
-    Color_t Color;
-} __attribute__((packed));
-
-// HSV LED chunk
-struct LedHSVChunk_t {
-    BaseChunk_Vars;
-    ColorHSV_t Color;
-} __attribute__((packed));
-
-// LED Smooth
-struct LedSmoothChunk_t {
-    BaseChunk_Vars;
-    uint8_t Brightness;
+    Color color;
 } __attribute__((packed));
 
 // Beeper

@@ -185,14 +185,14 @@ BaseChunk_t vsqSMBrr[] = {
 };
 
 LedRGBChunk_t lsqSM[] = {
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 207},
         {csSetup, 0, {0,1,0}},
         {csEnd},
 };
 
 LedRGBChunk_t lsqSMSmooth[] = {
-        {csSetup, 150, clRed},
+        {csSetup, 150, kRed},
         {csWait, 200},
         {csSetup, 150, {0,1,0}},
 		{csWait, 400},
@@ -200,7 +200,7 @@ LedRGBChunk_t lsqSMSmooth[] = {
 };
 
 LedRGBChunk_t lsqSMDeath[] = {
-        {csSetup, 0, clRed},
+        {csSetup, 0, kRed},
         {csWait, 200},
         {csSetup, 0, {0,0,0}},
 		{csWait, 600},
@@ -217,7 +217,7 @@ void FlashDeath() {
 }
 
 void Flash(unsigned int R, unsigned int G, unsigned int B, unsigned int Timeout) {
-    lsqSM[0].Color.FromRGB(R, G, B);
+    lsqSM[0].color = Color(R, G, B);
     lsqSM[1].Time_ms = Timeout;
     Led.StartOrRestart(lsqSM);
 }
@@ -233,7 +233,7 @@ void SendShining() {
 }
 
 void SetDefaultColor(uint8_t R, uint8_t G, uint8_t B) {
-    lsqSM[2].Color.FromRGB(R, G, B);
+    lsqSM[2].color = Color(R, G, B);
     Led.StartOrRestart(lsqSM);
 }
 
