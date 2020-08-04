@@ -1,9 +1,11 @@
+#include "stdout_logger.h"
 #include "basic_behavior.h"
 #include "emulator.h"
 #include "fake_led.h"
 
 int main() {
     FakeLed led;
-    BasicBehavior b(&led);
+    StdOutLogger logger;
+    BasicBehavior b(&logger, &led);
     Emulator(&b).Run();
 }

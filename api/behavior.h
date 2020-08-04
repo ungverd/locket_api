@@ -4,6 +4,7 @@
 #include "common_states.h"
 #include "led.h"
 #include "pill_manager.h"
+#include "logger.h"
 
 // Business logic developer needs to
 // 1) Decide what's the structure of data
@@ -86,6 +87,9 @@ public:
     // TODO(aeremin) Add radio handler and RadioManager member.
 
 protected:
+    // Use this to print to UART/console.
+    Logger* const logger;
+
     // Use this to control LED.
     RgbLed* const led;
 
@@ -93,7 +97,7 @@ public:
     // Concrete Behavior implementations should either inherit it by having
     //     using Behavior::Behavior;
     // in their public section, or (advanced mode) define their own constructor and call this one there.
-    Behavior(RgbLed* led): led(led) {}
+    Behavior(Logger* logger, RgbLed* led): logger(logger), led(led) {}
 };
 
 #endif //LOCKET_API_BEHAVIOR_H

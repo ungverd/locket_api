@@ -2,36 +2,35 @@
 #include "utility.h"
 
 void BasicBehavior::OnStarted() {
-    std::cout << "Started execution!" << std::endl;
+    logger->log("Started execution!");
     led->StartOrRestart(RgbLedSequence());
 }
 
 void BasicBehavior::EverySecond() {
     ++seconds_counter;
     if (seconds_counter % 30 == 0) {
-        std::cout << "30 seconds passed" << std::endl;
+        logger->log("30 seconds passed");
     }
 }
 
 void BasicBehavior::OnPillConnected(PillManager<IdOnlyState>* manager) {
     pill_manager = manager;
-    std::cout << "Read value " << pill_manager->ReadPill().id << " from pill" << std::endl;
+    logger->log("Read value %d from pill", pill_manager->ReadPill().id);
 }
 
 void BasicBehavior::OnPillDisconnected() {
-    std::cout << "Pill was disconnected" << std::endl;
+    logger->log("Pill was disconnected");
     pill_manager = nullptr;
 }
 
 void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
-    std::cout << "DIP switch changed to "
-              << GetSwitchState(dip_value_mask, 1)
-              << GetSwitchState(dip_value_mask, 2)
-              << GetSwitchState(dip_value_mask, 3)
-              << GetSwitchState(dip_value_mask, 4)
-              << GetSwitchState(dip_value_mask, 5)
-              << GetSwitchState(dip_value_mask, 6)
-              << GetSwitchState(dip_value_mask, 7)
-              << GetSwitchState(dip_value_mask, 8)
-              << std::endl;
+    logger->log("DIP switch changed to %d%d%d%d%d%d%d%d",
+                GetSwitchState(dip_value_mask, 1),
+                GetSwitchState(dip_value_mask, 2),
+                GetSwitchState(dip_value_mask, 3),
+                GetSwitchState(dip_value_mask, 4),
+                GetSwitchState(dip_value_mask, 5),
+                GetSwitchState(dip_value_mask, 6),
+                GetSwitchState(dip_value_mask, 7),
+                GetSwitchState(dip_value_mask, 8));
 }
