@@ -19,7 +19,7 @@ jobs:
       - name: cmake make pc
         run: cmake --build build_pc/ --target all
       - name: run unit tests
-        run: ctest ./build_pc
+        run: cd build_pc && ctest
       - name: mkdir arm
         run: mkdir build_arm
       - name: cmake build arm
