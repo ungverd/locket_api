@@ -6,9 +6,17 @@
 #include "pill_manager.h"
 
 // Business logic developer needs to
-// 1) Figure out what kind of data needs to be stored on the pill and which one needs to be transmitted over radio.
-//    See common_states.h for the examples.
+// 1) Decide what's the structure of data
+//    - Stored on the pill.
+//    - Transmitted over radio.
+//    See common_states.h for the examples struct's.
 //    If something more complex is needed - define your own struct (e.g. ThatGamePillState).
+//    Note: only fixed-size data is allowed in those structs:
+//    - int32_t id - good, 32 bits of data.
+//    - int8_t stuff[3] - good, 24 bits of data.
+//    - std::vector<int8_t> v - bad.
+//    - std::string s - bad (but you can potentially use 'char s[10]' if string size is limited to 10).
+//    - int8_t* something - bad.
 // 2) Create a class implementing Behavior interface, e.g.
 //    class ThatGameBehavior: public Behavior<ThatGamePillState, EmptyState> {
 //    public:
