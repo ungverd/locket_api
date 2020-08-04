@@ -1,5 +1,6 @@
 add_library(api INTERFACE)
 target_sources(api INTERFACE
+        color.h
         common_states.h
         behavior.h
         led.h
