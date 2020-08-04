@@ -6,7 +6,9 @@
 struct Color {
 public:
     uint8_t r = 0, g = 0, b = 0;
+    Color() {}
     Color(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+
 
     void Adjust(const Color &color) {
         AdjustComponent(r, color.r);
@@ -38,6 +40,11 @@ private:
         }
     }
 } __attribute__((packed));
+
+const Color kBlack = {0, 0, 0};
+const Color kRed = {255, 0, 0};
+const Color kGreen = {0, 255, 0};
+const Color kBlue = {0, 0, 255};
 
 #endif //LOCKET_API_COLOR_H
 

@@ -22,4 +22,30 @@ struct LedRGBChunk: BaseChunk {
 } __attribute__((packed));
 
 
+const LedRGBChunk kStartSequence[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, {0, 4, 0}},
+        {ChunkType::kEnd},
+};
+
+const LedRGBChunk kFailureSequence[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 99},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 99},
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 99},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 99},
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 99},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kEnd}
+};
+
 #endif //LOCKET_API_SEQUENCES_H
