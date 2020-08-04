@@ -7,40 +7,11 @@
 
 #pragma once
 
+#include <sequences.h>
 #include "color.h"
 #include "ch.h"
 #include "MsgQ.h"
-
-enum ChunkSort_t {csSetup, csWait, csGoto, csEnd, csRepeat};
-
-// The beginning of any sort of chunk. Everyone must contain it.
-#define BaseChunk_Vars \
-    ChunkSort_t ChunkSort;          \
-    union {                         \
-        uint32_t Value;             \
-        uint32_t Volume;            \
-        uint32_t Time_ms;           \
-        uint32_t ChunkToJumpTo;     \
-        int32_t RepeatCnt;          \
-    }
-
-// ==== Different types of chunks ====
-struct BaseChunk_t {
-    BaseChunk_Vars;
-};
-
-// RGB LED chunk
-struct LedRGBChunk_t {
-    BaseChunk_Vars;
-    Color color;
-} __attribute__((packed));
-
-// Beeper
-struct BeepChunk_t {   // Value == Volume
-    BaseChunk_Vars;
-    uint16_t Freq_Hz;
-} __attribute__((packed));
-
+#include "sequences_collection.h"
 
 #if 1 // ====================== Base sequencer class ===========================
 enum SequencerLoopTask_t {sltProceed, sltBreak};
@@ -60,13 +31,13 @@ protected:
     void IIrqHandler() {
         if(chVTIsArmedI(&ITmr)) chVTResetI(&ITmr);  // Reset timer
         while(true) {   // Process the sequence
-            switch(IPCurrentChunk->ChunkSort) {
-                case csSetup: // setup now and exit if required
+            switch(IPCurrentChunk->type) {
+                case ChunkType::kSetup: // setup now and exit if required
                     if(ISetup() == sltBreak) return;
                     break;
 
-                case csWait: { // Start timer, pointing to next chunk
-                        uint32_t Delay = IPCurrentChunk->Time_ms;
+                case ChunkType::kWait: { // Start timer, pointing to next chunk
+                        uint32_t Delay = IPCurrentChunk->time_ms;
                         IPCurrentChunk++;
                         if(Delay != 0) {
                             SetupDelay(Delay);
@@ -75,22 +46,22 @@ protected:
                     }
                     break;
 
-                case csGoto:
-                    IPCurrentChunk = IPStartChunk + IPCurrentChunk->ChunkToJumpTo;
+                case ChunkType::kGoto:
+                    IPCurrentChunk = IPStartChunk + IPCurrentChunk->chunk_to_jump_to;
                     if(IEvtMsg.ID != evtIdNone) EvtQMain.SendNowOrExitI(IEvtMsg);
                     SetupDelay(1);
                     return;
                     break;
 
-                case csEnd:
+                case ChunkType::kEnd:
                     if(IEvtMsg.ID != evtIdNone) EvtQMain.SendNowOrExitI(IEvtMsg);
                     IPStartChunk = nullptr;
                     IPCurrentChunk = nullptr;
                     return;
                     break;
 
-                case csRepeat:
-                    if(RepeatCounter == -1) RepeatCounter = IPCurrentChunk->RepeatCnt;
+                case ChunkType::kRepeat:
+                    if(RepeatCounter == -1) RepeatCounter = IPCurrentChunk->repeat_count;
                     if(RepeatCounter == 0) {    // All was repeated, goto next
                         RepeatCounter = -1;     // reset counter
                         IPCurrentChunk++;

@@ -13,7 +13,7 @@
 
 #include "led.h"
 #include "beeper.h"
-#include "Sequences.h"
+#include "sequences_collection.h"
 #include "Glue.h"
 
 extern LedRGBwPower_t Led;

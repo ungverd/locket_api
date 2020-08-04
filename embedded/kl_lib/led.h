@@ -13,7 +13,7 @@
 #include "uart.h"
 #include "kl_lib.h"
 
-class LedRGBParent_t : public BaseSequencer_t<LedRGBChunk_t> {
+class LedRGBParent_t : public BaseSequencer_t<LedRGBChunk> {
 protected:
     const PinOutputPWM_t  R, G, B;
     const uint32_t PWMFreq;
@@ -24,7 +24,7 @@ protected:
     }
     SequencerLoopTask_t ISetup() {
         if(ICurrColor != IPCurrentChunk->color) {
-            if(IPCurrentChunk->Value == 0) {     // If smooth time is zero,
+            if(IPCurrentChunk->value == 0) {     // If smooth time is zero,
                 SetColor(IPCurrentChunk->color); // set color now,
                 ICurrColor = IPCurrentChunk->color;
                 IPCurrentChunk++;                // and goto next chunk
@@ -36,7 +36,7 @@ protected:
                 if(ICurrColor == IPCurrentChunk->color) IPCurrentChunk++;
                 else { // Not completed
                     // Calculate time to next adjustment
-                    uint32_t Delay = ICurrColor.DelayToNextAdjustment(IPCurrentChunk->color, IPCurrentChunk->Value);
+                    uint32_t Delay = ICurrColor.DelayToNextAdjustment(IPCurrentChunk->color, IPCurrentChunk->value);
                     SetupDelay(Delay);
                     return sltBreak;
                 } // Not completed

@@ -1,7 +1,7 @@
 /*
  * vibro.h
  *
- *  Created on: 26-04-2015 ã.
+ *  Created on: 26-04-2015 ï¿½.
  *      Author: Kreyl
  */
 
@@ -11,12 +11,12 @@
 #include "ChunkTypes.h"
 #include "board.h"
 
-class Vibro_t : public BaseSequencer_t<BaseChunk_t> {
+class Vibro_t : public BaseSequencer_t<BaseChunk> {
 private:
     const PinOutputPWM_t IPin;
     void ISwitchOff() { IPin.Set(0); }
     SequencerLoopTask_t ISetup() {
-        IPin.Set(IPCurrentChunk->Volume);
+        IPin.Set(IPCurrentChunk->volume);
         IPCurrentChunk++;   // Always goto next
         return sltProceed;  // Always proceed
     }

@@ -18,9 +18,13 @@ struct BaseChunk {
 } __attribute__((packed));
 
 struct LedRGBChunk: BaseChunk {
-    Color Color;
+    Color color;
 } __attribute__((packed));
 
+struct BeepChunk: BaseChunk {
+    // Value == Volume
+    uint16_t freq_hz;
+} __attribute__((packed));
 
 const LedRGBChunk kStartSequence[] = {
         {ChunkType::kSetup, 0, kRed},

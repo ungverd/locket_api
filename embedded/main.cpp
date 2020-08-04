@@ -2,7 +2,7 @@
 #include "led.h"
 #include "vibro.h"
 #include "beeper.h"
-#include "Sequences.h"
+#include "sequences_collection.h"
 #include "radio_lvl1.h"
 #include "kl_i2c.h"
 #include "kl_lib.h"
@@ -177,34 +177,34 @@ void CheckRxData() {
     }
 }
 
-BaseChunk_t vsqSMBrr[] = {
-        {csSetup, VIBRO_VOLUME},
-        {csWait, 99},
-        {csSetup, 0},
-        {csEnd}
+BaseChunk vsqSMBrr[] = {
+        {ChunkType::kSetup, VIBRO_VOLUME},
+        {ChunkType::kWait, 99},
+        {ChunkType::kSetup, 0},
+        {ChunkType::kEnd}
 };
 
-LedRGBChunk_t lsqSM[] = {
-        {csSetup, 0, kRed},
-        {csWait, 207},
-        {csSetup, 0, {0,1,0}},
-        {csEnd},
+LedRGBChunk lsqSM[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, {0,1,0}},
+        {ChunkType::kEnd},
 };
 
-LedRGBChunk_t lsqSMSmooth[] = {
-        {csSetup, 150, kRed},
-        {csWait, 200},
-        {csSetup, 150, {0,1,0}},
-		{csWait, 400},
-		{csEnd},
+LedRGBChunk lsqSMSmooth[] = {
+        {ChunkType::kSetup, 150, kRed},
+        {ChunkType::kWait, 200},
+        {ChunkType::kSetup, 150, {0,1,0}},
+		{ChunkType::kWait, 400},
+		{ChunkType::kEnd},
 };
 
-LedRGBChunk_t lsqSMDeath[] = {
-        {csSetup, 0, kRed},
-        {csWait, 200},
-        {csSetup, 0, {0,0,0}},
-		{csWait, 600},
-        {csEnd},
+LedRGBChunk lsqSMDeath[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 200},
+        {ChunkType::kSetup, 0, {0,0,0}},
+		{ChunkType::kWait, 600},
+        {ChunkType::kEnd},
 };
 
 
@@ -218,12 +218,12 @@ void FlashDeath() {
 
 void Flash(unsigned int R, unsigned int G, unsigned int B, unsigned int Timeout) {
     lsqSM[0].color = Color(R, G, B);
-    lsqSM[1].Time_ms = Timeout;
+    lsqSM[1].time_ms = Timeout;
     Led.StartOrRestart(lsqSM);
 }
 
 void Vibro(unsigned int Timeout) {
-    vsqSMBrr[1].Time_ms = Timeout;
+    vsqSMBrr[1].time_ms = Timeout;
     VibroMotor.StartOrRestart(vsqSMBrr);
 }
 

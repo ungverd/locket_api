@@ -1,7 +1,7 @@
 /*
  * beeper.h
  *
- *  Created on: 22 марта 2015 г.
+ *  Created on: 22 пїЅпїЅпїЅпїЅпїЅ 2015 пїЅ.
  *      Author: Kreyl
  */
 
@@ -10,13 +10,13 @@
 #include "ChunkTypes.h"
 #include "kl_lib.h"
 
-class Beeper_t : public BaseSequencer_t<BeepChunk_t> {
+class Beeper_t : public BaseSequencer_t<BeepChunk> {
 private:
     const PinOutputPWM_t IPin;
     void ISwitchOff() { IPin.Set(0); }
     SequencerLoopTask_t ISetup() {
-        IPin.SetFrequencyHz(IPCurrentChunk->Freq_Hz);
-        IPin.Set(IPCurrentChunk->Volume);
+        IPin.SetFrequencyHz(IPCurrentChunk->freq_hz);
+        IPin.Set(IPCurrentChunk->volume);
         IPCurrentChunk++;   // Always goto next
         return sltProceed;  // Always proceed
     }
