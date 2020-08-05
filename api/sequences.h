@@ -1,5 +1,7 @@
 #ifndef LOCKET_API_SEQUENCES_H
 #define LOCKET_API_SEQUENCES_H
+// Sequences to control RGB LED (for now) and vibro/beeper (in future).
+// See example sequences in the end of file.
 
 #include <cstdint>
 #include "color.h"
@@ -17,10 +19,12 @@ struct BaseChunk {
     };
 } __attribute__((packed));
 
+// Chunk to control RGB LED
 struct LedRGBChunk: BaseChunk {
     Color color;
 } __attribute__((packed));
 
+// Chunk to control beeper
 struct BeepChunk: BaseChunk {
     // Value == Volume
     uint16_t freq_hz;

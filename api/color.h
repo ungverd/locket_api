@@ -1,6 +1,9 @@
 #ifndef LOCKET_API_COLOR_H
 #define LOCKET_API_COLOR_H
 
+// Simple implementation of RGB color.
+// See end of file for constants for standard colors.
+
 #include <cstdint>
 #include <algorithm>
 
