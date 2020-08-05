@@ -3,7 +3,7 @@
 
 void BasicBehavior::OnStarted() {
     logger->log("Started execution!");
-    led->StartOrRestart(RgbLedSequence());
+    led->StartOrRestart(kStartSequence);
 }
 
 void BasicBehavior::EverySecond() {

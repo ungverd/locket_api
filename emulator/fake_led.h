@@ -5,7 +5,7 @@
 
 class FakeLed: public RgbLed {
 public:
-    void StartOrRestart(const RgbLedSequence &sequence) override;
+    void StartOrRestart(const LedRGBChunk* sequence) override;
 };
 
 #endif //LOCKET_API_EMULATOR_FAKE_LED_H

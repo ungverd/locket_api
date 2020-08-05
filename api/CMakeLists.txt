@@ -10,4 +10,4 @@ target_sources(api INTERFACE
         utility.h
         utility.cpp
 )
-target_include_directories(api INTERFACE .)
+target_include_directories(api INTERFACE . ..)

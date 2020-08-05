@@ -5,24 +5,23 @@
 #include "try_giganda.h"
 #include "utility.h"
 
-const RgbLedSequence StartLedSequence;
-const RgbLedSequence ConnectLedSequence;
+const LedRGBChunk StartLedSequence[] = {ChunkType::kEnd};
+const LedRGBChunk ConnectLedSequence[] = {ChunkType::kEnd};
 
 //stub player state sequences
-const RgbLedSequence AccelerateSequence;
-const RgbLedSequence RegenerateSequence;
-const RgbLedSequence RefrigerateSequence;
-const RgbLedSequence BombSequence;
-const RgbLedSequence WrongSequence;
+const LedRGBChunk AccelerateSequence[] = {ChunkType::kEnd};
+const LedRGBChunk RegenerateSequence[] = {ChunkType::kEnd};
+const LedRGBChunk RefrigerateSequence[] = {ChunkType::kEnd};
+const LedRGBChunk BombSequence[] = {ChunkType::kEnd};
+const LedRGBChunk WrongSequence[] = {ChunkType::kEnd};
 
 // stub master sequences
-const RgbLedSequence EmptyMasterSequence;
-const RgbLedSequence AccelerateMasterSequence;
-const RgbLedSequence RegenerateMasterSequence;
-const RgbLedSequence RefrigerateMasterSequence;
-const RgbLedSequence LightMasterSequence;
-const RgbLedSequence BombMasterSequence;
-
+const LedRGBChunk EmptyMasterSequence[] = {ChunkType::kEnd};
+const LedRGBChunk AccelerateMasterSequence[] = {ChunkType::kEnd};
+const LedRGBChunk RegenerateMasterSequence[] = {ChunkType::kEnd};
+const LedRGBChunk RefrigerateMasterSequence[] = {ChunkType::kEnd};
+const LedRGBChunk LightMasterSequence[] = {ChunkType::kEnd};
+const LedRGBChunk BombMasterSequence[] = {ChunkType::kEnd};
 
 void GigandaBehavior::OnPillConnected(PillManager<IdOnlyState> *manager) {
     pill_manager = manager;

@@ -6,6 +6,7 @@ add_subdirectory(os)
 add_subdirectory(kl_lib)
 add_subdirectory(Radio)
 add_subdirectory(Pill)
+add_subdirectory(wrappers)
 
 add_executable(Locket_fw.elf
   ability.cpp
