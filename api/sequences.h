@@ -33,7 +33,7 @@ const LedRGBChunk kStartSequence[] = {
         {ChunkType::kWait, 207},
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait, 207},
-        {ChunkType::kSetup, 0, {0, 4, 0}},
+        {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kEnd},
 };
 
