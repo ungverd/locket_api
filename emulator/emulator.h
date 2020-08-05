@@ -30,16 +30,6 @@ template<typename PillState, typename RadioPacket>
 void Emulator<PillState, RadioPacket>::Run() {
     std::atomic<bool> stopping_execution = false;
 
-    behavior->OnDipSwitchChanged(dip_value);
-    behavior->OnStarted();
-    std::thread every_second_timer([&](){
-        while (!stopping_execution) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            std::lock_guard l(behavior_mutex);
-            behavior->EverySecond();
-        }
-    });
-
     std::cout << "Execution started. Supported commands: \n";
     std::cout << "  General commands: \n";
     std::cout << "    quit - stops emulator \n";
@@ -53,6 +43,15 @@ void Emulator<PillState, RadioPacket>::Run() {
     std::cout << "    dip <number 1-8> <number 0-1> - Simulates setting switch on position specified by first argument \n";
     std::cout << "                                    to state specified by the second argument \n";
 
+    behavior->OnDipSwitchChanged(dip_value);
+    behavior->OnStarted();
+    std::thread every_second_timer([&](){
+        while (!stopping_execution) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::lock_guard l(behavior_mutex);
+            behavior->EverySecond();
+        }
+    });
 
     std::string user_input;
     while(user_input != "q" && user_input != "quit"){
