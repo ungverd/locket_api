@@ -1,4 +1,3 @@
-* Implement sequences
 * Add missing handlers/interfaces to the Behavior. 
 * Add unit-tests.
 * Add README.md
