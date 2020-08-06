@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="giganda.elf" type="com.jetbrains.cidr.embedded.openocd.conf.type" factoryName="com.jetbrains.cidr.embedded.openocd.conf.factory" nameIsGenerated="true" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="locket_api" TARGET_NAME="giganda.elf" CONFIG_NAME="Debug ARM native" RUN_TARGET_PROJECT_NAME="locket_api" RUN_TARGET_NAME="giganda.elf">
+    <openocd gdb-port="3333" telnet-port="4444" board-config="D:\Dev\hardware\STM32\locket_api\embedded\openocd.cfg" reset-type="INIT" download-type="ALWAYS" />
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

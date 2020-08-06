@@ -6,6 +6,7 @@
 // Interface allowing to control RGB LED.
 class RgbLed {
 public:
+    virtual ~RgbLed() {};
     virtual void StartOrRestart(const LedRGBChunk* sequence) = 0;
 };
 
