@@ -2,7 +2,6 @@
 #define LOCKET_API_BASIC_BEHAVIOR_H
 
 #include "pill_manager.h"
-#include <iostream>
 #include "behavior.h"
 
 class BasicBehavior: public Behavior<IdOnlyState, IdOnlyState> {
