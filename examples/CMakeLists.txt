@@ -15,7 +15,7 @@ else()
     set(CMAKE_C_FLAGS   "-mthumb -mcpu=cortex-m3 -std=gnu11 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -MMD -MP -specs=nano.specs")
     set(CMAKE_ASM_FLAGS "-mthumb -mcpu=cortex-m3 -g -Wa,--warn -x assembler-with-cpp -specs=nano.specs")
 
-    add_executable(giganda.elf giganda_main.cpp)
+    add_executable(giganda.elf giganda_firmware.cpp)
     target_link_libraries(giganda.elf giganda_behaviour behavior_runner)
 
     set_target_properties(giganda.elf PROPERTIES LINK_FLAGS
