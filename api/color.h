@@ -69,7 +69,11 @@ private:
 const Color kBlack = {0, 0, 0};
 const Color kRed = {255, 0, 0};
 const Color kGreen = {0, 255, 0};
+const Color kLightGreen = {0, 127, 0};
 const Color kBlue = {0, 0, 255};
+const Color kYellow = {255, 255, 0};
+const Color kMagenta = {255, 0, 255};
+const Color kWhite = {255, 255, 255};
 
 #endif //LOCKET_API_COLOR_H
 

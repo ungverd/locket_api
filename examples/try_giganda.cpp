@@ -5,36 +5,108 @@
 #include "try_giganda.h"
 #include "utility.h"
 
-const LedRGBChunk StartLedSequence[] = {ChunkType::kEnd};
-const LedRGBChunk ConnectLedSequence[] = {ChunkType::kEnd};
+
+const LedRGBChunk StartOnceLedSequence[] = {
+        {ChunkType::kSetup, 0, kLightGreen},
+        {ChunkType::kWait, 1000},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk ConnectOnceLedSequence[] = {
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+
+const LedRGBChunk OffSequence[] = {
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 1000},
+        {ChunkType::kEnd}
+};
 
 //stub player state sequences
-const LedRGBChunk AccelerateSequence[] = {ChunkType::kEnd};
-const LedRGBChunk RegenerateSequence[] = {ChunkType::kEnd};
-const LedRGBChunk RefrigerateSequence[] = {ChunkType::kEnd};
-const LedRGBChunk BombSequence[] = {ChunkType::kEnd};
-const LedRGBChunk WrongSequence[] = {ChunkType::kEnd};
+const LedRGBChunk AccelerateSequence[] = {
+        {ChunkType::kSetup, 0, kYellow},
+        {ChunkType::kWait, 1000},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk RegenerateSequence[] = {
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 1000},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+
+const LedRGBChunk RefrigerateSequence[] = {
+        {ChunkType::kSetup, 0, kMagenta},
+        {ChunkType::kWait, 500},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd},
+};
+
+const LedRGBChunk BombSequence[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 500},
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 500},
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk WrongOnceSequence[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
 
 // stub master sequences
-const LedRGBChunk EmptyMasterSequence[] = {ChunkType::kEnd};
-const LedRGBChunk AccelerateMasterSequence[] = {ChunkType::kEnd};
-const LedRGBChunk RegenerateMasterSequence[] = {ChunkType::kEnd};
-const LedRGBChunk RefrigerateMasterSequence[] = {ChunkType::kEnd};
-const LedRGBChunk LightMasterSequence[] = {ChunkType::kEnd};
-const LedRGBChunk BombMasterSequence[] = {ChunkType::kEnd};
+const LedRGBChunk EmptyMasterSequence[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk AccelerateMasterSequence[] = {
+        {ChunkType::kSetup, 0, kYellow},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk RegenerateMasterSequence[] = {
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk RefrigerateMasterSequence[] = {
+        {ChunkType::kSetup, 0, kMagenta},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk LightMasterSequence[] = {
+        {ChunkType::kSetup, 0, kWhite},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
+const LedRGBChunk BombMasterSequence[] = {
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, 500},
+        {ChunkType::kEnd}
+};
 
 void GigandaBehavior::OnPillConnected(PillManager<IdOnlyState> *manager) {
     pill_manager = manager;
-    led->StartOrRestart(ConnectLedSequence);
+    led->StartOrRestart(ConnectOnceLedSequence);
+    led->StartOrRestart(OffSequence);
 }
 
 void GigandaBehavior::OnPillDisconnected() {
     pill_manager = nullptr;
-    led->StartOrRestart(StartLedSequence);
+    led->StartOrRestart(StartOnceLedSequence);
+    led->StartOrRestart(OffSequence);
 }
 
 void GigandaBehavior::OnStarted() {
-    led->StartOrRestart(StartLedSequence);
+    led->StartOrRestart(StartOnceLedSequence);
+    led->StartOrRestart(OffSequence);
     // мы считаем, что здесь вызвался OnDipSwitchChanged
 }
 
@@ -80,7 +152,8 @@ void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
                     state_timer = BOMB_S;
                 }
                 default: {
-                    led->StartOrRestart(WrongSequence);
+                    led->StartOrRestart(WrongOnceSequence);
+                    led->StartOrRestart(OffSequence);
                 }
             }
         }
