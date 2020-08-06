@@ -20,4 +20,11 @@ else()
 
     set_target_properties(giganda.elf PROPERTIES LINK_FLAGS
             "-T ${CMAKE_CURRENT_SOURCE_DIR}/../embedded/STM32L151x8.ld -T ${CMAKE_CURRENT_SOURCE_DIR}/../embedded/rules.ld -static -Wl,-cref,-u,Reset_Handler -Wl,-Map=giganda.map -Wl,--gc-sections -Wl,--defsym=malloc_getpagesize_P=0x1000 -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group")
+
+    add_executable(basic_behavior.elf basic_behavior_firmware.cpp)
+    target_link_libraries(basic_behavior.elf basic_behavior behavior_runner)
+
+    set_target_properties(basic_behavior.elf PROPERTIES LINK_FLAGS
+            "-T ${CMAKE_CURRENT_SOURCE_DIR}/../embedded/STM32L151x8.ld -T ${CMAKE_CURRENT_SOURCE_DIR}/../embedded/rules.ld -static -Wl,-cref,-u,Reset_Handler -Wl,-Map=basic_behavior.map -Wl,--gc-sections -Wl,--defsym=malloc_getpagesize_P=0x1000 -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group")
+
 endif()
