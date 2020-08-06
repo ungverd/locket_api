@@ -86,6 +86,10 @@ public:
     // TODO(aeremin) Add interface with interacting with beeper.
     // TODO(aeremin) Add radio handler and RadioManager member.
 
+    // Internal: This is needed for BehaviorRunner to work.
+    using PillStateParameter = PillState;
+    using RadioPacketParameter = RadioPacket;
+
 protected:
     // Use this to print to UART/console.
     Logger* const logger;

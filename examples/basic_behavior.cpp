@@ -28,6 +28,11 @@ void BasicBehavior::OnPillDisconnected() {
 }
 
 void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
+    if (GetSwitchState(dip_value_mask, 1)) {
+        led->StartOrRestart(kStartSequence);
+    } else {
+        led->StartOrRestart(kFailureSequence);
+    }
     logger->log("DIP switch changed to %d%d%d%d%d%d%d%d",
                 GetSwitchState(dip_value_mask, 1),
                 GetSwitchState(dip_value_mask, 2),

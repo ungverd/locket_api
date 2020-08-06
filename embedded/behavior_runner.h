@@ -31,51 +31,87 @@ LoggerWrapper loggerWrapper;
 // ==== Timers ====
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
+uint8_t ReadDipSwitch();
+
+
+// BehaviorType must be subtype of Behavior
 template<typename BehaviorType>
-[[noreturn]] void Run() {
-    // ==== Init Vcore & clock system ====
-    SetupVCore(vcore1V5);
-    Clk.SetMSI4MHz();
-    Clk.UpdateFreqValues();
+class BehaviorRunner {
+private:
+    Behavior<typename BehaviorType::PillStateParameter,
+            typename BehaviorType::RadioPacketParameter>* behavior = nullptr;
+public:
+    [[noreturn]] void Run() {
+        // ==== Init Vcore & clock system ====
+        SetupVCore(vcore1V5);
+        Clk.SetMSI4MHz();
+        Clk.UpdateFreqValues();
 
-    // === Init OS ===
-    halInit(Clk.APB1FreqHz);
-    chSysInit();
-    EvtQMain.Init();
+        // === Init OS ===
+        halInit(Clk.APB1FreqHz);
+        chSysInit();
+        EvtQMain.Init();
 
-    // ==== Init hardware ====
-    Uart.Init();
-    //ReadIDfromEE();
-    //Printf("\r%S %S; ID=%u\r", APP_NAME, XSTRINGIFY(BUILD_TIME), ID);
-    Clk.PrintFreqs();
+        // ==== Init hardware ====
+        Uart.Init();
+        //ReadIDfromEE();
+        //Printf("\r%S %S; ID=%u\r", APP_NAME, XSTRINGIFY(BUILD_TIME), ID);
+        Clk.PrintFreqs();
 
-    Led.Init();
-    VibroMotor.Init();
-    Beeper.Init();
-    Beeper.StartOrRestart(bsqBeepBeep);
-    SimpleSensors::Init();
+        Led.Init();
+        VibroMotor.Init();
+        Beeper.Init();
+        Beeper.StartOrRestart(bsqBeepBeep);
+        SimpleSensors::Init();
 
-    i2c1.Init();
-    PillMgr.Init();
+        i2c1.Init();
+        PillMgr.Init();
 
-    // ==== Time and timers ====
-    TmrEverySecond.StartOrRestart();
+        // ==== Time and timers ====
+        TmrEverySecond.StartOrRestart();
 
-    // ==== Radio ====
-    Radio.Init();
+        // ==== Radio ====
+        Radio.Init();
 
-    BehaviorType behavior(&loggerWrapper, &ledWrapper);
-    behavior.OnStarted();
+        behavior = new BehaviorType(&loggerWrapper, &ledWrapper);
+        CheckDipSwitch();
+        behavior->OnStarted();
 
-    while(true) {
-        EvtMsg_t Msg = EvtQMain.Fetch(TIME_INFINITE);
-        switch(Msg.ID) {
-            case evtIdEverySecond:
-                PillMgr.Check();
-                behavior.EverySecond();
-                break;
+        while (true) {
+            EvtMsg_t Msg = EvtQMain.Fetch(TIME_INFINITE);
+            switch (Msg.ID) {
+                case evtIdEverySecond:
+                    PillMgr.Check();
+                    CheckDipSwitch();
+                    behavior->EverySecond();
+                    break;
+            }
         }
     }
+
+    void CheckDipSwitch() {
+        static uint32_t previous_dip_value = 0xFFFF;
+        uint8_t current_dip_value = ReadDipSwitch();
+        if(current_dip_value != previous_dip_value) {
+            behavior->OnDipSwitchChanged(current_dip_value);
+            previous_dip_value = current_dip_value;
+        }
+    }
+};
+
+
+uint8_t ReadDipSwitch() {
+    const PinInputSetup_t dip_switch_pins[DIP_SW_CNT] =
+            {DIP_SW1, DIP_SW2, DIP_SW3, DIP_SW4, DIP_SW5, DIP_SW6, DIP_SW7, DIP_SW8 };
+    uint8_t result = 0;
+    for(int i=0; i<DIP_SW_CNT; i++) PinSetupInput(dip_switch_pins[i].PGpio,
+                                                  dip_switch_pins[i].Pin,
+                                                  dip_switch_pins[i].PullUpDown);
+    for(int i=0; i<DIP_SW_CNT; i++) {
+        if(!PinIsHi(dip_switch_pins[i].PGpio, dip_switch_pins[i].Pin)) result |= (1 << i);
+        PinSetupAnalog(dip_switch_pins[i].PGpio, dip_switch_pins[i].Pin);
+    }
+    return result;
 }
 
 #endif //LOCKET_API_BEHAVIOR_RUNNER_H

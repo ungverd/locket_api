@@ -2,5 +2,5 @@
 #include "behavior_runner.h"
 
 int main() {
-    Run<BasicBehavior>();
+    BehaviorRunner<BasicBehavior>().Run();
 }
