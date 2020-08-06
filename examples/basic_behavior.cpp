@@ -16,6 +16,28 @@ const LedRGBChunk kButtonSequence[] = {
         {ChunkType::kEnd},
 };
 
+const LedRGBChunk kPillConnectedSequence[] = {
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kEnd},
+};
+
+const LedRGBChunk kPillDisconnectedSequence[] = {
+        {ChunkType::kSetup, 0, kGreen},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kEnd},
+};
+
 
 void BasicBehavior::OnStarted() {
     logger->log("Started execution!");
@@ -36,11 +58,13 @@ void BasicBehavior::EverySecond() {
 void BasicBehavior::OnPillConnected(PillManager<IdOnlyState>* manager) {
     pill_manager = manager;
     logger->log("Read value %d from pill", pill_manager->ReadPill().id);
+    led->StartOrRestart(kPillConnectedSequence);
 }
 
 void BasicBehavior::OnPillDisconnected() {
     logger->log("Pill was disconnected");
     pill_manager = nullptr;
+    led->StartOrRestart(kPillDisconnectedSequence);
 }
 
 void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {

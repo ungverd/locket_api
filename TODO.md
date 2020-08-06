@@ -1,4 +1,3 @@
-* Call OnPillConnected/OnPillDisconnected in BehaviorRunner
 * Add missing handlers/interfaces to the Behavior. 
 * Add unit-tests.
 * Add README.md

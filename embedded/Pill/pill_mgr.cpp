@@ -65,7 +65,7 @@ uint8_t PillMgr_t::Read(uint8_t MemAddr, void *Ptr, uint32_t Length) {
     return Rslt;
 }
 
-uint8_t PillMgr_t::Write(uint8_t MemAddr, void *Ptr, uint32_t Length) {
+uint8_t PillMgr_t::Write(uint8_t MemAddr, const void *Ptr, uint32_t Length) {
     uint8_t *p8 = (uint8_t*)Ptr;
     Resume();
     // Write page by page

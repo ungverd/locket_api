@@ -2,6 +2,7 @@
 #define LOCKET_API_BEHAVIOR_RUNNER_H
 
 #include <embedded/wrappers/logger_wrapper.h>
+#include <embedded/wrappers/pill_manager_wrapper.h>
 #include "board.h"
 
 #include "embedded/wrappers/rgb_led_wrapper.h"
@@ -28,6 +29,7 @@ LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
 LoggerWrapper loggerWrapper;
 
+
 // ==== Timers ====
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
@@ -40,6 +42,7 @@ class BehaviorRunner {
 private:
     Behavior<typename BehaviorType::PillStateParameter,
             typename BehaviorType::RadioPacketParameter>* behavior = nullptr;
+    PillManagerWrapper<typename BehaviorType::PillStateParameter> pill_manager_wrapper{&PillMgr};
 public:
     [[noreturn]] void Run() {
         // ==== Init Vcore & clock system ====
@@ -90,6 +93,14 @@ public:
                     if(Msg.BtnEvtInfo.Type == beShortPress) {
                         behavior->OnButtonPressed(Msg.BtnEvtInfo.BtnID[0]);
                     }
+                    break;
+
+                case evtIdPillConnected:
+                    behavior->OnPillConnected(&pill_manager_wrapper);
+                    break;
+
+                case evtIdPillDisconnected:
+                    behavior->OnPillDisconnected();
                     break;
             }
         }
