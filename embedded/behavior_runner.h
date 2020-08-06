@@ -85,6 +85,12 @@ public:
                     CheckDipSwitch();
                     behavior->EverySecond();
                     break;
+                case evtIdButtons:
+                    // TODO(aeremin) Support other button events - long presses, double-clicks, combos, etc.
+                    if(Msg.BtnEvtInfo.Type == beShortPress) {
+                        behavior->OnButtonPressed(Msg.BtnEvtInfo.BtnID[0]);
+                    }
+                    break;
             }
         }
     }

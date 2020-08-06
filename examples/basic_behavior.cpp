@@ -1,6 +1,22 @@
 #include "basic_behavior.h"
 #include "utility.h"
 
+const LedRGBChunk kButtonSequence[] = {
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlue},
+        {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kEnd},
+};
+
+
 void BasicBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
@@ -42,4 +58,10 @@ void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
                 GetSwitchState(dip_value_mask, 6),
                 GetSwitchState(dip_value_mask, 7),
                 GetSwitchState(dip_value_mask, 8));
+}
+
+void BasicBehavior::OnButtonPressed(uint16_t button_index) {
+    if (button_index == 1) {
+        led->StartOrRestart(kButtonSequence);
+    }
 }

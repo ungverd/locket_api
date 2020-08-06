@@ -13,6 +13,7 @@ public:
     void OnPillConnected(PillManager<IdOnlyState>* manager) override;
     void OnPillDisconnected() override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
+    void OnButtonPressed(uint16_t button_index) override;
 
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;
