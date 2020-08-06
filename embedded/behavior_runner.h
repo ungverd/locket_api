@@ -69,6 +69,12 @@ template<typename BehaviorType>
 
     while(true) {
         EvtMsg_t Msg = EvtQMain.Fetch(TIME_INFINITE);
+        switch(Msg.ID) {
+            case evtIdEverySecond:
+                PillMgr.Check();
+                behavior.EverySecond();
+                break;
+        }
     }
 }
 
