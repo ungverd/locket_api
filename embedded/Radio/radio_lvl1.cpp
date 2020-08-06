@@ -13,7 +13,6 @@
 #include "led.h"
 #include "beeper.h"
 #include "sequences_collection.h"
-#include "Glue.h"
 
 extern LedRGBwPower_t Led;
 extern Beeper_t Beeper;
@@ -93,39 +92,6 @@ void ProcessRCmd() {
         // Command processing
         switch(PktRx.Cmd) {
             case rcmdPing: break; // Do not fall into default
-
-            case rcmdLocketSetParam:
-                switch(PktRx.LocketParam.ParamID) {
-                    case 1: ChargeTO = PktRx.LocketParam.Value; break;
-                    case 2: DangerTO = PktRx.LocketParam.Value; break;
-                    case 3: DefaultHP = PktRx.LocketParam.Value; break;
-                    case 4: HPThresh = PktRx.LocketParam.Value; break;
-                    case 5: TailorHP = PktRx.LocketParam.Value; break;
-                    case 6: LocalHP = PktRx.LocketParam.Value; break;
-                    case 7: StalkerHP = PktRx.LocketParam.Value; break;
-                    case 8: HealAmount = PktRx.LocketParam.Value; break;
-                    default: PktTx.Pong.Reply = retvBadValue; break;
-                } // switch
-                break;
-
-            case rcmdLocketGetParam:
-                PktTx.Cmd = rcmdLocketGetParam;
-                PktTx.LocketParam.ParamID = PktRx.LocketParam.ParamID;
-                switch(PktRx.LocketParam.ParamID) {
-                    case 1: PktTx.LocketParam.Value = ChargeTO; break;
-                    case 2: PktTx.LocketParam.Value = DangerTO; break;
-                    case 3: PktTx.LocketParam.Value = DefaultHP; break;
-                    case 4: PktTx.LocketParam.Value = HPThresh; break;
-                    case 5: PktTx.LocketParam.Value = TailorHP; break;
-                    case 6: PktTx.LocketParam.Value = LocalHP; break;
-                    case 7: PktTx.LocketParam.Value = StalkerHP; break;
-                    case 8: PktTx.LocketParam.Value = HealAmount; break;
-                    default:
-                        PktTx.Cmd = rcmdPong;
-                        PktTx.Pong.Reply = retvBadValue;
-                        break;
-                }
-                break;
 
             case rcmdScream:
                 Beeper.StartOrRestart(bsqSearch);

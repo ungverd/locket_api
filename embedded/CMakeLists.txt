@@ -9,13 +9,8 @@ add_subdirectory(Pill)
 add_subdirectory(wrappers)
 
 add_executable(Locket_fw.elf
-  ability.cpp
-  eventHandlers.cpp
-  health.cpp
-  main.cpp
-  player_type.cpp
-  qhsm.c
-)
+        main.cpp
+        )
 
 target_link_libraries(Locket_fw.elf
   kl_lib

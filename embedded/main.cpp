@@ -2,7 +2,6 @@
 #include "led.h"
 #include "vibro.h"
 #include "beeper.h"
-#include "sequences_collection.h"
 #include "radio_lvl1.h"
 #include "kl_i2c.h"
 #include "kl_lib.h"
@@ -11,12 +10,6 @@
 #include "MsgQ.h"
 #include "SimpleSensors.h"
 #include "buttons.h"
-
-#include "health.h"
-#include "ability.h"
-#include "player_type.h"
-#include "qhsm.h"
-#include "Glue.h"
 
 #if 1 // ======================== Variables and defines ========================
 // Forever
@@ -30,10 +23,6 @@ static void OnCmd(Shell_t *PShell);
 #define EE_ADDR_DEVICE_ID   0
 
 void InitSM();
-void SendEvent_Health(int QSig, unsigned int Value);
-void SendEvent_Ability(int QSig, unsigned int Value);
-void SendEvent_PlayerType(int QSig, unsigned int Value);
-static healthQEvt e;
 
 int32_t ID;
 static const PinInputSetup_t DipSwPin[DIP_SW_CNT] = { DIP_SW8, DIP_SW7, DIP_SW6, DIP_SW5, DIP_SW4, DIP_SW3, DIP_SW2, DIP_SW1 };
@@ -102,56 +91,24 @@ void ITask() {
             case evtIdEverySecond:
                 PillMgr.Check();
                 CheckRxData();
-                SendEvent_Health(TIME_TICK_1S_SIG, 0);
-                SendEvent_Ability(TIME_TICK_1S_SIG, 0);
-                SendEvent_PlayerType(TIME_TICK_1S_SIG, 0);
-                TimeS++;
-                if((TimeS % 60) == 0) {
-                    SendEvent_Health(TIME_TICK_1M_SIG, 0);
-                    SendEvent_Ability(TIME_TICK_1M_SIG, 0);
-                    SendEvent_PlayerType(TIME_TICK_1M_SIG, 0);
-                }
                 break;
 
-            // ==== Radio ====
-            case evtIdLustraDamagePkt:
-                SendEvent_Health(DMG_RCVD_SIG , Msg.Value);
-                SendEvent_PlayerType(DMG_RCVD_SIG , Msg.Value);
-                break;
-
-            case evtIdShineOrderHost:
-                SendEvent_Ability(SHINE_ORDER_SIG, 0);
-                break;
-
-            case evtIdShinePktMutant:
-                SendEvent_Health(SHINE_RCVD_SIG, 0);
-                break;
             case evtIdButtons:
                 Printf("Btn %u\r", Msg.BtnEvtInfo.BtnID[0]);
                 if(Msg.BtnEvtInfo.Type == beShortPress) {
                     if(Msg.BtnEvtInfo.BtnID[0] == 1) { // Central, check mutant
-                        SendEvent_Ability(CENTRAL_BUTTON_PRESSED_SIG, 0);
                     }
                     else {
-                        SendEvent_Health(FIRST_BUTTON_PRESSED_SIG, 0);
                     }
                 }
                 else if(Msg.BtnEvtInfo.Type == beLongCombo and Msg.BtnEvtInfo.BtnCnt == 3) {
                     Printf("Combo\r");
-                    SendEvent_Ability(SHINE_SIG, 0);
                 }
                 break;
 
             case evtIdPillConnected:
                 Printf("Pill: %u\r", PillMgr.Pill.DWord32);
                 switch(PillMgr.Pill.DWord32) {
-                    case 0: SendEvent_PlayerType(PILL_RESET_SIG, 0); break;
-                    case 1: SendEvent_Health(PILL_HEAL_SIG, 0); break;
-                    case 2: SendEvent_PlayerType(PILL_TAILOR_SIG, 0); break;
-                    case 3: SendEvent_PlayerType(PILL_STALKER_SIG, 0); break;
-                    case 4: SendEvent_PlayerType(PILL_LOCAL_SIG, 0); break;
-                    case 5: SendEvent_Ability(PILL_MUTANT_SIG, 0); break;
-                    default: break;
                 }
                 break;
 
@@ -326,34 +283,6 @@ void InitSM() {
     uint32_t ChargeTime = EE::Read32(EE_ADDR_CHARGETIME);
     Printf("Loaded: State=%d Ability=%d Type=%d HP=%d MaxHP=%d DangerTime=%d ChargeTime=%d\r",
             State, Ability, Type, HP, MaxHP, DangerTime, ChargeTime);
-    // Init
-    Health_ctor(State, HP, MaxHP, DangerTime);
-    Ability_ctor(Ability, ChargeTime);
-    Player_type_ctor(Type, (Health*)the_health);
-    QMSM_INIT(the_health, (QEvt *)0);
-    QMSM_INIT(the_ability, (QEvt *)0);
-    QMSM_INIT(the_player_type, (QEvt *)0);
-}
-
-void SendEvent_Health(int QSig, unsigned int Value) {
-    e.super.sig = QSig;
-    e.value = Value;
-    // Printf("evtHealth: %d; %d\r", e.super.sig, e.value);
-    QMSM_DISPATCH(the_health, &(e.super));
-}
-
-void SendEvent_Ability(int QSig, unsigned int Value) {
-    e.super.sig = QSig;
-    e.value = Value;
-    // Printf("evtAbility: %d; %d\r", e.super.sig, e.value);
-    QMSM_DISPATCH(the_ability, &(e.super));
-}
-
-void SendEvent_PlayerType(int QSig, unsigned int Value) {
-    e.super.sig = QSig;
-    e.value = Value;
-    // Printf("evtPlayerType: %d; %d\r", e.super.sig, e.value);
-    QMSM_DISPATCH(the_player_type, &(e.super));
 }
 
 #if 1 // ================= Command processing ====================
@@ -369,9 +298,6 @@ void OnCmd(Shell_t *PShell) {
 
 
     else if(PCmd->NameIs("evt1min")) {
-        SendEvent_Health(TIME_TICK_1M_SIG, 0);
-        SendEvent_Ability(TIME_TICK_1M_SIG, 0);
-        SendEvent_PlayerType(TIME_TICK_1M_SIG, 0);
     }
 
     else if(PCmd->NameIs("GetID")) PShell->Reply("ID", ID);
@@ -387,11 +313,6 @@ void OnCmd(Shell_t *PShell) {
     }
 
     else if(PCmd->NameIs("Rst")) {
-        State_Save(DEAD);
-        Ability_Save(DISABLED);
-        PlayerType_Save(DEAD);
-        HP_Save(DefaultHP);
-        MaxHP_Save(DefaultHP);
         DangerTime_Save(0);
         ChargeTime_Save(0);
         PShell->Ack(retvOk);
