@@ -9,7 +9,6 @@
 #include "pill.h"
 #include "pill_mgr.h"
 #include "MsgQ.h"
-#include "main.h"
 #include "SimpleSensors.h"
 #include "buttons.h"
 
@@ -424,6 +423,10 @@ void OnCmd(Shell_t *PShell) {
 
 
 #if 1 // =========================== ID management =============================
+#define ID_MIN                  1
+#define ID_MAX                  140
+#define ID_DEFAULT              ID_MIN
+
 void ReadIDfromEE() {
     ID = EE::Read32(EE_ADDR_DEVICE_ID);  // Read device ID
     if(ID < ID_MIN or ID > ID_MAX) {
