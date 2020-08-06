@@ -6,3 +6,4 @@
   * Notice what toolchains are needed
 * Make sure that CLion correctly adds files to the CMakeLists.txt.
 * Figure out how to debug via OpenOCD
+* Reduce amount of boilerplate needed to define firmware target.
