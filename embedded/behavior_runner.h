@@ -1,6 +1,7 @@
 #ifndef LOCKET_API_BEHAVIOR_RUNNER_H
 #define LOCKET_API_BEHAVIOR_RUNNER_H
 
+#include <embedded/wrappers/logger_wrapper.h>
 #include "board.h"
 
 #include "embedded/wrappers/rgb_led_wrapper.h"
@@ -25,6 +26,7 @@ Vibro_t VibroMotor {VIBRO_SETUP};
 Beeper_t Beeper {BEEPER_PIN};
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
+LoggerWrapper loggerWrapper;
 
 // ==== Timers ====
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
@@ -62,7 +64,7 @@ template<typename BehaviorType>
     // ==== Radio ====
     Radio.Init();
 
-    BehaviorType behavior(nullptr, &ledWrapper);
+    BehaviorType behavior(&loggerWrapper, &ledWrapper);
     behavior.OnStarted();
 
     while(true) {
