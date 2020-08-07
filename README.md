@@ -67,3 +67,42 @@ You can now try running them to see if everything works correctly. You should be
 
 Code in `api` and `projects` **must** be cross-platform. Don't use any low-level OS (be it Windows or RTOS) APIs.
 Code in `emulator` is desktop-only, in `embedded` - ARM-only.
+
+## Creating a new project
+
+### Add a new Behavior
+
+* Read comments in [api/behavior.h](api/behavior.h).
+* Create a new behavior target in `projects`:
+  * Add `projects/your_behavior.cpp` and `projects/your_behavior.h` files.
+  * Add a CMake target `your_behavior` to [projects/CMakeLists.txt](projects/CMakeLists.txt):
+```cmake
+add_library(your_behavior your_behavior.cpp your_behavior.h)
+target_link_libraries(your_behavior api)
+``` 
+
+### Create an emulator executable
+  * Add `projects/your_behavior_emulator.cpp` file by copying content of 
+  [projects/basic_behavior_emulator.cpp](projects/basic_behavior_emulator.cpp) and changing
+  `BasicBehavior` to your `Behavior`-implementing class.
+  * Add a CMake target `your_behavior_emulator` to [projects/CMakeLists.txt](projects/CMakeLists.txt).
+  Put it next to the other emulator targets (inside `if` block):
+```cmake
+    add_executable(your_behavior_emulator your_behavior_emulator.cpp)
+    target_link_libraries(your_behavior_emulator your_behavior_emulator emulator)
+``` 
+
+### Create a firmware target
+  * Add `projects/your_behavior_firmware.cpp` file by copying content of 
+  [projects/basic_behavior_firmware.cpp](projects/basic_behavior_firmware.cpp) and changing
+  `BasicBehavior` to your `Behavior`-implementing class.
+  * Add a CMake target `your_behavior_firmware` to [projects/CMakeLists.txt](projects/CMakeLists.txt).
+  Put it next to the other firmware targets (inside `if` block):
+```cmake
+    add_firmware(your_behavior.elf your_behavior_firmware.cpp)
+    target_link_libraries(your_behavior.elf your_behavior)
+``` 
+
+Now you can start developing. To build everything, use "Build -> Build projects". To run your code,
+set up run configuration for `your_behavior_emulator` and/or `your_behavior_firmware` targets (see examples for 
+`basic_behavior_emulator` and `basic_behavior_firmware` above).
