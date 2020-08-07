@@ -29,7 +29,7 @@ else()
 endif()
 
 add_subdirectory(api)
-add_subdirectory(examples)
+add_subdirectory(projects)
 
 
 # Download and unpack googletest at configure time
