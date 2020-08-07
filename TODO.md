@@ -2,5 +2,4 @@
 * Add unit-tests.
 * Add README.md
   * Describe typical workflow of business logic developer.
-  * Declare which folder dependencies are allowed.
 * Make sure that CLion correctly adds files to the CMakeLists.txt.
