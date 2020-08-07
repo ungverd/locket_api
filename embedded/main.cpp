@@ -33,7 +33,7 @@ LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 static TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
 static void CheckRxData();
-static void ITask();
+[[noreturn]] static void ITask();
 static void OnCmd(Shell_t *PShell);
 
 int main(void) {
@@ -75,7 +75,6 @@ int main(void) {
     ITask();
 }
 
-__noreturn
 void ITask() {
     while(true) {
         EvtMsg_t Msg = EvtQMain.Fetch(TIME_INFINITE);

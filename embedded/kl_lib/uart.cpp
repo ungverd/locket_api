@@ -230,7 +230,7 @@ uint8_t BaseUart_t::IPutByteNow(uint8_t b) {
 static thread_reference_t RXThread = nullptr;
 static THD_WORKING_AREA(waUartRxThread, 128);
 
-__noreturn
+[[noreturn]]
 static void UartRxThread(void *arg) {
     chRegSetThreadName("UartRx");
     while(true) {

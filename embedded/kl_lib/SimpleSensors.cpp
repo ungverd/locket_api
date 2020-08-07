@@ -1,7 +1,7 @@
 /*
  * SimpleSensors.cpp
  *
- *  Created on: 17 ÿíâ. 2015 ã.
+ *  Created on: 17 ï¿½ï¿½ï¿½. 2015 ï¿½.
  *      Author: Kreyl
  */
 
@@ -12,7 +12,7 @@
 static PinSnsState_t States[PIN_SNS_CNT];
 
 static THD_WORKING_AREA(waPinSnsThread, 128);
-__noreturn
+[[noreturn]]
 static void SensorsThread(void *arg) {
     chRegSetThreadName("PinSensors");
     while(true) {

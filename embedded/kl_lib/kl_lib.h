@@ -35,33 +35,8 @@
 #include "stm32f1xx.h"
 #endif
 
-#if 1 // ============================ General ==================================
-#define __noreturn      __attribute__((noreturn))
-#define __packed        __attribute__((__packed__))
-#define __align4        __attribute__((aligned (4)))
-// Also remember __unused and __attribute__ ((always_inline))
 #ifndef countof
 #define countof(A)  (sizeof(A)/sizeof(A[0]))
-#endif
-
-/* ==== Function in RAM ====
- * Add to LD script, inside .data section, the following line:
-     *(.kl_ramfunc)         // RAM-Functions
-     Example:
-        . = ALIGN(4);
-        *(.kl_ramfunc)     // RAM-Functions
-        PROVIDE(_edata = .);
-        _data_end = .;
-    } > DATA_RAM AT > flash
- */
-#define __ramfunc __attribute__ ((long_call, section (".kl_ramfunc")))
-
-#ifndef TRUE
-#define TRUE    1
-#endif
-#ifndef FALSE
-#define FALSE   0
-#endif
 
 // Return values
 #define retvOk              0
@@ -92,10 +67,6 @@
 #define retvNotAuthorised   25
 #define retvNoChanges       26
 
-// Binary semaphores
-#define NOT_TAKEN       false
-#define TAKEN           true
-
 enum BitOrder_t {boMSB, boLSB};
 enum LowHigh_t  {Low, High};
 enum RiseFall_t {rfRising, rfFalling, rfNone};
@@ -105,9 +76,7 @@ enum BitNumber_t {bitn8, bitn16, bitn32};
 enum EnableDisable_t {Enable, Disable};
 
 typedef void (*ftVoidVoid)(void);
-typedef void (*ftVoidUint32)(uint32_t);
 typedef void (*ftVoidPVoid)(void*p);
-typedef void (*ftVoidPVoidLen)(void*p, uint32_t Len);
 
 // Virtual class for IRQ handlers and timer callbacks
 class IrqHandler_t {
@@ -140,44 +109,6 @@ public:
 #define DMA_PRIORITY_HIGH       STM32_DMA_CR_PL(0b10)
 #define DMA_PRIORITY_VERYHIGH   STM32_DMA_CR_PL(0b11)
 
-template <typename T>
-static T Average(T *p, uint32_t Len) {
-    T Rslt = 0;
-    for(uint32_t i=0; i<Len; i++) Rslt += *p++;
-    Rslt /= Len;
-    return Rslt;
-}
-
-template <typename T>
-static inline T Proportion(T MinX, T MaxX, T MinY, T MaxY, T x) {
-    return (((x - MaxX) * (MaxY - MinY)) / (MaxX - MinX)) + MaxY;
-}
-
-template <typename T>
-static T FindMediana(T *Arr, int32_t N) {
-    int32_t L = 1, r = N, i, j, k = N / 2;
-    T x;
-    while(L < r) {
-        x = Arr[k];
-        i = L;
-        j = r;
-        do {
-            while(Arr[i] < x) i++;
-            while(x < Arr[j]) j--;
-            if(i <= j) {
-                T tmp = Arr[i];
-                Arr[i] = Arr[j];
-                Arr[j] = tmp;
-                i++;
-                j--;
-            }
-            if(j < k) L = i;
-            if(k < i) r = j;
-        } while(i <= j);
-    }
-    return Arr[k];
-}
-
 // Amount of memory occupied by thread
 uint32_t GetThdFreeStack(void *wsp, uint32_t size);
 void PrintThdFreeStack(void *wsp, uint32_t size);
@@ -193,38 +124,6 @@ void __early_init(void);
 
 void PrintMemoryInfo();
 
-namespace Convert { // ============== Conversion operations ====================
-union DWordBytes_t {
-    uint32_t DWord;
-    uint8_t b[4];
-    DWordBytes_t& operator = (const DWordBytes_t &Right) {
-        DWord = Right.DWord;
-        return *this;
-    }
-};
-union WordBytes_t {
-    uint16_t Word;
-    uint8_t b[2];
-    WordBytes_t& operator = (const WordBytes_t &Right) {
-        Word = Right.Word;
-        return *this;
-    }
-} __attribute__((packed));
-
-void U16ToArrAsBE(uint8_t *PArr, uint16_t N);
-void U32ToArrAsBE(uint8_t *PArr, uint32_t N);
-uint16_t ArrToU16AsBE(uint8_t *PArr);
-uint32_t ArrToU32AsBE(uint8_t *PArr);
-//void ReverseByteOrder16(uint16_t *p);
-//void ReverseByteOrder16(int16_t *p);
-#define ReverseByteOrder16(p)   (p) = __REV16(p)
-#define ReverseByteOrder32(p)   (p) = __REV(p)
-uint8_t TryStrToUInt32(char* S, uint32_t *POutput);
-uint8_t TryStrToInt32(char* S, int32_t *POutput);
-uint16_t BuildUint16(uint8_t Lo, uint8_t Hi);
-uint32_t BuildUint32(uint8_t Lo, uint8_t MidLo, uint8_t MidHi, uint8_t Hi);
-uint8_t TryStrToFloat(char* S, float *POutput);
-}; // namespace
 #endif
 
 #if 1 // ============================ kl_string ================================
@@ -351,116 +250,6 @@ static inline void DelayLoop(volatile uint32_t ACounter) { while(ACounter--); }
 // See Programming manual: http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf
 // On writes, write 0x5FA to VECTKEY, otherwise the write is ignored. 4 is SYSRESETREQ: System reset request
 #define REBOOT()                SCB->AIRCR = 0x05FA0004
-
-#if 0 // ======================= Power and backup unit =========================
-namespace BackupSpc {
-    static inline void EnableAccess() {
-        rccEnablePWRInterface(FALSE);
-#if defined STM32F2XX || defined STM32F4XX || defined STM32F10X_LD_VL
-        rccEnableBKPSRAM(FALSE);
-        PWR->CR |= PWR_CR_DBP;
-#elif defined STM32L4XX
-        PWR->CR1 |= PWR_CR1_DBP;
-#endif
-    }
-
-    static inline void DisableAccess() {
-#if defined STM32F2XX || defined STM32F4XX || defined STM32F10X_LD_VL
-        PWR->CR &= ~PWR_CR_DBP;
-#elif defined STM32L4XX
-        PWR->CR1 &= ~PWR_CR1_DBP;
-#endif
-    }
-
-    static inline void Reset() {
-        RCC->BDCR |=  RCC_BDCR_BDRST;
-        RCC->BDCR &= ~RCC_BDCR_BDRST;
-    }
-
-    // RegN = 0...19
-    static inline uint32_t ReadRegister(uint32_t RegN) {
-        volatile uint32_t tmp = RTC_BASE + 0x50 + (RegN * 4);
-        return (*(volatile uint32_t *)tmp);
-    }
-
-    static inline void WriteRegister(uint32_t RegN, uint32_t Data) {
-        volatile uint32_t tmp = RTC_BASE + 0x50 + (RegN * 4);
-        *(volatile uint32_t *)tmp = Data;
-    }
-} // namespace
-#endif
-
-#if 0 // ============================= RTC =====================================
-namespace Rtc {
-#if defined STM32F10X_LD_VL
-// Wait until the RTC registers (RTC_CNT, RTC_ALR and RTC_PRL) are synchronized with RTC APB clock.
-// Required after an APB reset or an APB clock stop.
-static inline void WaitForSync() {
-    RTC->CRL &= (uint16_t)~RTC_CRL_RSF; //Clear RSF flag
-    while((RTC->CRL & RTC_CRL_RSF) == 0);
-}
-
-// Waits until last write operation on RTC registers has finished.
-// This function must be called before any write to RTC registers.
-static inline void WaitForLastTask() { while((RTC->CRL & RTC_CRL_RTOFF) == 0); }
-
-static inline void SetPrescaler(uint32_t PrescalerValue) {
-    EnterConfigMode();
-    RTC->PRLH = (PrescalerValue & PRLH_MSB_MASK) >> 16;
-    RTC->PRLL = (PrescalerValue & RTC_LSB_MASK);
-    ExitConfigMode();
-}
-
-static inline void EnterConfigMode() { RTC->CRL |= RTC_CRL_CNF; }
-static inline void ExitConfigMode()  { RTC->CRL &= ~((uint16_t)RTC_CRL_CNF); }
-
-static inline void SetCounter(uint32_t CounterValue) {
-    EnterConfigMode();
-    RTC->CNTH = CounterValue >> 16;
-    RTC->CNTL = (CounterValue & RTC_LSB_MASK);
-    ExitConfigMode();
-}
-#elif defined STM32F072xB || defined STM32L4XX
-static inline void DisableWriteProtection() {
-    RTC->WPR = 0xCAU;
-    RTC->WPR = 0x53U;
-}
-static inline void EnableWriteProtection() { RTC->WPR = 0xFFU; }
-static inline void WaitSync() {
-    RTC->ISR &= ~RTC_ISR_RSF;   // Clear RSF reg
-    while(!BitIsSet(RTC->ISR, RTC_ISR_RSF));    // Wait RSF to become 1
-}
-
-static inline void EnterInitMode() {
-    RTC->ISR |= RTC_ISR_INIT;
-    while(!BitIsSet(RTC->ISR, RTC_ISR_INITF));
-}
-static inline void ExitInitMode() { RTC->ISR &= ~RTC_ISR_INIT; }
-
-static inline void ClearWakeupFlag() { RTC->ISR &= ~RTC_ISR_WUTF; }
-#endif
-
-static inline void SetClkSrcLSE() {
-    RCC->BDCR &= ~RCC_BDCR_RTCSEL;  // Clear bits
-    RCC->BDCR |=  0b01UL << 8;
-}
-static inline void EnableClk() { RCC->BDCR |= RCC_BDCR_RTCEN; }
-
-#define RTC_LSB_MASK     ((uint32_t)0x0000FFFF)  // RTC LSB Mask
-#define PRLH_MSB_MASK    ((uint32_t)0x000F0000)  // RTC Prescaler MSB Mask
-
-
-//static inline void EnableSecondIRQ() {
-//    WaitForLastTask();
-//    RTC->CRH |= RTC_CRH_SECIE;
-//}
-//static inline void ClearSecondIRQFlag() {
-//    RTC->CRL &= ~RTC_CRL_SECF;
-//}
-//#elif defined STM32F072xB
-
-} // namespace
-#endif
 
 #if 1 // =========================== HW Timers =================================
 enum TmrTrigInput_t {tiITR0=0x00, tiITR1=0x10, tiITR2=0x20, tiITR3=0x30, tiTIED=0x40, tiTI1FP1=0x50, tiTI2FP2=0x60, tiETRF=0x70};

@@ -44,7 +44,7 @@ static int8_t Rssi;
 
 #if 1 // ================================ Task =================================
 static THD_WORKING_AREA(warLvl1Thread, 256);
-__noreturn
+[[noreturn]]
 static void rLvl1Thread(void *arg) {
     chRegSetThreadName("rLvl1");
     while(true) {
