@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 3.16)
 project(locket_api LANGUAGES C CXX ASM)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_C_STANDARD 11)
 
 # If compiling in firmware mode - set bunch of hardware-specific compiler flags
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
-    set(CMAKE_CXX_FLAGS "-mthumb -mcpu=cortex-m3 -std=gnu++14 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g -fstack-usage -Wall -fno-threadsafe-statics -MMD -MP -specs=nano.specs")
-    set(CMAKE_C_FLAGS   "-mthumb -mcpu=cortex-m3 -std=gnu11 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -MMD -MP -specs=nano.specs")
+    set(CMAKE_CXX_FLAGS "-mthumb -mcpu=cortex-m3 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g -fstack-usage -Wall -fno-threadsafe-statics -MMD -MP -specs=nano.specs")
+    set(CMAKE_C_FLAGS   "-mthumb -mcpu=cortex-m3 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -MMD -MP -specs=nano.specs")
     set(CMAKE_ASM_FLAGS "-mthumb -mcpu=cortex-m3 -g -Wa,--warn -x assembler-with-cpp -specs=nano.specs")
 endif()
 
