@@ -27,7 +27,7 @@ Vibro_t VibroMotor {VIBRO_SETUP};
 Beeper_t Beeper {BEEPER_PIN};
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
-LoggerWrapper loggerWrapper;
+LoggerWrapper loggerWrapper(&Uart);
 
 
 // ==== Timers ====
