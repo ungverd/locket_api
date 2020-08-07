@@ -1,7 +1,7 @@
 add_library(basic_behavior basic_behavior.cpp)
 target_link_libraries(basic_behavior api)
 
-add_library(giganda_behaviour try_giganda.h try_giganda.cpp)
+add_library(giganda_behaviour giganda_behavior.h giganda_behavior.cpp)
 target_link_libraries(giganda_behaviour api)
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)

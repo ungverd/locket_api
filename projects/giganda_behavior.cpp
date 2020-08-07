@@ -2,7 +2,7 @@
 // Created by juice on 02.08.2020.
 //
 
-#include "try_giganda.h"
+#include "giganda_behavior.h"
 #include "utility.h"
 
 

@@ -1,4 +1,4 @@
-#include "try_giganda.h"
+#include "giganda_behavior.h"
 #include "emulator.h"
 #include "fake_led.h"
 #include "stdout_logger.h"

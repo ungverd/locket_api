@@ -1,4 +1,4 @@
-#include "try_giganda.h"
+#include "giganda_behavior.h"
 #include "behavior_runner.h"
 
 int main() {

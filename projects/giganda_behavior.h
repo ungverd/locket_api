@@ -2,8 +2,8 @@
 // Created by juice on 02.08.2020.
 //
 
-#ifndef LOCKET_API_TRY_GIGANDA_H
-#define LOCKET_API_TRY_GIGANDA_H
+#ifndef LOCKET_API_GIGANDA_BEHAVIOR_H
+#define LOCKET_API_GIGANDA_BEHAVIOR_H
 
 #define ACCELERATE_S 30
 #define REGENERATE_S  10
@@ -40,4 +40,4 @@ private:
 
 };
 
-#endif //LOCKET_API_TRY_GIGANDA_H
+#endif //LOCKET_API_GIGANDA_BEHAVIOR_H
