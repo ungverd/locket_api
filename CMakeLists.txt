@@ -3,6 +3,24 @@ project(locket_api LANGUAGES C CXX ASM)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# If compiling in firmware mode - set bunch of hardware-specific compiler flags
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+    set(CMAKE_CXX_FLAGS "-mthumb -mcpu=cortex-m3 -std=gnu++14 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -g -fstack-usage -Wall -fno-threadsafe-statics -MMD -MP -specs=nano.specs")
+    set(CMAKE_C_FLAGS   "-mthumb -mcpu=cortex-m3 -std=gnu11 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -MMD -MP -specs=nano.specs")
+    set(CMAKE_ASM_FLAGS "-mthumb -mcpu=cortex-m3 -g -Wa,--warn -x assembler-with-cpp -specs=nano.specs")
+endif()
+
+# Helper to define firmware targets.
+# TARGET should end in .elf.
+# Will automatically add dependency on behavior runner.
+function(add_firmware TARGET SOURCES)
+    add_executable(${TARGET} ${SOURCES})
+    target_link_libraries(${TARGET} behavior_runner)
+    set_target_properties(${TARGET} PROPERTIES LINK_FLAGS
+            "-T ${CMAKE_CURRENT_SOURCE_DIR}/../embedded/STM32L151x8.ld -T ${CMAKE_CURRENT_SOURCE_DIR}/../embedded/rules.ld -static -Wl,-cref,-u,Reset_Handler -Wl,-Map=${TARGET}.map -Wl,--gc-sections -Wl,--defsym=malloc_getpagesize_P=0x1000 -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group")
+endfunction()
+
+
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_subdirectory(embedded)
 else()
@@ -13,9 +31,8 @@ add_subdirectory(api)
 add_subdirectory(examples)
 
 
+# Download and unpack googletest at configure time
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
-
-    # Download and unpack googletest at configure time
     configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
             RESULT_VARIABLE result
@@ -53,5 +70,5 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(example2 example2.cpp)
     target_link_libraries(example2 gtest_main)
     gtest_discover_tests(example2)
-
 endif()
+
