@@ -53,14 +53,17 @@ You can now try running them to see if everything works correctly. You should be
 
 ### Folder structure
 
-* **api**. Contains interfaces available to the business logic developer. Can also should implementations of simple,
+* `api`. Contains interfaces available to the business logic developer. Can also should implementations of simple,
   non-hardware-specific utilities. Shouldn't depend on anything else (except for standard C++ libraries). This is the
   main starting point for business logic developer to learn what is available.
-* **projects**. The place for business logic developers to implement Behavior's for specific projects. Code here can
-  (and will) depend on **api**. It will also depend on `BehaviorRunner` from **embedded** and on `Emulator` from
-  **emulator** for the `main()`-containing files (see details below), but please don't add other dependencies on 
+* `projects`. The place for business logic developers to implement Behavior's for specific projects. Code here can
+  (and will) depend on `api`. It will also depend on `BehaviorRunner` from `embedded` and on `Emulator` from
+  `emulator` for the `main()`-containing files (see details below), but please don't add other dependencies on 
   emulator/embedded internals. 
-* **emulator**. Contains code for running Behavior's on desktop (by emulating hardware peripherals).
-* **embedded**. Contains code for running Behavior's on-device. Also contains quite a lot of half-unused code from the
+* `emulator`. Contains code for running Behavior's on desktop (by emulating hardware peripherals).
+* `embedded`. Contains code for running Behavior's on-device. Also contains quite a lot of half-unused code from the
   https://github.com/Kreyl/Locket_fw repo. Tread carefully.
-* **docs**. Images for this and potentially other documents or documents themselves.
+* `docs`. Images for this and potentially other documents or documents themselves.
+
+Code in `api` and `projects` **must** be cross-platform. Don't use any low-level OS (be it Windows or RTOS) APIs.
+Code in `emulator` is desktop-only, in `embedded` - ARM-only.
