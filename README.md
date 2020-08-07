@@ -1,5 +1,15 @@
 ![build](https://github.com/aeremin/locket_api/workflows/build/badge.svg)
 
+- [Locket](#locket)
+  * [Software prerequisites](#software-prerequisites)
+    + [Setting up a CLion](#setting-up-a-clion)
+  * [Development](#development)
+    + [Folder structure](#folder-structure)
+  * [Creating a new project](#creating-a-new-project)
+    + [Add a new Behavior](#add-a-new-behavior)
+    + [Create an emulator executable](#create-an-emulator-executable)
+    + [Create a firmware target](#create-a-firmware-target)
+
 # Locket 
 Firmware for the Locket Project ([Russian description](https://ostranna.ru/gamedesign/locket), [English description](https://ostranna.ru/?lang=en)).
 
