@@ -5,6 +5,7 @@
  *      Author: kreyl
  */
 
+#include <algorithm>
 #include "MsgQ.h"
 #include <string.h>
 #include "uart.h"
@@ -184,7 +185,7 @@ void BaseUart_t::IRQDmaTxHandler() {
 
 void BaseUart_t::ISendViaDMA() {
     uint32_t PartSz = (TXBuf + UART_TXBUF_SZ) - PRead; // Cnt from PRead to end of buf
-    ITransSize = MIN_(IFullSlotsCount, PartSz);
+    ITransSize = std::min(IFullSlotsCount, PartSz);
     if(ITransSize != 0) {
         IDmaIsIdle = false;
         dmaStreamSetMemory0(PDmaTx, PRead);

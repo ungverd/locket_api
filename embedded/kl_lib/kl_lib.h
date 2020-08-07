@@ -85,11 +85,7 @@ public:
 };
 
 // ==== Math ====
-#define MIN_(a, b)   ( ((a)<(b))? (a) : (b) )
-#define MAX_(a, b)   ( ((a)>(b))? (a) : (b) )
-#define ABS(a)      ( ((a) < 0)? -(a) : (a) )
 #define TRIM_VALUE(v, Max)  { if((v) > (Max)) (v) = (Max); }
-#define IS_LIKE(v, precise, deviation)  (((precise - deviation) < v) and (v < (precise + deviation)))
 #define BitIsSet(r, b)  ((r) & (b))
 
 #define ANY_OF_2(a, b1, b2)             (((a)==(b1)) or ((a)==(b2)))
