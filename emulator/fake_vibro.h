@@ -7,6 +7,9 @@
 class FakeVibro: public Vibro, public Sequenceable<VibroChunk> {
 public:
     void StartOrRestart(const VibroChunk* sequence) override { Sequenceable::StartOrRestart(sequence); }
+    void StartOrContinue(const VibroChunk* sequence) override { Sequenceable::StartOrContinue(sequence); }
+    void Stop() override { Sequenceable::Stop(); }
+
     void Setup(const VibroChunk& current) override;
     void Off() override;
 };

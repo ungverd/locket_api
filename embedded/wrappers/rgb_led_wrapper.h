@@ -8,6 +8,8 @@ class RgbLedWrapper: public RgbLed {
 public:
     explicit RgbLedWrapper(LedRGBwPower_t* implementation): implementation(implementation) {}
     void StartOrRestart(const LedRGBChunk* sequence) override;
+    void StartOrContinue(const LedRGBChunk *sequence) override;
+    void Stop() override;
 
 private:
     LedRGBwPower_t* const implementation;

@@ -9,6 +9,9 @@
 class FakeLed: public RgbLed, public Sequenceable<LedRGBChunk> {
 public:
     void StartOrRestart(const LedRGBChunk* sequence) override { Sequenceable::StartOrRestart(sequence); }
+    void StartOrContinue(const LedRGBChunk* sequence) override { Sequenceable::StartOrContinue(sequence); }
+    void Stop() override { Sequenceable::Stop(); }
+
     void Setup(const LedRGBChunk& current) override;
     void Off() override;
 };

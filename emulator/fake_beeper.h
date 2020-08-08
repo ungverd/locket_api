@@ -8,6 +8,9 @@
 class FakeBeeper: public Beeper, public Sequenceable<BeepChunk> {
 public:
     void StartOrRestart(const BeepChunk* sequence) override { Sequenceable::StartOrRestart(sequence); }
+    void StartOrContinue(const BeepChunk* sequence) override { Sequenceable::StartOrContinue(sequence); }
+    void Stop() override { Sequenceable::Stop(); }
+
     void Setup(const BeepChunk& current) override;
     void Off() override;
 };

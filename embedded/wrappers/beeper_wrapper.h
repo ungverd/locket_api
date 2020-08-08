@@ -8,6 +8,8 @@ class BeeperWrapper: public Beeper {
 public:
     explicit BeeperWrapper(Beeper_t* implementation): implementation(implementation) {}
     void StartOrRestart(const BeepChunk* sequence) override;
+    void StartOrContinue(const BeepChunk *sequence) override;
+    void Stop() override;
 
 private:
     Beeper_t* const implementation;

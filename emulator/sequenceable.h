@@ -1,6 +1,7 @@
 #ifndef LOCKET_API_SEQUENCABLE_H
 #define LOCKET_API_SEQUENCABLE_H
 
+#include <atomic>
 #include <cstdint>
 #include <mutex>
 #include <thread>
@@ -10,8 +11,9 @@ template<typename TChunk>
 class Sequenceable {
 public:
     void StartOrRestart(const TChunk* sequence);
+    void StartOrContinue(const TChunk* sequence);
     void Stop();
-    virtual ~Sequenceable() { Stop(); }
+    virtual ~Sequenceable() { StopThread(); }
 
 protected:
     virtual void Setup(const TChunk& current) = 0;
@@ -23,18 +25,16 @@ private:
     void StopThread();
 
 protected:
-    std::mutex sequence_mutex; // Guards current_sequence & current_chunk
     const TChunk* current_sequence = nullptr;
     const TChunk* current_chunk = nullptr;
     std::thread actuation_thread;
     int32_t repeat_counter = 0;
-    bool stopping = false;
+    std::atomic<bool> stopping = false;
 };
 
 template<typename TChunk>
 void Sequenceable<TChunk>::StartOrRestart(const TChunk* sequence) {
     StopThread();
-    std::lock_guard l(sequence_mutex);
     current_sequence = sequence;
     current_chunk = sequence;
     repeat_counter = -1;
@@ -46,7 +46,6 @@ void Sequenceable<TChunk>::Actuate() {
     while(!stopping) {   // Process the sequence
         auto delay = std::chrono::milliseconds(0);
         {
-            std::lock_guard l(sequence_mutex);
             if (!(current_sequence && current_chunk)) continue;
             switch(current_chunk->type) {
                 case ChunkType::kSetup: {
@@ -90,6 +89,13 @@ void Sequenceable<TChunk>::Actuate() {
 }
 
 template<typename TChunk>
+void Sequenceable<TChunk>::StartOrContinue(const TChunk* sequence) {
+    if (sequence != current_sequence) {
+        StartOrRestart(sequence);
+    }
+}
+
+template<typename TChunk>
 void Sequenceable<TChunk>::StartThread() {
     stopping = false;
     actuation_thread = std::thread([&](){Actuate();});
@@ -107,6 +113,9 @@ void Sequenceable<TChunk>::StopThread() {
 template<typename TChunk>
 void Sequenceable<TChunk>::Stop() {
     StopThread();
+    Off();
+    current_sequence = nullptr;
+    current_chunk = nullptr;
 }
 
 #endif //LOCKET_API_SEQUENCABLE_H
