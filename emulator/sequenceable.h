@@ -24,7 +24,6 @@ private:
     void StartThread();
     void StopThread();
 
-protected:
     const TChunk* current_sequence = nullptr;
     const TChunk* current_chunk = nullptr;
     std::thread actuation_thread;
