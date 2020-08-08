@@ -53,6 +53,16 @@ void BasicBehavior::EverySecond() {
     if (seconds_counter % 5 == 0) {
         led->StartOrRestart(kStartSequence);
     }
+
+    if (annoying) {
+        if (seconds_counter % 10 == 5) {
+            vibro->StartOrRestart(kBrrBrr);
+        }
+
+        if (seconds_counter % 10 == 0) {
+            beeper->StartOrRestart(kShortBeep); 
+        }
+    }
 }
 
 void BasicBehavior::OnPillConnected(PillManager<IdOnlyState>* manager) {
@@ -87,5 +97,9 @@ void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
 void BasicBehavior::OnButtonPressed(uint16_t button_index) {
     if (button_index == 1) {
         led->StartOrRestart(kButtonSequence);
+    }
+
+    if (button_index == 2) {
+        annoying = !annoying;
     }
 }

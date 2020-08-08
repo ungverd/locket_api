@@ -18,6 +18,7 @@ public:
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;
     uint32_t seconds_counter = 0;
+    bool annoying = true; // If true, beep and vibrate every bunch of seconds.
 };
 
 #endif //LOCKET_API_BASIC_BEHAVIOR_H
