@@ -107,7 +107,7 @@ constexpr const uint32_t kVibroShortDelayMs = 99;
 constexpr const uint32_t kVibroRepeatPeriod = 1008;
 
 // Single vibration
-const BaseChunk kBrr[] = {
+const VibroChunk kBrr[] = {
         {ChunkType::kSetup, kVibroVolume},
         {ChunkType::kWait, kVibroShortDelayMs},
         {ChunkType::kSetup, 0},
@@ -116,7 +116,7 @@ const BaseChunk kBrr[] = {
 };
 
 // Double vibration
-const BaseChunk kBrrBrr[] = {
+const VibroChunk kBrrBrr[] = {
         {ChunkType::kSetup, kVibroVolume},
         {ChunkType::kWait, kVibroShortDelayMs},
         {ChunkType::kSetup, 0},
@@ -129,7 +129,7 @@ const BaseChunk kBrrBrr[] = {
 };
 
 // Triple vibration
-const BaseChunk kBrrBrrBrr[] = {
+const VibroChunk kBrrBrrBrr[] = {
         {ChunkType::kSetup, kVibroVolume},
         {ChunkType::kWait, kVibroShortDelayMs},
         {ChunkType::kSetup, 0},
