@@ -51,16 +51,6 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     include(GoogleTest)
 
     enable_testing()
-
-    # Now simply link against gtest or gtest_main as needed. Eg
-    add_executable(example example.cpp)
-    target_link_libraries(example gtest_main)
-    gtest_discover_tests(example)
-
-    # Now simply link against gtest or gtest_main as needed. Eg
-    add_executable(example2 example2.cpp)
-    target_link_libraries(example2 gtest_main)
-    gtest_discover_tests(example2)
 endif()
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
