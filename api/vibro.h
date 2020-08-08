@@ -7,7 +7,7 @@
 class Vibro {
 public:
     virtual ~Vibro() {};
-    virtual void StartOrRestart(const BaseChunk* sequence) = 0;
+    virtual void StartOrRestart(const VibroChunk* sequence) = 0;
 };
 
 

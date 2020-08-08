@@ -3,7 +3,9 @@
 
 #include "sequences.h"
 
-// Interface allowing to control RGB LED.
+// Interface allowing to control RGB LED by using LedRGBChunk sequences.
+//
+
 class RgbLed {
 public:
     virtual ~RgbLed() {};

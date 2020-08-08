@@ -89,12 +89,6 @@ const BeepChunk bsqOn[] = {
         {ChunkType::kEnd}
 };
 
-const BeepChunk bsqButton[] = {
-        {ChunkType::kSetup, 1, 1975},
-        {ChunkType::kWait, 54},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kEnd}
-};
 const BeepChunk bsqBeepBeep[] = {
         {ChunkType::kSetup, BEEP_VOLUME, 1975},
         {ChunkType::kWait, 54},

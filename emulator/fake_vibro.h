@@ -5,7 +5,7 @@
 
 class FakeVibro: public Vibro {
 public:
-    void StartOrRestart(const BaseChunk *sequence) override;
+    void StartOrRestart(const VibroChunk* sequence) override;
 };
 
 

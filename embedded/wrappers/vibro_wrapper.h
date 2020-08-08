@@ -7,7 +7,7 @@
 class VibroWrapper: public Vibro {
 public:
     explicit VibroWrapper(Vibro_t* implementation): implementation(implementation) {}
-    void StartOrRestart(const BaseChunk* sequence) override;
+    void StartOrRestart(const VibroChunk* sequence) override;
 
 private:
     Vibro_t* const implementation;
