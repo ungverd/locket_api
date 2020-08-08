@@ -9,41 +9,6 @@
 
 #include "ChunkTypes.h"
 
-const LedRGBChunk lsqStart[] = {
-        {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 207},
-        {ChunkType::kSetup, 0, kGreen},
-        {ChunkType::kWait, 207},
-        {ChunkType::kSetup, 0, kBlue},
-        {ChunkType::kWait, 207},
-        {ChunkType::kSetup, 0, {0,4,0}},
-        {ChunkType::kEnd},
-};
-
-const LedRGBChunk lsqFailure[] = {
-        {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0, kBlack},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0, kBlack},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0, kBlack},
-        {ChunkType::kEnd}
-};
-
-const LedRGBChunk lsqSearch[] = {
-        {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0, kBlack},
-        {ChunkType::kEnd},
-};
-
-
-#if 1 // ============================= Beeper ==================================
 #define BEEP_VOLUME     2   // Maximum 10
 
 #if 1 // ==== Notes ====
@@ -84,10 +49,6 @@ const LedRGBChunk lsqSearch[] = {
 #endif
 
 // Type, BEEP_VOLUME, freq
-const BeepChunk bsqOn[] = {
-        {ChunkType::kSetup, 10, 7000},
-        {ChunkType::kEnd}
-};
 
 const BeepChunk bsqBeepBeep[] = {
         {ChunkType::kSetup, BEEP_VOLUME, 1975},
@@ -100,115 +61,3 @@ const BeepChunk bsqBeepBeep[] = {
         {ChunkType::kEnd}
 };
 
-const BeepChunk bsqSearch[] = {
-        {ChunkType::kSetup, BEEP_VOLUME, 1975},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kEnd}
-};
-
-#if 1 // ==== Extensions ====
-// Pill
-const BeepChunk bsqBeepPillOk[] = {
-        {ChunkType::kSetup, BEEP_VOLUME, Si_3},
-        {ChunkType::kWait, 180},
-        {ChunkType::kSetup, BEEP_VOLUME, Re_D_4},
-        {ChunkType::kWait, 180},
-        {ChunkType::kSetup, BEEP_VOLUME, Fa_D_4},
-        {ChunkType::kWait, 180},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kEnd}
-};
-
-const BeepChunk bsqBeepPillBad[] = {
-        {ChunkType::kSetup, BEEP_VOLUME, Fa_4},
-        {ChunkType::kWait, 180},
-        {ChunkType::kSetup, BEEP_VOLUME, Re_4},
-        {ChunkType::kWait, 180},
-        {ChunkType::kSetup, BEEP_VOLUME, Si_3},
-        {ChunkType::kWait, 180},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kEnd}
-};
-#endif // ext
-#endif // beeper
-
-#if 1 // ============================== Vibro ==================================
-#define VIBRO_VOLUME    100  // 1 to 100
-
-#define VIBRO_SHORT_MS          99
-#define VIBRO_REPEAT_PERIOD     1008
-
-const BaseChunk vsqBrr[] = {
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, VIBRO_REPEAT_PERIOD},
-        {ChunkType::kEnd}
-};
-
-const BaseChunk vsqBrrBrr[] = {
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, VIBRO_REPEAT_PERIOD},
-        {ChunkType::kEnd}
-};
-
-const BaseChunk vsqBrrBrrBrr[] = {
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, VIBRO_REPEAT_PERIOD},
-        {ChunkType::kEnd}
-};
-
-// ==== Health ====
-const BaseChunk vsqIll[] = {
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, 999},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 3600},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kGoto, 2}
-};
-
-const BaseChunk vsqDeath[] = {
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, 999},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 4005},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kGoto, 2}
-};
-
-// Cataclysm
-const BaseChunk vsqCataclysm[] = {
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, 999},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 999},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kSetup, 0},
-        {ChunkType::kWait, 99},
-        {ChunkType::kSetup, VIBRO_VOLUME},
-        {ChunkType::kWait, VIBRO_SHORT_MS},
-        {ChunkType::kGoto, 2}
-};
-
-#endif

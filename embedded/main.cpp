@@ -66,9 +66,9 @@ int main(void) {
     TmrEverySecond.StartOrRestart();
 
     // ==== Radio ====
-    if(Radio.Init() == retvOk) Led.StartOrRestart(lsqStart);
-    else Led.StartOrRestart(lsqFailure);
-    VibroMotor.StartOrRestart(vsqBrrBrr);
+    if(Radio.Init() == retvOk) Led.StartOrRestart(kStartSequence);
+    else Led.StartOrRestart(kFailureSequence);
+    VibroMotor.StartOrRestart(kBrrBrr);
     chThdSleepMilliseconds(1008);
 
     // Main cycle

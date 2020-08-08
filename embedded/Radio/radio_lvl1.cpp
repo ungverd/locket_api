@@ -93,11 +93,6 @@ void ProcessRCmd() {
         switch(PktRx.Cmd) {
             case rcmdPing: break; // Do not fall into default
 
-            case rcmdScream:
-                Beeper.StartOrRestart(bsqSearch);
-                Led.StartOrRestart(lsqSearch);
-                break;
-
             case rcmdLocketExplode:
                 EvtQMain.SendNowOrExit(EvtMsg_t(evtIdShineOrderHost));
                 break;
