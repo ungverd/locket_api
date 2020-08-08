@@ -3,11 +3,17 @@
 
 #include "sequences.h"
 
-// Interface allowing to control beeper.
+// Interface allowing to control beeper by using BeepChunk sequences.
+// Reading general documentation on sequences in sequences.h first is *highly* recommended.
 class Beeper {
 public:
-    virtual ~Beeper() {};
+    // Starts execution of the sequence. If same sequence is already set to be executed by the previous call - will
+    // start it from the beginning.
+    // Returns instantaneously, even if sequence have waits (sequences are always executed in parallel with main
+    // program flow!).
     virtual void StartOrRestart(const BeepChunk* sequence) = 0;
+
+    virtual ~Beeper() {}; // Abstract classes must have virtual destructor.
 };
 
 #endif //LOCKET_API_BEEPER_H
