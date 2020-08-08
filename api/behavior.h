@@ -5,6 +5,8 @@
 #include "led.h"
 #include "pill_manager.h"
 #include "logger.h"
+#include "vibro.h"
+#include "beeper.h"
 
 // Business logic developer needs to
 // 1) Decide what's the structure of data
@@ -82,8 +84,6 @@ public:
     // To get the ON/OFF state of the specific switch, use GetSwitchState from the utility.h.
     virtual void OnDipSwitchChanged(uint16_t dip_value_mask) {}
 
-    // TODO(aeremin) Add interface with interacting with vibro.
-    // TODO(aeremin) Add interface with interacting with beeper.
     // TODO(aeremin) Add radio handler and RadioManager member.
 
     // Internal: This is needed for BehaviorRunner to work.
@@ -97,11 +97,18 @@ protected:
     // Use this to control LED.
     RgbLed* const led;
 
+    // Use this to control LED.
+    Beeper* const beeper;
+
+    // Use this to control LED.
+    Vibro* const vibro;
+
 public:
     // Concrete Behavior implementations should either inherit it by having
     //     using Behavior::Behavior;
     // in their public section, or (advanced mode) define their own constructor and call this one there.
-    Behavior(Logger* logger, RgbLed* led): logger(logger), led(led) {}
+    Behavior(Logger* logger, RgbLed* led, Beeper* beeper, Vibro* vibro):
+            logger(logger), led(led), beeper(beeper), vibro(vibro){}
 };
 
 #endif //LOCKET_API_BEHAVIOR_H

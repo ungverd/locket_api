@@ -1,14 +1,16 @@
 #ifndef LOCKET_API_BEHAVIOR_RUNNER_H
 #define LOCKET_API_BEHAVIOR_RUNNER_H
 
-#include <embedded/wrappers/logger_wrapper.h>
-#include <embedded/wrappers/pill_manager_wrapper.h>
 #include "board.h"
 
+#include "embedded/wrappers/beeper_wrapper.h"
+#include "embedded/wrappers/vibro_wrapper.h"
 #include "embedded/wrappers/rgb_led_wrapper.h"
+#include "embedded/wrappers/logger_wrapper.h"
+#include "embedded/wrappers/pill_manager_wrapper.h"
 #include "embedded/kl_lib/led.h"
-#include "vibro.h"
-#include "beeper.h"
+#include "embedded/kl_lib/vibro.h"
+#include "embedded/kl_lib/beeper.h"
 #include "radio_lvl1.h"
 #include "kl_i2c.h"
 #include "kl_lib.h"
@@ -24,7 +26,11 @@ EvtMsgQ_t<EvtMsg_t, MAIN_EVT_Q_LEN> EvtQMain;
 int32_t ID;
 // ==== Periphery ====
 Vibro_t VibroMotor {VIBRO_SETUP};
+VibroWrapper vibroWrapper(&VibroMotor);
+
 Beeper_t Beeper {BEEPER_PIN};
+BeeperWrapper beeperWrapper(&Beeper);
+
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
 LoggerWrapper loggerWrapper(&Uart);
@@ -76,7 +82,7 @@ public:
         // ==== Radio ====
         Radio.Init();
 
-        behavior = new BehaviorType(&loggerWrapper, &ledWrapper);
+        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper);
         CheckDipSwitch();
         behavior->OnStarted();
 

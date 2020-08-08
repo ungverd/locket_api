@@ -7,6 +7,8 @@ add_library(emulator
         fake_led.cpp
         fake_pill_manager.h
         fake_pill_manager.cpp
-        stdout_logger.cpp stdout_logger.h)
+        stdout_logger.cpp stdout_logger.h
+        fake_beeper.cpp fake_beeper.h
+        fake_vibro.cpp fake_vibro.h)
 target_link_libraries(emulator Threads::Threads api)
 target_include_directories(emulator INTERFACE .)
