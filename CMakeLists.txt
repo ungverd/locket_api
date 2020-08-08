@@ -22,16 +22,6 @@ function(add_firmware TARGET SOURCES)
 endfunction()
 
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
-    add_subdirectory(embedded)
-else()
-    add_subdirectory(emulator)
-endif()
-
-add_subdirectory(api)
-add_subdirectory(projects)
-
-
 # Download and unpack googletest at configure time
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -73,3 +63,11 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     gtest_discover_tests(example2)
 endif()
 
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+    add_subdirectory(embedded)
+else()
+    add_subdirectory(emulator)
+endif()
+
+add_subdirectory(api)
+add_subdirectory(projects)

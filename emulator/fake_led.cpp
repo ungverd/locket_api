@@ -3,18 +3,20 @@
 #include <iostream>
 
 void FakeLed::StartOrRestart(const LedRGBChunk* sequence) {
+    StopThread();
     std::lock_guard l(sequence_mutex);
     current_sequence = sequence;
     current_chunk = sequence;
     repeat_counter = -1;
-    actuation_thread = std::thread([&](){Actuate();});
+    StartThread();
 }
 
 void FakeLed::Actuate() {
-    while(true) {   // Process the sequence
+    while(!stopping) {   // Process the sequence
         auto delay = std::chrono::milliseconds(0);
         {
             std::lock_guard l(sequence_mutex);
+            if (!(current_sequence && current_chunk)) continue;
             switch(current_chunk->type) {
                 case ChunkType::kSetup: {
                     if (current_chunk->color == kBlack) {
@@ -61,4 +63,21 @@ void FakeLed::Actuate() {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
+}
+
+void FakeLed::Stop() {
+    StopThread();
+}
+
+void FakeLed::StartThread() {
+    stopping = false;
+    actuation_thread = std::thread([&](){Actuate();});
+}
+
+void FakeLed::StopThread() {
+    stopping = true;
+    if (actuation_thread.joinable()) {
+        actuation_thread.join();
+    }
+    actuation_thread = std::thread();
 }
