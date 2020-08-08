@@ -60,7 +60,7 @@ void BasicBehavior::EverySecond() {
         }
 
         if (seconds_counter % 10 == 0) {
-            beeper->StartOrRestart(kShortBeep); 
+            beeper->StartOrRestart(kShortBeep);
         }
     }
 }
