@@ -41,7 +41,7 @@ TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
 uint8_t ReadDipSwitch();
 
-
+namespace embedded {
 // BehaviorType must be subtype of Behavior
 template<typename BehaviorType>
 class BehaviorRunner {
@@ -96,7 +96,7 @@ public:
                     break;
                 case evtIdButtons:
                     // TODO(aeremin) Support other button events - long presses, double-clicks, combos, etc.
-                    if(Msg.BtnEvtInfo.Type == beShortPress) {
+                    if (Msg.BtnEvtInfo.Type == beShortPress) {
                         behavior->OnButtonPressed(Msg.BtnEvtInfo.BtnID[0]);
                     }
                     break;
@@ -115,13 +115,14 @@ public:
     void CheckDipSwitch() {
         static uint32_t previous_dip_value = 0xFFFF;
         uint8_t current_dip_value = ReadDipSwitch();
-        if(current_dip_value != previous_dip_value) {
+        if (current_dip_value != previous_dip_value) {
             behavior->OnDipSwitchChanged(current_dip_value);
             previous_dip_value = current_dip_value;
         }
     }
 };
 
+}
 
 uint8_t ReadDipSwitch() {
     const PinInputSetup_t dip_switch_pins[DIP_SW_CNT] =
