@@ -12,6 +12,7 @@
 
 #include "behavior.h"
 #include "pill_manager.h"
+#include "sequences.h"
 
 enum class LocketEnum{NOTHING, ACCELERATOR, REGENERATOR, REFRIGERATOR, MASTER};
 enum class PillEnum{EMPTY, ACCELERATE, REGENERATE, REFRIGERATE, LIGHT, BOMB};
@@ -37,6 +38,9 @@ private:
 
     PillEnum IdToEnum(uint8_t id);
     uint8_t GetNextState(uint8_t pill_id);
+    LedRGBChunk CurrentLedChunk[] = EmptyLedChunk;
+    VibroChunk CurrentVibroChunk[] = VibroChunkEmpty;
+
 
 };
 

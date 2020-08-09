@@ -145,4 +145,15 @@ const VibroChunk kBrrBrrBrr[] = {
         {ChunkType::kEnd}
 };
 
+const VibroChunk VibroChunkEmpty[] = {
+        {ChunkType::kSetup, 0},
+        {ChunkType::kWait, kVibroShortDelayMs},
+};
+
+const LedRGBChunk EmptyLedChunk[] {
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait, 99},
+        {ChunkType::kEnd}
+};
+
 #endif //LOCKET_API_SEQUENCES_H

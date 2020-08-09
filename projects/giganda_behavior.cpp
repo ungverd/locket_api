@@ -26,12 +26,12 @@ const LedRGBChunk OffSequence[] = {
 //stub player state sequences
 const LedRGBChunk AccelerateSequence[] = {
         {ChunkType::kSetup, 0, kYellow},
-        {ChunkType::kWait, 1000},
+        {ChunkType::kWait, 1100},
         {ChunkType::kEnd}
 };
 const LedRGBChunk RegenerateSequence[] = {
         {ChunkType::kSetup, 0, kBlue},
-        {ChunkType::kWait, 1000},
+        {ChunkType::kWait, 500},
         {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kWait, 500},
         {ChunkType::kEnd}
@@ -47,11 +47,11 @@ const LedRGBChunk RefrigerateSequence[] = {
 
 const LedRGBChunk BombSequence[] = {
         {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 500},
+        {ChunkType::kWait, 330},
         {ChunkType::kSetup, 0, kGreen},
-        {ChunkType::kWait, 500},
+        {ChunkType::kWait, 330},
         {ChunkType::kSetup, 0, kBlue},
-        {ChunkType::kWait, 500},
+        {ChunkType::kWait, 330},
         {ChunkType::kEnd}
 };
 const LedRGBChunk WrongOnceSequence[] = {
@@ -92,25 +92,28 @@ const LedRGBChunk BombMasterSequence[] = {
         {ChunkType::kEnd}
 };
 
+const VibroChunk kBrrLong[] = {
+        {ChunkType::kSetup, kVibroVolume},
+        {ChunkType::kWait, 1000},
+        {ChunkType::kEnd}
+};
+
 void GigandaBehavior::OnPillConnected(PillManager<IdOnlyState> *manager) {
     pill_manager = manager;
     led->StartOrRestart(ConnectOnceLedSequence);
-    led->StartOrRestart(OffSequence);
+    vibro->StartOrRestart(kBrr);
 }
 
 void GigandaBehavior::OnPillDisconnected() {
     pill_manager = nullptr;
     led->StartOrRestart(StartOnceLedSequence);
-    led->StartOrRestart(OffSequence);
 }
 
 void GigandaBehavior::OnStarted() {
     led->StartOrRestart(StartOnceLedSequence);
-    led->StartOrRestart(OffSequence);
+    vibro->StartOrRestart(kBrrBrrBrr);
     // мы считаем, что здесь вызвался OnDipSwitchChanged
 }
-
-
 
 void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
 
@@ -125,6 +128,7 @@ void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
                 case PillEnum::ACCELERATE: {
                     if (LocketType == LocketEnum::ACCELERATOR) {
                         led->StartOrRestart(AccelerateSequence);
+                        vibro->StartOrRestart(kBrr);
                         pill_manager->WritePill({.id=0});
                         state_timer = ACCELERATE_S;
                     }
@@ -133,6 +137,7 @@ void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
                 case PillEnum::REGENERATE: {
                     if (LocketType == LocketEnum::REGENERATOR) {
                         led->StartOrRestart(RegenerateSequence);
+                        vibro->StartOrRestart(kBrrBrr);
                         pill_manager->WritePill({.id=0});
                         state_timer = REGENERATE_S;
                     }
@@ -148,12 +153,12 @@ void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
                 }
                 case PillEnum::BOMB: {
                     led->StartOrRestart(BombSequence);
+                    vibro->StartOrRestart(kBrrLong);
                     alive = false;
                     state_timer = BOMB_S;
                 }
                 default: {
                     led->StartOrRestart(WrongOnceSequence);
-                    led->StartOrRestart(OffSequence);
                 }
             }
         }
