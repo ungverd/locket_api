@@ -38,10 +38,6 @@ private:
 
     PillEnum IdToEnum(uint8_t id);
     uint8_t GetNextState(uint8_t pill_id);
-    LedRGBChunk CurrentLedChunk[] = EmptyLedChunk;
-    VibroChunk CurrentVibroChunk[] = VibroChunkEmpty;
-
-
 };
 
 #endif //LOCKET_API_GIGANDA_BEHAVIOR_H

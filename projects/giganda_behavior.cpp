@@ -9,32 +9,34 @@
 const LedRGBChunk StartOnceLedSequence[] = {
         {ChunkType::kSetup, 0, kLightGreen},
         {ChunkType::kWait, 1000},
+        {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kEnd}
 };
 const LedRGBChunk ConnectOnceLedSequence[] = {
         {ChunkType::kSetup, 0, kGreen},
         {ChunkType::kWait, 500},
+        {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kEnd}
 };
 
 const LedRGBChunk OffSequence[] = {
         {ChunkType::kSetup, 0, kBlack},
-        {ChunkType::kWait, 1000},
         {ChunkType::kEnd}
 };
 
 //stub player state sequences
 const LedRGBChunk AccelerateSequence[] = {
         {ChunkType::kSetup, 0, kYellow},
-        {ChunkType::kWait, 1100},
+        {ChunkType::kWait, 1000*ACCELERATE_S},
         {ChunkType::kEnd}
+
 };
 const LedRGBChunk RegenerateSequence[] = {
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait, 500},
         {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kWait, 500},
-        {ChunkType::kEnd}
+        {ChunkType::kGoto, 0},
 };
 
 const LedRGBChunk RefrigerateSequence[] = {
@@ -42,7 +44,7 @@ const LedRGBChunk RefrigerateSequence[] = {
         {ChunkType::kWait, 500},
         {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kWait, 500},
-        {ChunkType::kEnd},
+        {ChunkType::kGoto, 0}
 };
 
 const LedRGBChunk BombSequence[] = {
@@ -52,43 +54,38 @@ const LedRGBChunk BombSequence[] = {
         {ChunkType::kWait, 330},
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait, 330},
-        {ChunkType::kEnd}
+        {ChunkType::kGoto, 0}
 };
 const LedRGBChunk WrongOnceSequence[] = {
         {ChunkType::kSetup, 0, kRed},
         {ChunkType::kWait, 500},
+        {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kEnd}
 };
 
 // stub master sequences
 const LedRGBChunk EmptyMasterSequence[] = {
         {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 500},
         {ChunkType::kEnd}
 };
 const LedRGBChunk AccelerateMasterSequence[] = {
         {ChunkType::kSetup, 0, kYellow},
-        {ChunkType::kWait, 500},
         {ChunkType::kEnd}
 };
 const LedRGBChunk RegenerateMasterSequence[] = {
         {ChunkType::kSetup, 0, kBlue},
-        {ChunkType::kWait, 500},
         {ChunkType::kEnd}
 };
 const LedRGBChunk RefrigerateMasterSequence[] = {
         {ChunkType::kSetup, 0, kMagenta},
-        {ChunkType::kWait, 500},
         {ChunkType::kEnd}
 };
 const LedRGBChunk LightMasterSequence[] = {
         {ChunkType::kSetup, 0, kWhite},
-        {ChunkType::kWait, 500},
         {ChunkType::kEnd}
 };
 const LedRGBChunk BombMasterSequence[] = {
         {ChunkType::kSetup, 0, kRed},
-        {ChunkType::kWait, 500},
         {ChunkType::kEnd}
 };
 
@@ -161,6 +158,8 @@ void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
                     led->StartOrRestart(WrongOnceSequence);
                 }
             }
+        } else if (LocketType == LocketEnum::MASTER) {
+            master_pill_id = GetNextState(master_pill_id);
         }
     }
 }
