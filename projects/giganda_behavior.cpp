@@ -4,6 +4,7 @@
 
 #include "giganda_behavior.h"
 #include "utility.h"
+#include "stdio.h"
 
 
 const LedRGBChunk StartOnceLedSequence[] = {
@@ -92,6 +93,7 @@ const LedRGBChunk BombMasterSequence[] = {
 const VibroChunk kBrrLong[] = {
         {ChunkType::kSetup, kVibroVolume},
         {ChunkType::kWait, 1000},
+        {ChunkType::kSetup, 0},
         {ChunkType::kEnd}
 };
 
@@ -107,16 +109,24 @@ void GigandaBehavior::OnPillDisconnected() {
 }
 
 void GigandaBehavior::OnStarted() {
-    led->StartOrRestart(StartOnceLedSequence);
-    vibro->StartOrRestart(kBrrBrrBrr);
     // мы считаем, что здесь вызвался OnDipSwitchChanged
+    if (LocketType == LocketEnum::MASTER) {
+        led->StartOrRestart(EmptyMasterSequence);
+    } else {
+        led->StartOrRestart(StartOnceLedSequence);
+        vibro->StartOrRestart(kBrrBrrBrr);
+    }
 }
 
 void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
 
+    if (LocketType == LocketEnum::MASTER) {
+        master_pill_id = GetNextState(master_pill_id);
+    }
+
+
     if (pill_manager) {
         if (LocketType == LocketEnum::MASTER) {
-            master_pill_id = GetNextState(master_pill_id);
             pill_manager->WritePill({.id=master_pill_id});
         } else if (alive && state_timer==0) {
             uint32_t pill_id = pill_manager->ReadPill().id;
