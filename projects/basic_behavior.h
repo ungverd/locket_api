@@ -4,8 +4,14 @@
 #include "pill_manager.h"
 #include "behavior.h"
 
+
 class BasicBehavior: public Behavior<IdOnlyState, IdOnlyState> {
 public:
+    enum class Mode {
+        kAnnoying = 0,
+        kNotAnnoying = 1,
+    };
+
     using Behavior::Behavior;
 
     void OnStarted() override;
@@ -18,7 +24,7 @@ public:
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;
     uint32_t seconds_counter = 0;
-    bool annoying = true; // If true, beep and vibrate every bunch of seconds.
+    Mode mode = Mode::kAnnoying; // If true, beep and vibrate every bunch of seconds.
 };
 
 #endif //LOCKET_API_BASIC_BEHAVIOR_H
