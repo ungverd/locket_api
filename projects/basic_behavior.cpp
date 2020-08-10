@@ -38,6 +38,11 @@ const LedRGBChunk kPillDisconnectedSequence[] = {
         {ChunkType::kEnd},
 };
 
+const VibroChunk kVibroDoNothing[] = {{ChunkType::kEnd}};
+const BeepChunk kBeeperDoNothing[] = {{ChunkType::kEnd}};
+
+const VibroChunk* kVibroByMode[] = {kBrrBrr, kVibroDoNothing};
+const BeepChunk* kBeeperByMode[] = {kShortBeep, kBeeperDoNothing};
 
 void BasicBehavior::OnStarted() {
     logger->log("Started execution!");
@@ -54,14 +59,13 @@ void BasicBehavior::EverySecond() {
         led->StartOrRestart(kStartSequence);
     }
 
-    if (annoying) {
-        if (seconds_counter % 10 == 5) {
-            vibro->StartOrRestart(kBrrBrr);
-        }
 
-        if (seconds_counter % 10 == 0) {
-            beeper->StartOrRestart(kShortBeep);
-        }
+    if (seconds_counter % 10 == 5) {
+        vibro->StartOrRestart(kVibroByMode[static_cast<int>(mode)]);
+    }
+
+    if (seconds_counter % 10 == 0) {
+        beeper->StartOrRestart(kBeeperByMode[static_cast<int>(mode)]);
     }
 }
 
@@ -100,6 +104,6 @@ void BasicBehavior::OnButtonPressed(uint16_t button_index) {
     }
 
     if (button_index == 2) {
-        annoying = !annoying;
+        mode = Mode(1 - static_cast<int>(mode));
     }
 }
