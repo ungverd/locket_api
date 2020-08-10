@@ -8,7 +8,7 @@
 #define ACCELERATE_S 30
 #define REGENERATE_S  10
 #define REFRIGERATE_S  15
-#define BOMB_S  60
+#define BOMB_S  30
 
 #include "behavior.h"
 #include "pill_manager.h"
