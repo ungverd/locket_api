@@ -178,6 +178,7 @@ void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
                     vibro->StartOrRestart(kBrrLong);
                     alive = false;
                     state_timer = BOMB_S;
+                    break;
                 }
                 default: {
                     led->StartOrRestart(WrongOnceSequence);
