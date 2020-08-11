@@ -24,7 +24,7 @@ jobs:
       - name: mkdir arm
         run: mkdir build_arm
       - name: cmake build arm
-        run: cmake -DCMAKE_TOOLCHAIN_FILE=embedded/toolchain.cmake -Bbuild_arm -H.
+        run: cmake -DCMAKE_TOOLCHAIN_FILE=embedded/toolchain.cmake -DCMAKE_BUILD_TYPE=MinSizeRel -Bbuild_arm -H.
       - name: cmake make arm
         run: cmake --build build_arm/ --target all
       - name: print firmware stats
