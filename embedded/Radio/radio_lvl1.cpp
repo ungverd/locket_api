@@ -117,19 +117,6 @@ void ProcessRCmd() {
     }
     else { // for everyone!
         switch(PktRx.Cmd) {
-            case rcmdBeacon: // Damage pkt from lustra
-                if(PktRx.From >= LUSTRA_MIN_ID and PktRx.From <= LUSTRA_MAX_ID) {
-                    // Add to accumulator. Averaging is done in main thd
-                    int32_t Indx = PktRx.From - LUSTRA_MIN_ID;
-                    if(Indx >= 0 and Indx < LUSTRA_CNT) {
-                        g_radio_singleton.RxData[Indx].Cnt++;
-                        g_radio_singleton.RxData[Indx].Summ += Rssi;
-                        g_radio_singleton.RxData[Indx].RssiThr = PktRx.Beacon.RssiThr;
-                        g_radio_singleton.RxData[Indx].Damage = PktRx.Beacon.Damage;
-                    }
-                }
-                break;
-
             case rcmdLocketDieAll:
                 EvtQMain.SendNowOrExit(EvtMsg_t(evtIdShinePktMutant));
                 break;
@@ -147,16 +134,6 @@ void rLevel1_t::TryToSleep(uint32_t SleepDuration) {
 
 #if 1 // ============================
 uint8_t rLevel1_t::Init() {
-#ifdef DBG_PINS
-    PinSetupOut(DBG_GPIO1, DBG_PIN1, omPushPull);
-    PinSetupOut(DBG_GPIO2, DBG_PIN2, omPushPull);
-#endif
-
-    for(int i=0; i<LUSTRA_CNT; i++) {
-        RxData[i].Cnt = 0;
-        RxData[i].Summ = 0;
-    }
-
     RMsgQ.Init();
     if(CC.Init() == retvOk) {
         CC.SetTxPower(CC_PwrMinus20dBm);

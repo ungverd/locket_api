@@ -117,11 +117,6 @@ void ITask() {
 } // ITask()
 
 void CheckRxData() {
-    for(int i=0; i<LUSTRA_CNT; i++) {
-        if(g_radio_singleton.RxData[i].ProcessAndCheck()) {
-            EvtQMain.SendNowOrExit(EvtMsg_t(evtIdLustraDamagePkt, g_radio_singleton.RxData[i].Damage));
-        }
-    }
 }
 
 void OnCmd(Shell_t *PShell) {
