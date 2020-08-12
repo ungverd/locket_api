@@ -14,7 +14,6 @@ add_library(emulator
 target_link_libraries(emulator Threads::Threads api)
 target_include_directories(emulator INTERFACE .)
 
-# Now simply link against gtest or gtest_main as needed. Eg
 add_executable(emulator_test fake_led_test.cpp)
 target_link_libraries(emulator_test emulator gtest_main)
 gtest_discover_tests(emulator_test)
