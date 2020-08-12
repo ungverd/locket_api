@@ -37,9 +37,8 @@ cc1101_t CC(CC_Setup0);
 
 rLevel1_t g_radio_singleton;
 extern int32_t ID;
-void ProcessRCmd();
+void ProcessRCmd(const rPkt_t& packet);
 
-static rPkt_t PktTx, PktRx;
 static int8_t Rssi;
 
 #if 1 // ================================ Task =================================
@@ -50,31 +49,28 @@ static void rLvl1Thread(void *arg) {
     while(true) {
         // ==== TX if needed ====
         RMsg_t Msg = g_radio_singleton.RMsgQ.Fetch(TIME_IMMEDIATE);
-        if(Msg.Cmd == R_MSG_SEND_KILL) {
-            PktTx.From = ID;
-            PktTx.To = 0;
-            PktTx.TransmitterID = ID;
-            PktTx.Cmd = rcmdLocketDieAll;
-            PktTx.PktID = PKTID_DO_NOT_RETRANSMIT;
-            PktTx.Die.RssiThr = RSSI_FOR_MUTANT;
+        if(Msg.Cmd == R_MSG_TRANSMIT) {
             CC.SetTxPower(CC_PwrMinus20dBm);
             for(int i=0; i<4; i++) {
                 CC.Recalibrate();
-                CC.Transmit(&PktTx, RPKT_LEN);
+                CC.Transmit(g_radio_singleton.PktTx, g_radio_singleton.PktTxSize);
                 chThdSleepMilliseconds(99);
             }
         }
         // ==== Rx ====
         CC.Recalibrate();
+
+        rPkt_t PktRx;
         if(CC.Receive(360, &PktRx, RPKT_LEN, &Rssi) == retvOk) {
             Printf("From: %u; To: %u; TrrID: %u; PktID: %u; Cmd: %u; Rssi: %d\r\n", PktRx.From, PktRx.To, PktRx.TransmitterID, PktRx.PktID, PktRx.Cmd, Rssi);
 //            Led.StartOrRestart(lsqBlinkB);
-            ProcessRCmd();
+            ProcessRCmd(PktRx);
         }
     } // while true
 }
 
-void ProcessRCmd() {
+void ProcessRCmd(const rPkt_t& PktRx) {
+    rPkt_t PktTx;
     if(PktRx.To == ID) { // For us
         // Common preparations
         PktTx.From = ID;
@@ -86,23 +82,7 @@ void ProcessRCmd() {
             else PktTx.PktID = PktRx.PktID + 1;
         }
         else PktTx.PktID = PKTID_DO_NOT_RETRANSMIT;
-        PktTx.Pong.MaxLvlID = PktRx.TransmitterID;
-        PktTx.Pong.Reply = retvOk;
 
-        // Command processing
-        switch(PktRx.Cmd) {
-            case rcmdPing: break; // Do not fall into default
-
-            case rcmdLocketExplode:
-                EvtQMain.SendNowOrExit(EvtMsg_t(evtIdShineOrderHost));
-                break;
-
-            case rcmdLocketDieChoosen:
-                EvtQMain.SendNowOrExit(EvtMsg_t(evtIdShinePktMutant));
-                break;
-
-            default: PktTx.Pong.Reply = retvCmdError; break;
-        } // switch
         // Transmit pkt
         if(PktRx.PktID != PKTID_DO_NOT_RETRANSMIT) chThdSleepMilliseconds(999); // Let network to calm down
         CC.SetTxPower(CC_PwrPlus5dBm);

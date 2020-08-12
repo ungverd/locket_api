@@ -57,66 +57,6 @@ static inline void Lvl250ToLvl1000(uint16_t *PLvl) {
 
 #if 1 // =========================== Pkt_t =====================================
 
-enum RCmd_t : uint8_t {
-    rcmdNone = 0,
-    rcmdPing = 1,
-    rcmdPong = 2,
-    rcmdBeacon = 3,
-    rcmdScream = 4,
-    rcmdLustraParams = 5,
-    rcmdLocketSetParam = 6,
-    rcmdLocketGetParam = 7,
-    rcmdLocketExplode = 8,
-    rcmdLocketDieAll = 9,
-    rcmdLocketDieChoosen = 10,
-};
-
-struct rPkt_t {
-    uint16_t From;  // 2
-    uint16_t To;    // 2
-    uint16_t TransmitterID; // 2
-    RCmd_t Cmd; // 1
-    uint8_t PktID; // 1
-    union {
-        struct {
-            uint16_t MaxLvlID;
-            uint8_t Reply;
-        } __attribute__ ((__packed__)) Pong; // 3
-
-        struct {
-            int8_t RssiThr;
-            uint8_t Damage;
-            uint8_t Power;
-        } __attribute__ ((__packed__)) Beacon; // 3
-
-        struct {
-            uint8_t Power;
-            int8_t RssiThr;
-            uint8_t Damage;
-        } __attribute__ ((__packed__)) LustraParams; // 3
-
-        struct {
-            uint8_t ParamID;
-            uint16_t Value;
-        } __attribute__ ((__packed__)) LocketParam; // 3
-
-        struct {
-            int8_t RssiThr;
-        } __attribute__ ((__packed__)) Die; // 1
-    } __attribute__ ((__packed__)); // union
-    rPkt_t& operator = (const rPkt_t &Right) {
-        From = Right.From;
-        To = Right.To;
-        TransmitterID = Right.TransmitterID;
-        Cmd = Right.Cmd;
-        PktID = Right.PktID;
-        // Payload
-        Pong.MaxLvlID = Right.Pong.MaxLvlID;
-        Pong.Reply = Right.Pong.Reply;
-        return *this;
-    }
-} __attribute__ ((__packed__));
-
 #define PKTID_DO_NOT_RETRANSMIT 0
 #define PKTID_TOP_VALUE         254
 #endif
@@ -127,7 +67,7 @@ struct rPkt_t {
 #define R_MSGQ_LEN      4 // Length of q
 #define R_MSG_SET_PWR   1
 #define R_MSG_SET_CHNL  2
-#define R_MSG_SEND_KILL 4
+#define R_MSG_TRANSMIT  4
 struct RMsg_t {
     uint8_t Cmd;
     uint8_t Value;
@@ -164,12 +104,35 @@ struct RMsg_t {
 #define LUSTRA_MIN_ID   1000
 #define LUSTRA_MAX_ID   (LUSTRA_MIN_ID + LUSTRA_CNT - 1)
 
+enum RCmd_t : uint8_t {
+    rcmdNone = 0,
+    rcmdPing = 1,
+    rcmdPong = 2,
+    rcmdBeacon = 3,
+    rcmdScream = 4,
+    rcmdLustraParams = 5,
+    rcmdLocketSetParam = 6,
+    rcmdLocketGetParam = 7,
+    rcmdLocketExplode = 8,
+    rcmdLocketDieAll = 9,
+    rcmdLocketDieChoosen = 10,
+};
+
+struct rPkt_t {
+    uint16_t From;  // 2
+    uint16_t To;    // 2
+    uint16_t TransmitterID; // 2
+    RCmd_t Cmd; // 1
+    uint8_t PktID; // 1
+};
+
 class rLevel1_t {
 public:
     EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ;
-    rPkt_t PktRx, PktTx;
-//    bool MustTx = false;
     int8_t Rssi;
+
+    void* PktTx = nullptr;
+    uint32_t PktTxSize = 0;
 
     uint8_t Init();
     // Inner use

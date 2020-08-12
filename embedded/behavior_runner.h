@@ -83,7 +83,7 @@ public:
         // ==== Radio ====
         g_radio_singleton.Init();
 
-        RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper;
+        RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper(&g_radio_singleton);
 
         behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper);
         CheckDipSwitch();
