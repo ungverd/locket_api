@@ -11,5 +11,13 @@ target_sources(api INTERFACE
         utility.h
         utility.cpp
         vibro.h
+        rx_table.h
 )
 target_include_directories(api INTERFACE . ..)
+
+if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+    add_executable(api_test
+            rx_table_test.cpp)
+    target_link_libraries(api_test api gtest_main)
+    gtest_discover_tests(api_test)
+endif()
