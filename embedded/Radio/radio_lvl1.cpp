@@ -35,7 +35,7 @@ cc1101_t CC(CC_Setup0);
 #define DBG1_CLR()
 #endif
 
-rLevel1_t Radio;
+rLevel1_t g_radio_singleton;
 extern int32_t ID;
 void ProcessRCmd();
 
@@ -49,7 +49,7 @@ static void rLvl1Thread(void *arg) {
     chRegSetThreadName("rLvl1");
     while(true) {
         // ==== TX if needed ====
-        RMsg_t Msg = Radio.RMsgQ.Fetch(TIME_IMMEDIATE);
+        RMsg_t Msg = g_radio_singleton.RMsgQ.Fetch(TIME_IMMEDIATE);
         if(Msg.Cmd == R_MSG_SEND_KILL) {
             PktTx.From = ID;
             PktTx.To = 0;
@@ -122,10 +122,10 @@ void ProcessRCmd() {
                     // Add to accumulator. Averaging is done in main thd
                     int32_t Indx = PktRx.From - LUSTRA_MIN_ID;
                     if(Indx >= 0 and Indx < LUSTRA_CNT) {
-                        Radio.RxData[Indx].Cnt++;
-                        Radio.RxData[Indx].Summ += Rssi;
-                        Radio.RxData[Indx].RssiThr = PktRx.Beacon.RssiThr;
-                        Radio.RxData[Indx].Damage = PktRx.Beacon.Damage;
+                        g_radio_singleton.RxData[Indx].Cnt++;
+                        g_radio_singleton.RxData[Indx].Summ += Rssi;
+                        g_radio_singleton.RxData[Indx].RssiThr = PktRx.Beacon.RssiThr;
+                        g_radio_singleton.RxData[Indx].Damage = PktRx.Beacon.Damage;
                     }
                 }
                 break;

@@ -16,6 +16,7 @@
 #include "fake_beeper.h"
 #include "fake_vibro.h"
 #include "stdout_logger.h"
+#include "fake_radio.h"
 
 namespace emulator {
 
@@ -26,8 +27,9 @@ public:
         FakeLed led;
         FakeBeeper beeper;
         FakeVibro vibro;
+        FakeRadio<typename BehaviorType::RadioPacketParameter> radio;
         StdOutLogger logger;
-        behavior = std::make_unique<BehaviorType>(&logger, &led, &beeper, &vibro);
+        behavior = std::make_unique<BehaviorType>(&logger, &led, &beeper, &vibro, &radio);
         std::atomic<bool> stopping_execution = false;
 
         std::cout << "Execution started. Supported commands: \n";

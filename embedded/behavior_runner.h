@@ -8,6 +8,7 @@
 #include "embedded/wrappers/rgb_led_wrapper.h"
 #include "embedded/wrappers/logger_wrapper.h"
 #include "embedded/wrappers/pill_manager_wrapper.h"
+#include "embedded/wrappers/radio_wrapper.h"
 #include "embedded/kl_lib/led.h"
 #include "embedded/kl_lib/vibro.h"
 #include "embedded/kl_lib/beeper.h"
@@ -80,9 +81,11 @@ public:
         TmrEverySecond.StartOrRestart();
 
         // ==== Radio ====
-        Radio.Init();
+        g_radio_singleton.Init();
 
-        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper);
+        RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper;
+
+        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper);
         CheckDipSwitch();
         behavior->OnStarted();
 

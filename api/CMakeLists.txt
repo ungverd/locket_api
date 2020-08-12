@@ -12,6 +12,7 @@ target_sources(api INTERFACE
         utility.cpp
         vibro.h
         rx_table.h
+        radio.h
 )
 target_include_directories(api INTERFACE . ..)
 

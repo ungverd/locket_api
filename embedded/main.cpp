@@ -66,7 +66,7 @@ int main(void) {
     TmrEverySecond.StartOrRestart();
 
     // ==== Radio ====
-    if(Radio.Init() == retvOk) Led.StartOrRestart(kStartSequence);
+    if(g_radio_singleton.Init() == retvOk) Led.StartOrRestart(kStartSequence);
     else Led.StartOrRestart(kFailureSequence);
     VibroMotor.StartOrRestart(kBrrBrr);
     chThdSleepMilliseconds(1008);
@@ -118,8 +118,8 @@ void ITask() {
 
 void CheckRxData() {
     for(int i=0; i<LUSTRA_CNT; i++) {
-        if(Radio.RxData[i].ProcessAndCheck()) {
-            EvtQMain.SendNowOrExit(EvtMsg_t(evtIdLustraDamagePkt, Radio.RxData[i].Damage));
+        if(g_radio_singleton.RxData[i].ProcessAndCheck()) {
+            EvtQMain.SendNowOrExit(EvtMsg_t(evtIdLustraDamagePkt, g_radio_singleton.RxData[i].Damage));
         }
     }
 }
@@ -145,7 +145,7 @@ void OnCmd(Shell_t *PShell) {
         RMsg_t msg;
         msg.Cmd = R_MSG_SET_CHNL;
         msg.Value = ID2RCHNL(ID);
-        Radio.RMsgQ.SendNowOrExit(msg);
+        g_radio_singleton.RMsgQ.SendNowOrExit(msg);
         PShell->Ack(r);
     }
 
