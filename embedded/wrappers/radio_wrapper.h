@@ -11,7 +11,6 @@ public:
     void Transmit(const TRadioPacket& packet) override {
         packet_to_send = packet;
         radio->PktTx = &packet_to_send;
-        radio->PktTxSize = sizeof(TRadioPacket);
         RMsg_t msg;
         msg.Cmd = R_MSG_TRANSMIT;
         radio->RMsgQ.SendNowOrExit(msg);

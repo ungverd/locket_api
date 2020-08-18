@@ -108,8 +108,7 @@ public:
     EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ;
     int8_t Rssi;
 
-    void* PktTx = nullptr;
-    uint32_t PktTxSize = 0;
+    TRadioPacket* PktTx = nullptr;
 
     uint8_t Init();
     // Inner use
@@ -136,7 +135,7 @@ static void rLvl1Thread(void* arg) {
             CC.SetTxPower(CC_PwrMinus20dBm);
             for(int i=0; i<4; i++) {
                 CC.Recalibrate();
-                CC.Transmit(radio_instance->PktTx, radio_instance->PktTxSize);
+                CC.Transmit(radio_instance->PktTx, sizeof(TRadioPacket));
                 chThdSleepMilliseconds(99);
             }
         }
