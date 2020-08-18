@@ -61,8 +61,6 @@ static inline void Lvl250ToLvl1000(uint16_t *PLvl) {
 #define PKTID_TOP_VALUE         254
 #endif
 
-#define RPKT_LEN                sizeof(rPkt_t)
-
 // Message queue
 #define R_MSGQ_LEN      4 // Length of q
 #define R_MSG_SET_PWR   1
@@ -103,28 +101,6 @@ struct RMsg_t {
 #define LUSTRA_CNT      100
 #define LUSTRA_MIN_ID   1000
 #define LUSTRA_MAX_ID   (LUSTRA_MIN_ID + LUSTRA_CNT - 1)
-
-enum RCmd_t : uint8_t {
-    rcmdNone = 0,
-    rcmdPing = 1,
-    rcmdPong = 2,
-    rcmdBeacon = 3,
-    rcmdScream = 4,
-    rcmdLustraParams = 5,
-    rcmdLocketSetParam = 6,
-    rcmdLocketGetParam = 7,
-    rcmdLocketExplode = 8,
-    rcmdLocketDieAll = 9,
-    rcmdLocketDieChoosen = 10,
-};
-
-struct rPkt_t {
-    uint16_t From;  // 2
-    uint16_t To;    // 2
-    uint16_t TransmitterID; // 2
-    RCmd_t Cmd; // 1
-    uint8_t PktID; // 1
-};
 
 template <typename TRadioPacket>
 class RadioLevel1 {
@@ -168,16 +144,9 @@ static void rLvl1Thread(void* arg) {
         CC.Recalibrate();
 
         int8_t Rssi;
-        rPkt_t PktRx;
-        if(CC.Receive(360, &PktRx, RPKT_LEN, &Rssi) == retvOk) {
-            Printf("From: %u; To: %u; TrrID: %u; PktID: %u; Cmd: %u; Rssi: %d\r\n", PktRx.From, PktRx.To, PktRx.TransmitterID, PktRx.PktID, PktRx.Cmd, Rssi);
-            switch(PktRx.Cmd) {
-                case rcmdLocketDieAll:
-                    EvtQMain.SendNowOrExit(EvtMsg_t(evtIdShinePktMutant));
-                    break;
-
-                default: break;
-            }
+        TRadioPacket PktRx;
+        if(CC.Receive(360, &PktRx, sizeof(TRadioPacket), &Rssi) == retvOk) {
+            Printf("Received radio packet");
         }
     } // while true
 }
@@ -195,7 +164,7 @@ uint8_t RadioLevel1<TRadioPacket>::Init() {
     RMsgQ.Init();
     if(CC.Init() == retvOk) {
         CC.SetTxPower(CC_PwrMinus20dBm);
-        CC.SetPktSize(RPKT_LEN);
+        CC.SetPktSize(sizeof(TRadioPacket));
         CC.SetChannel(1);
         // Thread
         chThdCreateStatic(warLvl1Thread, sizeof(warLvl1Thread), HIGHPRIO, rLvl1Thread<TRadioPacket>, this);

@@ -30,6 +30,28 @@ Beeper_t Beeper {BEEPER_PIN};
 
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 
+enum RCmd_t : uint8_t {
+    rcmdNone = 0,
+    rcmdPing = 1,
+    rcmdPong = 2,
+    rcmdBeacon = 3,
+    rcmdScream = 4,
+    rcmdLustraParams = 5,
+    rcmdLocketSetParam = 6,
+    rcmdLocketGetParam = 7,
+    rcmdLocketExplode = 8,
+    rcmdLocketDieAll = 9,
+    rcmdLocketDieChoosen = 10,
+};
+
+struct rPkt_t {
+    uint16_t From;  // 2
+    uint16_t To;    // 2
+    uint16_t TransmitterID; // 2
+    RCmd_t Cmd; // 1
+    uint8_t id; // 1
+};
+
 RadioLevel1<rPkt_t> Radio;
 
 // ==== Timers ====
