@@ -67,6 +67,11 @@ void BasicBehavior::EverySecond() {
     if (seconds_counter % 10 == 0) {
         beeper->StartOrRestart(kBeeperByMode[static_cast<int>(mode)]);
     }
+
+    if (rx_table.HasPacketWithId(17)) {
+        vibro->StartOrRestart(kBrrBrrBrr);
+    }
+    rx_table.Clear();
 }
 
 void BasicBehavior::OnPillConnected(PillManager<IdOnlyState>* manager) {
@@ -99,6 +104,10 @@ void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
 }
 
 void BasicBehavior::OnButtonPressed(uint16_t button_index) {
+    if (button_index == 0) {
+        radio->Transmit({17});
+    }
+
     if (button_index == 1) {
         led->StartOrRestart(kButtonSequence);
     }
@@ -106,4 +115,8 @@ void BasicBehavior::OnButtonPressed(uint16_t button_index) {
     if (button_index == 2) {
         mode = Mode(1 - static_cast<int>(mode));
     }
+}
+
+void BasicBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+    rx_table.AddPacket(packet);
 }

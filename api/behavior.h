@@ -85,7 +85,8 @@ public:
     // To get the ON/OFF state of the specific switch, use GetSwitchState from the utility.h.
     virtual void OnDipSwitchChanged(uint16_t dip_value_mask) {}
 
-    // TODO(aeremin) Add radio handler and RadioManager member.
+    // TODO(aeremin)
+    virtual void OnRadioPacketReceived(const RadioPacket& packet) {}
 
     // Internal: This is needed for BehaviorRunner to work.
     using PillStateParameter = PillState;

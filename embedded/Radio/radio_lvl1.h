@@ -37,6 +37,7 @@ template <typename TRadioPacket>
 class RadioLevel1 {
 public:
     EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ;
+    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets;
     TRadioPacket* PktTx = nullptr;
     uint8_t Init();
     // Inner use
@@ -66,6 +67,8 @@ static void rLvl1Thread(void* arg) {
         TRadioPacket PktRx;
         if(CC.Receive(360, &PktRx, sizeof(TRadioPacket), &Rssi) == retvOk) {
             Printf("Received radio packet");
+            EvtQMain.SendNowOrExit({evtIdRadioCmd});
+            radio_instance->received_packets.SendNowOrExit(PktRx);
         }
     } // while true
 }
@@ -80,6 +83,7 @@ template <typename TRadioPacket>
 uint8_t RadioLevel1<TRadioPacket>::Init() {
     static THD_WORKING_AREA(warLvl1Thread, 256);
 
+    received_packets.Init();
     RMsgQ.Init();
     if(CC.Init() == retvOk) {
         CC.SetTxPower(CC_PwrMinus20dBm);

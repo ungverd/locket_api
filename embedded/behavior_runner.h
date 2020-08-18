@@ -112,6 +112,11 @@ public:
                 case evtIdPillDisconnected:
                     behavior->OnPillDisconnected();
                     break;
+
+                case evtIdRadioCmd:
+                    const auto packet = radio.received_packets.Fetch(TIME_IMMEDIATE);
+                    behavior->OnRadioPacketReceived(packet);
+                    break;
             }
         }
     }
