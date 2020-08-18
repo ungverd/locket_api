@@ -10,7 +10,7 @@
 
 #define CC_MAX_BAUDRATE_HZ  6500000
 
-extern cc1101_t CC;
+cc1101_t CC(CC_Setup0);
 
 void CCIrqHandler() { CC.IIrqHandler(); }
 

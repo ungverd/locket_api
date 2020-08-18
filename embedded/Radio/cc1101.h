@@ -78,3 +78,5 @@ public:
         IGdo0(AGd0Gpio, AGdo0, pudNone, CCIrqHandler),
         IState(0), ThdRef(nullptr) {}
 };
+
+extern cc1101_t CC;
