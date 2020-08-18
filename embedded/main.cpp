@@ -29,6 +29,8 @@ Beeper_t Beeper {BEEPER_PIN};
 
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 
+rLevel1_t Radio;
+
 // ==== Timers ====
 static TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
@@ -66,7 +68,7 @@ int main(void) {
     TmrEverySecond.StartOrRestart();
 
     // ==== Radio ====
-    if(g_radio_singleton.Init() == retvOk) Led.StartOrRestart(kStartSequence);
+    if(Radio.Init() == retvOk) Led.StartOrRestart(kStartSequence);
     else Led.StartOrRestart(kFailureSequence);
     VibroMotor.StartOrRestart(kBrrBrr);
     chThdSleepMilliseconds(1008);
@@ -140,7 +142,7 @@ void OnCmd(Shell_t *PShell) {
         RMsg_t msg;
         msg.Cmd = R_MSG_SET_CHNL;
         msg.Value = ID2RCHNL(ID);
-        g_radio_singleton.RMsgQ.SendNowOrExit(msg);
+        Radio.RMsgQ.SendNowOrExit(msg);
         PShell->Ack(r);
     }
 

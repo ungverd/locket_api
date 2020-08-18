@@ -9,8 +9,6 @@
 #include "radio_lvl1.h"
 #include "uart.h"
 
-rLevel1_t g_radio_singleton;
-
 static THD_WORKING_AREA(warLvl1Thread, 256);
 
 template <typename TRadioPacket>

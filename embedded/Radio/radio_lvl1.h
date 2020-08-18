@@ -147,4 +147,3 @@ public:
     void TaskFeelEachOtherMany();
 };
 
-extern rLevel1_t g_radio_singleton;

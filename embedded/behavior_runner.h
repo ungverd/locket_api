@@ -36,6 +36,7 @@ LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
 LoggerWrapper loggerWrapper(&Uart);
 
+rLevel1_t radio;
 
 // ==== Timers ====
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
@@ -81,9 +82,9 @@ public:
         TmrEverySecond.StartOrRestart();
 
         // ==== Radio ====
-        g_radio_singleton.Init();
+        radio.Init();
 
-        RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper(&g_radio_singleton);
+        RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper(&radio);
 
         behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper);
         CheckDipSwitch();
