@@ -1,3 +1,4 @@
+#include "common_states.h"
 #include "board.h"
 #include "led.h"
 #include "vibro.h"
@@ -29,7 +30,7 @@ Beeper_t Beeper {BEEPER_PIN};
 
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 
-rLevel1_t Radio;
+RadioLevel1<rPkt_t> Radio;
 
 // ==== Timers ====
 static TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};

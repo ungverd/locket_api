@@ -36,8 +36,6 @@ LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
 LoggerWrapper loggerWrapper(&Uart);
 
-rLevel1_t radio;
-
 // ==== Timers ====
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
@@ -51,6 +49,8 @@ private:
     Behavior<typename BehaviorType::PillStateParameter,
             typename BehaviorType::RadioPacketParameter>* behavior = nullptr;
     PillManagerWrapper<typename BehaviorType::PillStateParameter> pill_manager_wrapper{&PillMgr};
+    RadioLevel1<typename BehaviorType::RadioPacketParameter> radio;
+
 public:
     [[noreturn]] void Run() {
         // ==== Init Vcore & clock system ====

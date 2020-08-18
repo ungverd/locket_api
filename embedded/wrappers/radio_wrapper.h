@@ -7,7 +7,7 @@
 template <typename TRadioPacket>
 class RadioWrapper: public Radio<TRadioPacket> {
 public:
-    explicit RadioWrapper(rLevel1_t* radio): radio(radio) {}
+    explicit RadioWrapper(RadioLevel1<TRadioPacket>* radio): radio(radio) {}
     void Transmit(const TRadioPacket& packet) override {
         packet_to_send = packet;
         radio->PktTx = &packet_to_send;
@@ -18,7 +18,7 @@ public:
     }
 
 private:
-    rLevel1_t* radio;
+    RadioLevel1<TRadioPacket>* radio;
     TRadioPacket packet_to_send;
 };
 
