@@ -85,7 +85,15 @@ public:
     // To get the ON/OFF state of the specific switch, use GetSwitchState from the utility.h.
     virtual void OnDipSwitchChanged(uint16_t dip_value_mask) {}
 
-    // TODO(aeremin)
+    // Will be called each time new radio packet is received.
+    // Most typical way to handle that is to
+    // 1) Add `RxTable<RadioPacket> rx_table` member to your behavior class.
+    // 2) Call `rx_table.AddPacket(packet)` in OnRadioPacketReceived.
+    // 3) Investigate recent packets in EverySecond using rx_table methods and then call rx_table.Clear().
+    //
+    // In this approach, RxTable is used to deduplicate packets with same id. Also, we don't process incoming packets
+    // immediately and independently, but instead process all packets received during recent second. This simplifies
+    // implementation of more complex behaviors
     virtual void OnRadioPacketReceived(const RadioPacket& packet) {}
 
     // Internal: This is needed for BehaviorRunner to work.
