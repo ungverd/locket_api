@@ -107,7 +107,7 @@ target_link_libraries(your_behavior api)
   [projects/basic_behavior_firmware.cpp](projects/basic_behavior_firmware.cpp) and changing
   `BasicBehavior` to your `Behavior`-implementing class.
   * Add a CMake target `your_behavior_firmware` to [projects/CMakeLists.txt](projects/CMakeLists.txt).
-  Put it next to the other firmware targets (inside `if` block):
+  Put it next to the other firmware targets (inside `else` block):
 ```cmake
     add_firmware(your_behavior.elf your_behavior_firmware.cpp)
     target_link_libraries(your_behavior.elf your_behavior)
