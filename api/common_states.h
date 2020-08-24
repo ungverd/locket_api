@@ -11,4 +11,11 @@ struct IdOnlyState {
     uint32_t id;
 };
 
+
+// Type for transmitting id and type
+struct IdAndTypeState {
+    uint32_t id;
+    uint8_t state;
+};
+
 #endif //LOCKET_API_COMMON_STATES_H
