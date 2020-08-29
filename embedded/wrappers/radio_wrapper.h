@@ -9,16 +9,25 @@ class RadioWrapper: public Radio<TRadioPacket> {
 public:
     explicit RadioWrapper(RadioLevel1<TRadioPacket>* radio): radio(radio) {}
     void Transmit(const TRadioPacket& packet) override {
-        packet_to_send = packet;
-        radio->PktTx = &packet_to_send;
+        packet_to_send_once = packet;
+        radio->PktTxOnce = &packet_to_send_once;
         RMsg_t msg;
         msg.Cmd = R_MSG_TRANSMIT;
         radio->RMsgQ.SendNowOrExit(msg);
     }
 
+    void SetBeaconPacket(const TRadioPacket& packet) override {
+        packet_beacon = packet;
+        radio->PktTxBeacon = &packet_beacon;
+    }
+
+    void ClearBeaconPacket() override {
+        radio->PktTxBeacon = nullptr;
+    }
+
 private:
     RadioLevel1<TRadioPacket>* radio;
-    TRadioPacket packet_to_send;
+    TRadioPacket packet_to_send_once, packet_beacon;
 };
 
 #endif //LOCKET_API_RADIO_WRAPPER_H

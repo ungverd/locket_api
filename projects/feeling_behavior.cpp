@@ -23,6 +23,7 @@ const LedRGBChunk kFeelSequence[] = {
 void FeelingBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
+    radio->SetBeaconPacket({19});
 }
 
 void FeelingBehavior::EverySecond() {
@@ -33,7 +34,6 @@ void FeelingBehavior::EverySecond() {
         rx_table.Clear();
         logger->log("BrrBrrBrr");
     }
-    radio->Transmit({19});
     logger->log("PacketSent!");
 
 }

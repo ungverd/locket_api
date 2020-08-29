@@ -38,7 +38,8 @@ class RadioLevel1 {
 public:
     EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ;
     EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets;
-    TRadioPacket* PktTx = nullptr;
+    TRadioPacket* PktTxOnce = nullptr;
+    TRadioPacket* PktTxBeacon = nullptr;
     uint8_t Init();
     // Inner use
     void TryToSleep(uint32_t SleepDuration);
@@ -56,10 +57,17 @@ static void rLvl1Thread(void* arg) {
             CC.SetTxPower(CC_PwrMinus20dBm);
             for(int i=0; i<4; i++) {
                 CC.Recalibrate();
-                CC.Transmit(radio_instance->PktTx, sizeof(TRadioPacket));
+                CC.Transmit(radio_instance->PktTxOnce, sizeof(TRadioPacket));
                 chThdSleepMilliseconds(99);
             }
         }
+
+        if (radio_instance->PktTxBeacon) {
+            CC.SetTxPower(CC_PwrMinus20dBm);
+            CC.Recalibrate();
+            CC.Transmit(radio_instance->PktTxBeacon, sizeof(TRadioPacket));
+        }
+
         // ==== Rx ====
         CC.Recalibrate();
 
@@ -70,6 +78,8 @@ static void rLvl1Thread(void* arg) {
             EvtQMain.SendNowOrExit({evtIdRadioCmd});
             radio_instance->received_packets.SendNowOrExit(PktRx);
         }
+
+        radio_instance->TryToSleep(300);
     } // while true
 }
 
