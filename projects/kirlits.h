@@ -9,6 +9,7 @@
 #include "rx_table.h"
 #include "behavior.h"
 
+enum class LocketEnum{YELLOW, WHITE, SILENT, BLUE, RED, BLUERED};
 
 class KirlitsBehavior: public Behavior<IdOnlyState, IdAndTypeState> {
 public:
@@ -23,6 +24,8 @@ public:
 private:
     uint32_t seconds_counter = 0;
     RxTable<IdAndTypeState> rx_table;
+    LocketEnum LocketType = LocketEnum::YELLOW;
+    LocketEnum IdToEnum(uint8_t id);
 };
 
 #endif //LOCKET_API_KIRLITS_H
