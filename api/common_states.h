@@ -15,7 +15,7 @@ struct IdOnlyState {
 // Type for transmitting id and type
 struct IdAndTypeState {
     uint32_t id;
-    uint8_t state;
+    uint8_t locket_type;
 };
 
 #endif //LOCKET_API_COMMON_STATES_H
