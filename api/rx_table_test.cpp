@@ -11,19 +11,16 @@ struct DummyRadioPacket {
     uint32_t stuff;
 };
 
-class RxTableTest: public testing::Test {
-public:
+TEST(RxTableTest, CanAddPacket) {
     RxTable<DummyRadioPacket, 10> table;
-};
-
-TEST_F(RxTableTest, CanAddPacket) {
     DummyRadioPacket p = {10, 'x', 123};
     EXPECT_EQ(table.AddPacket(p), true);
     EXPECT_EQ(table.Raw().size(), 1);
     EXPECT_EQ(table.Raw()[0], p);
 }
 
-TEST_F(RxTableTest, LatestPacketOverridesPrevious) {
+TEST(RxTableTest, LatestPacketOverridesPrevious) {
+    RxTable<DummyRadioPacket, 10> table;
     DummyRadioPacket p_first = {10, 'x', 123};
     DummyRadioPacket p_second = {10, 'y', 321};
     EXPECT_EQ(table.AddPacket(p_first), true);
@@ -32,7 +29,8 @@ TEST_F(RxTableTest, LatestPacketOverridesPrevious) {
     EXPECT_EQ(table.Raw()[0], p_second);
 }
 
-TEST_F(RxTableTest, CanGetPacketByIdIfPresent) {
+TEST(RxTableTest, CanGetPacketByIdIfPresent) {
+    RxTable<DummyRadioPacket, 10> table;
     DummyRadioPacket p1 = {11, 'x', 123};
     DummyRadioPacket p2 = {12, 'y', 321};
     DummyRadioPacket p3 = {13, 'z', 555};
@@ -52,7 +50,8 @@ TEST_F(RxTableTest, CanGetPacketByIdIfPresent) {
     }
 }
 
-TEST_F(RxTableTest, CanCheckForPacketPresence) {
+TEST(RxTableTest, CanCheckForPacketPresence) {
+    RxTable<DummyRadioPacket, 10> table;
     DummyRadioPacket p1 = {11, 'x', 123};
     DummyRadioPacket p2 = {12, 'y', 321};
     DummyRadioPacket p3 = {13, 'z', 555};
@@ -63,7 +62,8 @@ TEST_F(RxTableTest, CanCheckForPacketPresence) {
     EXPECT_FALSE(table.HasPacketWithId(14));
 }
 
-TEST_F(RxTableTest, AddPacketReturnsFalseOnOverflow) {
+TEST(RxTableTest, AddPacketReturnsFalseOnOverflow) {
+    RxTable<DummyRadioPacket, 10> table;
     for (uint8_t i = 0; i < 10; ++i) {
         DummyRadioPacket p = {i, 'x', 123};
         EXPECT_TRUE(table.AddPacket(p));
@@ -75,7 +75,8 @@ TEST_F(RxTableTest, AddPacketReturnsFalseOnOverflow) {
     EXPECT_EQ(table.Raw().size(), 10);
 }
 
-TEST_F(RxTableTest, CanFitAnyNumbersOfPacketsWithSameId) {
+TEST(RxTableTest, CanFitAnyNumbersOfPacketsWithSameId) {
+    RxTable<DummyRadioPacket, 10> table;
     for (uint32_t i = 0; i < 100; ++i) {
         DummyRadioPacket p = {10, 'x', i};
         EXPECT_TRUE(table.AddPacket(p));
@@ -83,7 +84,8 @@ TEST_F(RxTableTest, CanFitAnyNumbersOfPacketsWithSameId) {
     }
 }
 
-TEST_F(RxTableTest, CanClear) {
+TEST(RxTableTest, CanClear) {
+    RxTable<DummyRadioPacket, 10> table;
     DummyRadioPacket p1 = {11, 'x', 123};
     DummyRadioPacket p2 = {12, 'y', 321};
     DummyRadioPacket p3 = {13, 'z', 555};
