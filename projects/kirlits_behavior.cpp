@@ -7,7 +7,7 @@
 
 const int FlashDur = 500;
 const int MaxLocketNum = 16;
-const int MaxChunksForLocket = 5;
+const int MaxChunksForLocket = 9;
 const int MaxChunkNum = MaxChunksForLocket*MaxLocketNum;
 const int TypesNum = 6;
 
@@ -62,14 +62,16 @@ const LedRGBChunk kDoubleWhite[] = {
 const LedRGBChunk kRedAndBlue[] = {
         {ChunkType::kSetup, 0, kRed},
         {ChunkType::kWait, FlashDur},
-        {ChunkType::kSetup, 0, kBlack},
-        {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait, FlashDur},
-        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kSetup, 0, kRed},
+        {ChunkType::kWait, FlashDur},
+        {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait,  FlashDur},
         {ChunkType::kEnd}
 };
+
+const LedRGBChunk* Sequences[] = {kDoubleYellow, kDoubleWhite, kDoubleBlue, kDoubleRed, kRedAndBlue};
 
 void KirlitsBehavior::OnStarted() {
     logger->log("Started execution!");
@@ -91,23 +93,37 @@ void KirlitsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
     LocketType = TypeToEnum(CurrentType);
     radio->ClearBeaconPacket();
     radio->SetBeaconPacket({LocketId, EnumToType()});
-    logger->log("Radio Started");
+    logger->log("Radio Started %i % i", LocketId, EnumToType());
 }
 
 void KirlitsBehavior::EverySecond() {
     ++seconds_counter;
-    uint8_t LocketNum = 0;
-    LedRGBChunk
     if (seconds_counter % 60 == 0) {
-        for (uint8_t i = 0; i < TypesNum; i++) {
-            LocketNum = 0;
-
+        int LocketsNear[TypesNum] = {};
+        logger->log("MinutePassed!");
+        for (int i = 0; i < rx_table.Raw().size(); i++) {
+            LocketsNear[rx_table.Raw()[i].locket_type] += 1;
         }
+        for (int i = 0; i < TypesNum-1; i++) {
+            for (int j = 0; j < LocketsNear[i]; j++) {
+                for (int k = 0; k < sizeof(*Sequences[i])/sizeof(LedRGBChunk); k++) {
+                    sequence.push_back(Sequences[i][k]);
+                }
+            }
+        }
+        led->Stop();
         rx_table.Clear();
         logger->log("LedsStarted!");
+        led->StartOrRestart(sequence.data());
+        if (LocketsNear[TypesNum-1] != 0) {
+            radio->ClearBeaconPacket();
+            logger->log("Radio Off");
+        } else {
+            radio->SetBeaconPacket({LocketId, EnumToType()});
+            logger->log("Radio Started %i % i", LocketId, EnumToType());
+        }
+        seconds_counter = 0;
     }
-    logger->log("SecondPassed!");
-
 }
 
 void KirlitsBehavior::OnRadioPacketReceived(const IdAndTypeState& packet) {

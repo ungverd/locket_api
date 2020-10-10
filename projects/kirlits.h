@@ -9,7 +9,7 @@
 #include "rx_table.h"
 #include "behavior.h"
 
-enum class LocketEnum{YELLOW, WHITE, SILENT, BLUE, RED, BLUERED};
+enum class LocketEnum{YELLOW, WHITE, BLUE, RED, BLUERED, SILENT};
 
 class KirlitsBehavior: public Behavior<IdOnlyState, IdAndTypeState> {
 public:
