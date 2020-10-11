@@ -11,7 +11,7 @@ const int MaxChunksForLocket = 9;
 const int MaxChunkNum = MaxChunksForLocket*MaxLocketNum;
 const int TypesNum = 6;
 
-const LedRGBChunk kDoubleYellow[] = {
+const std::vector<LedRGBChunk> kDoubleYellow = {
         {ChunkType::kSetup, 0, kYellow},
         {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlack},
@@ -23,7 +23,7 @@ const LedRGBChunk kDoubleYellow[] = {
         {ChunkType::kEnd}
 };
 
-const LedRGBChunk kDoubleRed[] = {
+const std::vector<LedRGBChunk> kDoubleRed = {
         {ChunkType::kSetup, 0, kRed},
         {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlack},
@@ -35,7 +35,7 @@ const LedRGBChunk kDoubleRed[] = {
         {ChunkType::kEnd}
 };
 
-const LedRGBChunk kDoubleBlue[] = {
+const std::vector<LedRGBChunk> kDoubleBlue = {
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlack},
@@ -47,7 +47,7 @@ const LedRGBChunk kDoubleBlue[] = {
         {ChunkType::kEnd}
 };
 
-const LedRGBChunk kDoubleWhite[] = {
+const std::vector<LedRGBChunk> kDoubleWhite = {
         {ChunkType::kSetup, 0, kWhite},
         {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlack},
@@ -59,7 +59,7 @@ const LedRGBChunk kDoubleWhite[] = {
         {ChunkType::kEnd}
 };
 
-const LedRGBChunk kRedAndBlue[] = {
+const std::vector<LedRGBChunk> kRedAndBlue = {
         {ChunkType::kSetup, 0, kRed},
         {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlue},
@@ -71,7 +71,13 @@ const LedRGBChunk kRedAndBlue[] = {
         {ChunkType::kEnd}
 };
 
-const LedRGBChunk* Sequences[] = {kDoubleYellow, kDoubleWhite, kDoubleBlue, kDoubleRed, kRedAndBlue};
+const std::vector<const std::vector<LedRGBChunk>*> Sequences = {
+        &kDoubleYellow,
+        &kDoubleWhite,
+        &kDoubleBlue,
+        &kDoubleRed,
+        &kRedAndBlue
+};
 
 void KirlitsBehavior::OnStarted() {
     logger->log("Started execution!");
@@ -101,16 +107,19 @@ void KirlitsBehavior::EverySecond() {
     if (seconds_counter % 60 == 0) {
         int LocketsNear[TypesNum] = {};
         logger->log("MinutePassed!");
-        for (int i = 0; i < rx_table.Raw().size(); i++) {
-            LocketsNear[rx_table.Raw()[i].locket_type] += 1;
+        sequence.clear();
+        for (const IdAndTypeState& packet: rx_table.Raw()) {
+            LocketsNear[packet.locket_type] += 1;
         }
+
         for (int i = 0; i < TypesNum-1; i++) {
             for (int j = 0; j < LocketsNear[i]; j++) {
-                for (int k = 0; k < sizeof(*Sequences[i])/sizeof(LedRGBChunk); k++) {
-                    sequence.push_back(Sequences[i][k]);
+                for (unsigned int k = 0; k < Sequences[i]->size()-1; k++) {
+                    sequence.push_back((*Sequences[i])[k]);
                 }
             }
         }
+        sequence.push_back({ChunkType::kEnd});
         led->Stop();
         rx_table.Clear();
         logger->log("LedsStarted!");

@@ -54,6 +54,9 @@ void BasicBehavior::EverySecond() {
     if (seconds_counter % 30 == 0) {
         logger->log("30 seconds passed");
     }
+    if (seconds_counter % 5 == 0) {
+        led->StartOrRestart(kStartSequence);
+    }
 
     if (seconds_counter % 5 == 0) {
         led->StartOrRestart(kStartSequence);

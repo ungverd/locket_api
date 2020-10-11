@@ -37,3 +37,10 @@ else()
     add_firmware(kirlits_behavior.elf kirlits_behavior_firmware.cpp)
     target_link_libraries(kirlits_behavior.elf kirlits_behavior)
 endif()
+
+if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
+    add_executable(kirlits_test
+            sequence_creation_test.cpp)
+    target_link_libraries(kirlits_test kirlits_behavior gtest_main)
+    gtest_discover_tests(kirlits_test)
+endif()
