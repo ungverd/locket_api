@@ -2,7 +2,7 @@
 // Created by juice on 12.10.2020.
 //
 
-#include <../cmake-build-debug/googletest-src/googletest/include/gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "rx_table.h"
 #include "kirlits.h"
 
@@ -18,4 +18,3 @@ struct KirlitsDummyRadioPacket {
 TEST(SequenceCreation, EmptySequense) {
     RxTable<KirlitsDummyRadioPacket, 10> table;
 }
-
