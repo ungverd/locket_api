@@ -25,11 +25,14 @@ private:
     uint32_t seconds_counter = 0;
     RxTable<IdAndTypeState> rx_table;
     LocketEnum LocketType = LocketEnum::YELLOW;
-    LocketEnum TypeToEnum(uint8_t id);
-    uint8_t EnumToType();
     std::vector<LedRGBChunk> sequence;
     uint8_t LocketId = 1;
     bool silent = false;
 };
+
+void CreateSequence(const std::vector<IdAndTypeState>& rx_table, std::vector<LedRGBChunk>& sequence);
+bool IfSilentNear(const std::vector<IdAndTypeState>& rx_table);
+uint8_t EnumToType(LocketEnum LocketType);
+LocketEnum TypeToEnum(uint8_t id);
 
 #endif //LOCKET_API_KIRLITS_H

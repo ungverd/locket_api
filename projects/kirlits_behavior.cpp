@@ -68,6 +68,8 @@ const std::vector<LedRGBChunk> kRedAndBlue = {
         {ChunkType::kWait, FlashDur},
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait,  FlashDur},
+        {ChunkType::kSetup, 0, kBlack},
+        {ChunkType::kWait,  FlashDur},
         {ChunkType::kEnd}
 };
 
@@ -83,7 +85,7 @@ void KirlitsBehavior::OnStarted() {
     logger->log("Started execution!");
     sequence.reserve(MaxChunkNum);
     led->StartOrRestart(kStartSequence);
-    radio->SetBeaconPacket({LocketId, EnumToType()});
+    radio->SetBeaconPacket({LocketId, EnumToType(LocketType)});
 }
 
 void KirlitsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
@@ -98,40 +100,27 @@ void KirlitsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
     LocketId = FirstId*4 + SecondId*2 + ThirdId;
     LocketType = TypeToEnum(CurrentType);
     radio->ClearBeaconPacket();
-    radio->SetBeaconPacket({LocketId, EnumToType()});
-    logger->log("Radio Started %i % i", LocketId, EnumToType());
+    radio->SetBeaconPacket({LocketId, EnumToType(LocketType)});
+    logger->log("Radio Started %i % i", LocketId, EnumToType(LocketType));
 }
 
 void KirlitsBehavior::EverySecond() {
     ++seconds_counter;
     if (seconds_counter % 60 == 0) {
-        int LocketsNear[TypesNum] = {};
         logger->log("MinutePassed!");
-        sequence.clear();
-        for (const IdAndTypeState& packet: rx_table.Raw()) {
-            LocketsNear[packet.locket_type] += 1;
-        }
-
-        for (int i = 0; i < TypesNum-1; i++) {
-            for (int j = 0; j < LocketsNear[i]; j++) {
-                for (unsigned int k = 0; k < Sequences[i]->size()-1; k++) {
-                    sequence.push_back((*Sequences[i])[k]);
-                }
-            }
-        }
-        sequence.push_back({ChunkType::kEnd});
+        CreateSequence(rx_table.Raw(), sequence);
         led->Stop();
         rx_table.Clear();
         logger->log("LedsStarted!");
         led->StartOrRestart(sequence.data());
-        if (LocketsNear[TypesNum-1] != 0) {
+        seconds_counter = 0;
+        if (IfSilentNear(rx_table.Raw())) {
             radio->ClearBeaconPacket();
             logger->log("Radio Off");
         } else {
-            radio->SetBeaconPacket({LocketId, EnumToType()});
-            logger->log("Radio Started %i % i", LocketId, EnumToType());
+            radio->SetBeaconPacket({LocketId, EnumToType(LocketType)});
+            logger->log("Radio Started %i % i", LocketId, EnumToType(LocketType));
         }
-        seconds_counter = 0;
     }
 }
 
@@ -140,7 +129,7 @@ void KirlitsBehavior::OnRadioPacketReceived(const IdAndTypeState& packet) {
 }
 
 
-LocketEnum KirlitsBehavior::TypeToEnum(uint8_t id) {
+LocketEnum TypeToEnum(uint8_t id) {
 
     switch (id) {
         case 0:
@@ -160,7 +149,7 @@ LocketEnum KirlitsBehavior::TypeToEnum(uint8_t id) {
     }
 }
 
-uint8_t KirlitsBehavior::EnumToType() {
+uint8_t EnumToType(LocketEnum LocketType) {
 
     switch (LocketType) {
         case LocketEnum::YELLOW:
@@ -178,4 +167,30 @@ uint8_t KirlitsBehavior::EnumToType() {
         default:
             return 0;
     }
+}
+
+void CreateSequence(const std::vector<IdAndTypeState>& rx_table, std::vector<LedRGBChunk>& chunk_sequence) {
+    chunk_sequence.clear();
+    int LocketsNear[TypesNum] = {};
+    for (const IdAndTypeState &packet: rx_table) {
+        LocketsNear[packet.locket_type] += 1;
+    }
+
+    for (int i = 0; i < TypesNum - 1; i++) {
+        for (int j = 0; j < LocketsNear[i]; j++) {
+            for (unsigned int k = 0; k < Sequences[i]->size() - 1; k++) {
+                chunk_sequence.push_back((*Sequences[i])[k]);
+            }
+        }
+    }
+    chunk_sequence.push_back({ChunkType::kEnd});
+}
+
+bool IfSilentNear(const std::vector<IdAndTypeState>& rx_table) {
+    for (const IdAndTypeState &packet: rx_table) {
+        if (packet.locket_type == EnumToType(LocketEnum::SILENT)) {
+            return true;
+        }
+    }
+    return false;
 }
