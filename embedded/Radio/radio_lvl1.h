@@ -79,7 +79,7 @@ static void rLvl1Thread(void* arg) {
             radio_instance->received_packets.SendNowOrExit(PktRx);
         }
 
-        radio_instance->TryToSleep(300);
+        // vyzradio_instance->TryToSleep(300);
     } // while true
 }
 
