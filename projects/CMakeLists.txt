@@ -10,7 +10,7 @@ target_link_libraries(feeling_behavior api)
 add_library(kirlits_behavior kirlits_behavior.cpp kirlits.h)
 target_link_libraries(kirlits_behavior api)
 
-add_library(sm_behavior sm_behavior.cpp)
+add_library(sm_behavior sm_behavior.cpp eventHandlers.cpp ability.cpp qhsm.c)
 target_link_libraries(sm_behavior api)
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
