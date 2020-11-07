@@ -16,6 +16,13 @@ target_sources(api INTERFACE
 )
 target_include_directories(api INTERFACE . ..)
 
+add_library(qhsm INTERFACE)
+target_sources(api INTERFACE
+        qhsm.h
+        qhsm.c
+)
+target_include_directories(api INTERFACE .)
+
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(api_test
             rx_table_test.cpp)
