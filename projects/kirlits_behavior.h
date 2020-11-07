@@ -2,8 +2,8 @@
 // Created by juice on 24.08.2020.
 //
 
-#ifndef LOCKET_API_KIRLITS_H
-#define LOCKET_API_KIRLITS_H
+#ifndef LOCKET_API_KIRLITS_BEHAVIOR_H
+#define LOCKET_API_KIRLITS_BEHAVIOR_H
 
 #include "pill_manager.h"
 #include "rx_table.h"
@@ -35,4 +35,4 @@ bool IfSilentNear(const std::vector<IdAndTypeState>& rx_table);
 uint8_t EnumToType(LocketEnum LocketType);
 LocketEnum TypeToEnum(uint8_t id);
 
-#endif //LOCKET_API_KIRLITS_H
+#endif //LOCKET_API_KIRLITS_BEHAVIOR_H

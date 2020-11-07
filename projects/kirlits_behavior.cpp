@@ -1,7 +1,7 @@
 //
 // Created by juice on 24.08.2020.
 //
-#include "kirlits.h"
+#include "kirlits_behavior.h"
 #include "utility.h"
 
 
