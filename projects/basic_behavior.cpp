@@ -47,6 +47,7 @@ const BeepChunk* kBeeperByMode[] = {kShortBeep, kBeeperDoNothing};
 void BasicBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
+    radio->SetPowerLevel(RadioPowerLevel::MINUS_15_DBM);
 }
 
 void BasicBehavior::EverySecond() {

@@ -54,16 +54,16 @@ static void rLvl1Thread(void* arg) {
         // ==== TX if needed ====
         RMsg_t Msg = radio_instance->RMsgQ.Fetch(TIME_IMMEDIATE);
         if(Msg.Cmd == R_MSG_TRANSMIT) {
-            CC.SetTxPower(CC_PwrMinus20dBm);
             for(int i=0; i<4; i++) {
                 CC.Recalibrate();
                 CC.Transmit(radio_instance->PktTxOnce, sizeof(TRadioPacket));
                 chThdSleepMilliseconds(99);
             }
+        } else if(Msg.Cmd == R_MSG_SET_PWR) {
+            CC.SetTxPower(Msg.Value);
         }
 
         if (radio_instance->PktTxBeacon) {
-            CC.SetTxPower(CC_PwrMinus20dBm);
             CC.Recalibrate();
             CC.Transmit(radio_instance->PktTxBeacon, sizeof(TRadioPacket));
         }

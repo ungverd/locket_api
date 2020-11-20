@@ -25,6 +25,13 @@ public:
         radio->PktTxBeacon = nullptr;
     }
 
+    void SetPowerLevel(RadioPowerLevel level) override {
+        RMsg_t msg;
+        msg.Cmd = R_MSG_SET_PWR;
+        msg.Value = static_cast<uint8_t>(level);
+        radio->RMsgQ.SendNowOrExit(msg);
+    }
+
 private:
     RadioLevel1<TRadioPacket>* radio;
     TRadioPacket packet_to_send_once, packet_beacon;
