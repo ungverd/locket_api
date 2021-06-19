@@ -52,5 +52,4 @@ Steps:
   * `Error: target voltage may be too low for reliable debugging`: Have turned power on?
 
 Last known state:
-* Locket Alpha + Ostranna Alpha - OK
-* Locket Alpha + Ostranna Beta - OK
+* Locket Alpha/Beta + Ostranna Alpha/Beta/ST-Link Alpha - OK
