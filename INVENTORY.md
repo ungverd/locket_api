@@ -6,9 +6,13 @@
 
 Ostranna Teco v.1. Has some weird additional wire on top.
 
+hla_serial: 066FFF534953867067205729 
+
 ### Ostranna Beta
 
 Ostranna Teco v.3.
+
+hla_serial: 0672FF555550877067141642
 
 ### ST-Link Alpha
 
