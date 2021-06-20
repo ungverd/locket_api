@@ -11,6 +11,7 @@ add_library(emulator
         stdout_logger.cpp stdout_logger.h
         fake_beeper.cpp fake_beeper.h
         fake_vibro.cpp fake_vibro.h
+        fake_uart_command.cpp fake_uart_command.h
         sequenceable.h)
 target_link_libraries(emulator Threads::Threads api)
 target_include_directories(emulator INTERFACE .)

@@ -17,6 +17,7 @@
 #include "fake_vibro.h"
 #include "stdout_logger.h"
 #include "fake_radio.h"
+#include "fake_uart_command.h"
 
 namespace emulator {
 
@@ -45,6 +46,8 @@ public:
         std::cout
                 << "    dip <number 1-8> <number 0-1> - Simulates setting switch on position specified by first argument \n";
         std::cout << "                                    to state specified by the second argument \n";
+        std::cout << "  UART commands: \n";
+        std::cout << "    uart <string> - Simulates sending this string to UART \n";
 
         behavior->OnDipSwitchChanged(dip_value);
         behavior->OnStarted();
@@ -96,6 +99,11 @@ public:
                 dip_value = dip_value ^ (dip_value & (1 << position));
                 if (on) dip_value = dip_value | (1 << position);
                 behavior->OnDipSwitchChanged(dip_value);
+            } else if (command == "uart") {
+                std::string s;
+                std::getline(input, s);
+                FakeUartCommand uart_command(s);
+                behavior->OnUartCommand(uart_command);
             }
         }
         stopping_execution = true;
