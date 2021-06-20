@@ -1,6 +1,9 @@
 add_library(basic_behavior basic_behavior.cpp)
 target_link_libraries(basic_behavior api)
 
+add_library(integration_testing_behavior integration_testing_behavior.cpp)
+target_link_libraries(integration_testing_behavior api)
+
 add_library(giganda_behaviour giganda_behavior.h giganda_behavior.cpp)
 target_link_libraries(giganda_behaviour api)
 
@@ -34,6 +37,9 @@ else()
 
     add_firmware(basic_behavior.elf basic_behavior_firmware.cpp)
     target_link_libraries(basic_behavior.elf basic_behavior)
+
+    add_firmware(integration_testing_behavior.elf integration_testing_behavior_firmware.cpp)
+    target_link_libraries(integration_testing_behavior.elf integration_testing_behavior)
 
     add_firmware(feeling_behavior.elf feeling_behavior_firmware.cpp)
     target_link_libraries(feeling_behavior.elf feeling_behavior)
