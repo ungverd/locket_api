@@ -124,3 +124,21 @@ void BasicBehavior::OnButtonPressed(uint16_t button_index) {
 void BasicBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
     rx_table.AddPacket(packet);
 }
+
+void BasicBehavior::OnUartCommand(UartCommand& command) {
+   if (command.NameIs("ping")) {
+       logger->log("pong");
+       return;
+   }
+
+    if (command.NameIs("plus")) {
+        std::optional<int32_t> a = command.GetNext();
+        std::optional<int32_t> b = command.GetNext();
+        if (a.has_value() && b.has_value()) {
+            logger->log("sum equals %d", a.value() + b.value());
+        } else {
+            logger->log("not enough parameters!");
+        }
+        return;
+    }
+}

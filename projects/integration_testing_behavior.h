@@ -22,6 +22,7 @@ public:
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
     void OnButtonPressed(uint16_t button_index) override;
     void OnRadioPacketReceived(const IdOnlyState& packet) override;
+    void OnUartCommand(UartCommand& command) override;
 
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;

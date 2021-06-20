@@ -8,6 +8,7 @@
 #include "vibro.h"
 #include "beeper.h"
 #include "radio.h"
+#include "uart_command.h"
 
 // Business logic developer needs to
 // 1) Decide what's the structure of data
@@ -95,6 +96,11 @@ public:
     // immediately and independently, but instead process all packets received during recent second. This simplifies
     // implementation of more complex behaviors
     virtual void OnRadioPacketReceived(const RadioPacket& packet) {}
+
+    // Will be called when received command via UART.
+    // Use `command` methods to figure out what the command is.
+    // Don't store `command` internally - reference will become invalid after OnUartCommand returned.
+    virtual void OnUartCommand(UartCommand& command) {}
 
     // Internal: This is needed for BehaviorRunner to work.
     using PillStateParameter = PillState;

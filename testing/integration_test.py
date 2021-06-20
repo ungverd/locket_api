@@ -49,7 +49,7 @@ class UartHelper:
             time.sleep(0.1)
 
 
-class TestLightIsDiscoverable(unittest.TestCase):
+class TestLocketHardwareLibraries(unittest.TestCase):
     primaryUart = None
     secondaryUart = None
 
@@ -70,6 +70,18 @@ class TestLightIsDiscoverable(unittest.TestCase):
 
     def testSecondaryDeviceIsOnline(self):
         self.secondaryUart.waitUntilStringInUart('Started execution')
+
+    def testRespondsToPing(self):
+        self.primaryUart.connection.write(b'ping\n')
+        self.primaryUart.waitUntilStringInUart('pong')
+
+    def testRespondsToCommandWithArguments(self):
+        self.primaryUart.connection.write(b'plus 20 -10\n')
+        self.primaryUart.waitUntilStringInUart('sum equals 10')
+
+    def testSimpleRadioCommunication(self):
+        self.primaryUart.connection.write(b'emit 1637\n')
+        self.secondaryUart.waitUntilStringInUart('received packet with id 1637')
 
 
 if __name__ == '__main__':

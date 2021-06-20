@@ -13,6 +13,7 @@ target_sources(api INTERFACE
         vibro.h
         rx_table.h
         radio.h
+        uart_command.h
 )
 target_include_directories(api INTERFACE . ..)
 

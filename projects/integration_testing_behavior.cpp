@@ -66,6 +66,10 @@ void IntegrationTestingBehavior::EverySecond() {
     if (rx_table.HasPacketWithId(17)) {
         vibro->StartOrRestart(kBrrBrrBrr);
     }
+
+    for (const auto& packet: rx_table.Raw()) {
+        logger->log("received packet with id %d", packet.id);
+    }
     rx_table.Clear();
 }
 
@@ -114,4 +118,33 @@ void IntegrationTestingBehavior::OnButtonPressed(uint16_t button_index) {
 
 void IntegrationTestingBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
     rx_table.AddPacket(packet);
+}
+
+void IntegrationTestingBehavior::OnUartCommand(UartCommand& command) {
+    if (command.NameIs("ping")) {
+        logger->log("pong");
+        return;
+    }
+
+    if (command.NameIs("plus")) {
+        std::optional<int32_t> a = command.GetNext();
+        std::optional<int32_t> b = command.GetNext();
+        if (a.has_value() && b.has_value()) {
+            logger->log("sum equals %d", a.value() + b.value());
+        } else {
+            logger->log("not enough parameters!");
+        }
+        return;
+    }
+
+    if (command.NameIs("emit")) {
+        std::optional<int32_t> id = command.GetNext();
+        if (id.has_value()) {
+            IdOnlyState s = {static_cast<uint32_t>(id.value())};
+            radio->Transmit(s);
+        } else {
+            logger->log("not enough parameters!");
+        }
+        return;
+    }
 }

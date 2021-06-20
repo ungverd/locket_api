@@ -9,6 +9,7 @@
 #include "embedded/wrappers/logger_wrapper.h"
 #include "embedded/wrappers/pill_manager_wrapper.h"
 #include "embedded/wrappers/radio_wrapper.h"
+#include "embedded/wrappers/uart_command_wrapper.h"
 #include "embedded/kl_lib/led.h"
 #include "embedded/kl_lib/vibro.h"
 #include "embedded/kl_lib/beeper.h"
@@ -113,10 +114,18 @@ public:
                     behavior->OnPillDisconnected();
                     break;
 
-                case evtIdRadioCmd:
+                case evtIdRadioCmd: {
                     const auto packet = radio.received_packets.Fetch(TIME_IMMEDIATE);
                     behavior->OnRadioPacketReceived(packet);
                     break;
+                }
+                case evtIdShellCmd: {
+                    auto* shell = static_cast<Shell_t*>(Msg.Ptr);
+                    auto wrapper = UartCommandWrapper(&shell->Cmd);
+                    behavior->OnUartCommand(wrapper);
+                    shell->SignalCmdProcessed();
+                    break;
+                }
             }
         }
     }
