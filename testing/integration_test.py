@@ -39,14 +39,18 @@ class UartHelper:
     def __del__(self):
         self.connection.close()
 
-    def waitUntilStringInUart(self, waitFor):
-        while True:
-            line = self.connection.readline().decode('ascii', 'ignore')
-            if line:
-                print('Received: ' + line, end='')
-                if waitFor in line:
-                    return
+    def waitUntilStringInUart(self, waitFor: str, timeout: float = 5.0):
+        self.connection.timeout = timeout
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if self.connection.readable():
+                line = self.connection.readline().decode('ascii', 'ignore')
+                if line:
+                    print('Received: ' + line, end='')
+                    if waitFor in line:
+                        return
             time.sleep(0.1)
+        raise TimeoutError('Timeout while waiting for %s to appear in UART' % waitFor)
 
 
 class TestLocketHardwareLibraries(unittest.TestCase):
