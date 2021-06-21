@@ -69,10 +69,12 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         del cls.primaryUart
         del cls.secondaryUart
 
-    def testPrimaryDeviceIsOnline(self):
+    # Next 2 tests have 000 prefix so they are executed first (otherwise other tests will "consume" part of uart
+    # log containing "Started execution").
+    def test000PrimaryDeviceIsOnline(self):
         self.primaryUart.waitUntilStringInUart('Started execution')
 
-    def testSecondaryDeviceIsOnline(self):
+    def test000SecondaryDeviceIsOnline(self):
         self.secondaryUart.waitUntilStringInUart('Started execution')
 
     def testRespondsToPing(self):
