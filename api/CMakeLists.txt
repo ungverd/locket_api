@@ -14,6 +14,7 @@ target_sources(api INTERFACE
         rx_table.h
         radio.h
         uart_command.h
+        eeprom.h
 )
 target_include_directories(api INTERFACE . ..)
 

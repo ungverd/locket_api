@@ -10,6 +10,7 @@
 #include "embedded/wrappers/pill_manager_wrapper.h"
 #include "embedded/wrappers/radio_wrapper.h"
 #include "embedded/wrappers/uart_command_wrapper.h"
+#include "embedded/wrappers/eeprom_wrapper.h"
 #include "embedded/kl_lib/led.h"
 #include "embedded/kl_lib/vibro.h"
 #include "embedded/kl_lib/beeper.h"
@@ -36,6 +37,8 @@ BeeperWrapper beeperWrapper(&Beeper);
 LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
 RgbLedWrapper ledWrapper(&Led);
 LoggerWrapper loggerWrapper(&Uart);
+
+EepromWrapper eepromWrapper;
 
 // ==== Timers ====
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
@@ -87,7 +90,7 @@ public:
 
         RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper(&radio);
 
-        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper);
+        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper, &eepromWrapper);
         CheckDipSwitch();
         behavior->OnStarted();
 

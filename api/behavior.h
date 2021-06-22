@@ -9,6 +9,7 @@
 #include "beeper.h"
 #include "radio.h"
 #include "uart_command.h"
+#include "eeprom.h"
 
 // Business logic developer needs to
 // 1) Decide what's the structure of data
@@ -122,12 +123,15 @@ protected:
     // Use this to send radio packets.
     Radio<RadioPacket>* const radio;
 
+    // Use this to read/write from/to EEPROM
+    Eeprom* const eeprom;
+
 public:
     // Concrete Behavior implementations should either inherit it by having
     //     using Behavior::Behavior;
     // in their public section, or (advanced mode) define their own constructor and call this one there.
-    Behavior(Logger* logger, RgbLed* led, Beeper* beeper, Vibro* vibro, Radio<RadioPacket>* radio):
-            logger(logger), led(led), beeper(beeper), vibro(vibro), radio(radio) {}
+    Behavior(Logger* logger, RgbLed* led, Beeper* beeper, Vibro* vibro, Radio<RadioPacket>* radio, Eeprom* eeprom):
+            logger(logger), led(led), beeper(beeper), vibro(vibro), radio(radio), eeprom(eeprom) {}
 };
 
 #endif //LOCKET_API_BEHAVIOR_H

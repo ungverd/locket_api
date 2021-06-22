@@ -89,6 +89,12 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         self.primaryUart.connection.write(b'emit 1637\n')
         self.secondaryUart.waitUntilStringInUart('received packet with id 1637')
 
+    def testCanWriteAndReadEeprom(self):
+        self.primaryUart.connection.write(b'eeprom_write 23 178\n')
+        self.primaryUart.waitUntilStringInUart('EEPROM write success')
+        self.primaryUart.connection.write(b'eeprom_read 23\n')
+        self.primaryUart.waitUntilStringInUart('value in EEPROM: 178')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -30,7 +30,7 @@ public:
         FakeVibro vibro;
         FakeRadio<typename BehaviorType::RadioPacketParameter> radio;
         StdOutLogger logger;
-        behavior = std::make_unique<BehaviorType>(&logger, &led, &beeper, &vibro, &radio);
+        behavior = std::make_unique<BehaviorType>(&logger, &led, &beeper, &vibro, &radio, nullptr);
         std::atomic<bool> stopping_execution = false;
 
         std::cout << "Execution started. Supported commands: \n";
