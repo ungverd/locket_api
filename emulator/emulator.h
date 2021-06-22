@@ -18,6 +18,7 @@
 #include "stdout_logger.h"
 #include "fake_radio.h"
 #include "fake_uart_command.h"
+#include "fake_eeprom.h"
 
 namespace emulator {
 
@@ -30,7 +31,8 @@ public:
         FakeVibro vibro;
         FakeRadio<typename BehaviorType::RadioPacketParameter> radio;
         StdOutLogger logger;
-        behavior = std::make_unique<BehaviorType>(&logger, &led, &beeper, &vibro, &radio, nullptr);
+        FakeEeprom eeprom;
+        behavior = std::make_unique<BehaviorType>(&logger, &led, &beeper, &vibro, &radio, &eeprom);
         std::atomic<bool> stopping_execution = false;
 
         std::cout << "Execution started. Supported commands: \n";

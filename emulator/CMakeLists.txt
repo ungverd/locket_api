@@ -12,10 +12,11 @@ add_library(emulator
         fake_beeper.cpp fake_beeper.h
         fake_vibro.cpp fake_vibro.h
         fake_uart_command.cpp fake_uart_command.h
+        fake_eeprom.cpp fake_eeprom.h
         sequenceable.h)
 target_link_libraries(emulator Threads::Threads api)
 target_include_directories(emulator INTERFACE .)
 
-add_executable(emulator_test fake_led_test.cpp)
+add_executable(emulator_test fake_led_test.cpp fake_eeprom_test.cpp)
 target_link_libraries(emulator_test emulator gtest_main)
 gtest_discover_tests(emulator_test)
