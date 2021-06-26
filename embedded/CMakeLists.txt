@@ -8,20 +8,6 @@ add_subdirectory(Radio)
 add_subdirectory(Pill)
 add_subdirectory(wrappers)
 
-add_executable(Locket_fw.elf
-        main.cpp
-        )
-
-target_link_libraries(Locket_fw.elf
-  kl_lib
-  radio
-  pill
-)
-
-target_include_directories(Locket_fw.elf
-  PRIVATE .
-)
-
 add_library(behavior_runner
         behavior_runner.h
         )
@@ -36,7 +22,3 @@ target_link_libraries(behavior_runner
         radio
         pill
 )
-
-
-set_target_properties(Locket_fw.elf PROPERTIES LINK_FLAGS
-  "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32L151x8.ld -T ${CMAKE_CURRENT_SOURCE_DIR}/rules.ld -static -Wl,-cref,-u,Reset_Handler -Wl,-Map=Locket_fw.map -Wl,--gc-sections -Wl,--defsym=malloc_getpagesize_P=0x1000 -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group")
