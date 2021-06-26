@@ -74,7 +74,6 @@ static void rLvl1Thread(void* arg) {
         int8_t Rssi;
         TRadioPacket PktRx;
         if(CC.Receive(360, &PktRx, sizeof(TRadioPacket), &Rssi) == retvOk) {
-            Printf("Received radio packet");
             EvtQMain.SendNowOrExit({evtIdRadioCmd});
             radio_instance->received_packets.SendNowOrExit(PktRx);
         }

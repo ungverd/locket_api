@@ -48,6 +48,7 @@ void BasicBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
     radio->SetPowerLevel(RadioPowerLevel::MINUS_15_DBM);
+    radio->SetBeaconPacket({22});
 }
 
 void BasicBehavior::EverySecond() {
@@ -109,6 +110,7 @@ void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
 
 void BasicBehavior::OnButtonPressed(uint16_t button_index) {
     if (button_index == 0) {
+        logger->log("Sent some spam!");
         radio->Transmit({17});
     }
 
@@ -122,6 +124,7 @@ void BasicBehavior::OnButtonPressed(uint16_t button_index) {
 }
 
 void BasicBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+    logger->log("Received radio packet with id = %d", packet.id);
     rx_table.AddPacket(packet);
 }
 

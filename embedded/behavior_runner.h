@@ -15,6 +15,7 @@
 #include "embedded/kl_lib/vibro.h"
 #include "embedded/kl_lib/beeper.h"
 #include "radio_lvl1.h"
+#include "radio_lvl2.h"
 #include "kl_i2c.h"
 #include "kl_lib.h"
 #include "pill.h"
@@ -46,14 +47,40 @@ TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 uint8_t ReadDipSwitch();
 
 namespace embedded {
+
+namespace radio_strategy {
+// Just type tokens for template resolution
+struct Simple {};
+struct ManyToMany {};
+
+namespace internal {
+
+template <typename TRadioPacket, typename TRadioStrategy>
+inline typename std::enable_if<std::is_same<TRadioStrategy, Simple>::value, Radio<TRadioPacket>*>::type
+CreateRadioWrapper() {
+    auto radio = new RadioLevel1<TRadioPacket>();
+    radio->Init();
+    return new RadioWrapperSimple(radio);
+}
+
+template <typename TRadioPacket, typename TRadioStrategy>
+inline typename std::enable_if<std::is_same<TRadioStrategy, ManyToMany>::value, Radio<TRadioPacket>*>::type
+CreateRadioWrapper() {
+    auto radio = new RadioLevel2<TRadioPacket>();
+    radio->Init();
+    return new RadioWrapperManyToMany(radio);
+}
+}
+}
+
+
 // BehaviorType must be subtype of Behavior
-template<typename BehaviorType>
+template<typename BehaviorType, typename RadioStrategy = radio_strategy::Simple>
 class BehaviorRunner {
 private:
     Behavior<typename BehaviorType::PillStateParameter,
             typename BehaviorType::RadioPacketParameter>* behavior = nullptr;
     PillManagerWrapper<typename BehaviorType::PillStateParameter> pill_manager_wrapper{&PillMgr};
-    RadioLevel1<typename BehaviorType::RadioPacketParameter> radio;
 
 public:
     [[noreturn]] void Run() {
@@ -82,17 +109,16 @@ public:
         i2c1.Init();
         PillMgr.Init();
 
+        Cfg.ID = EE::Read32(0);
+
         // ==== Time and timers ====
         TmrEverySecond.StartOrRestart();
 
-        // ==== Radio ====
-        radio.Init();
-
         chThdSleepMilliseconds(1008);
 
-        RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper(&radio);
-
-        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper, &eepromWrapper);
+        auto radio_wrapper = radio_strategy::internal::CreateRadioWrapper<typename BehaviorType::RadioPacketParameter, RadioStrategy>();
+        behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper,
+                                    radio_wrapper , &eepromWrapper);
         CheckDipSwitch();
         behavior->OnStarted();
 
@@ -120,14 +146,22 @@ public:
                     break;
 
                 case evtIdRadioCmd: {
-                    const auto packet = radio.received_packets.Fetch(TIME_IMMEDIATE);
+                    const auto packet = radio_wrapper->FetchReceived();
                     behavior->OnRadioPacketReceived(packet);
                     break;
                 }
                 case evtIdShellCmd: {
                     auto* shell = static_cast<Shell_t*>(Msg.Ptr);
                     auto wrapper = UartCommandWrapper(&shell->Cmd);
-                    behavior->OnUartCommand(wrapper);
+                    if (wrapper.NameIs("set_id")) {
+                        auto maybe_id = wrapper.GetNext();
+                        if (maybe_id) {
+                            Cfg.ID = maybe_id.value();
+                            EE::Write32(0, maybe_id.value());
+                        }
+                    } else {
+                        behavior->OnUartCommand(wrapper);
+                    }
                     shell->SignalCmdProcessed();
                     break;
                 }

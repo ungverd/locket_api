@@ -10,6 +10,7 @@ public:
     void SetBeaconPacket(const TRadioPacket& packet) override {}
     void ClearBeaconPacket() override {}
     void SetPowerLevel(RadioPowerLevel level) override {}
+    TRadioPacket FetchReceived() override { return {}; }
 };
 
 #endif //LOCKET_API_FAKE_RADIO_H

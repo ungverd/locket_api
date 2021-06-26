@@ -2,5 +2,5 @@
 #include "embedded/behavior_runner.h"
 
 int main() {
-    embedded::BehaviorRunner<IntegrationTestingBehavior>().Run();
+    embedded::BehaviorRunner<IntegrationTestingBehavior, embedded::radio_strategy::ManyToMany>().Run();
 }

@@ -31,6 +31,9 @@ public:
 
     virtual void SetPowerLevel(RadioPowerLevel level) = 0;
 
+    // Internal, don't use directly.
+    virtual TRadioPacketType FetchReceived() = 0;
+
     virtual ~Radio() {};
 };
 

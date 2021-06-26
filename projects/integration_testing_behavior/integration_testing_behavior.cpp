@@ -137,11 +137,22 @@ void IntegrationTestingBehavior::OnUartCommand(UartCommand& command) {
         return;
     }
 
-    if (command.NameIs("emit")) {
+    if (command.NameIs("emit_once")) {
         std::optional<int32_t> id = command.GetNext();
         if (id.has_value()) {
             IdOnlyState s = {static_cast<uint32_t>(id.value())};
             radio->Transmit(s);
+        } else {
+            logger->log("not enough parameters!");
+        }
+        return;
+    }
+
+    if (command.NameIs("emit_beacon")) {
+        std::optional<int32_t> id = command.GetNext();
+        if (id.has_value()) {
+            IdOnlyState s = {static_cast<uint32_t>(id.value())};
+            radio->SetBeaconPacket(s);
         } else {
             logger->log("not enough parameters!");
         }

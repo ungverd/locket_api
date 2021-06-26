@@ -63,6 +63,8 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         cls.secondaryUart = UartHelper(comPortName(SECONDARY_DEVICE_ID))
         buildAndUpload(PRIMARY_DEVICE_ID)
         buildAndUpload(SECONDARY_DEVICE_ID)
+        # cls.primaryUart.connection.write(b'set_id 2\n')
+        # cls.secondaryUart.connection.write(b'set_id 3\n')
 
     @classmethod
     def tearDownClass(cls):
@@ -85,9 +87,14 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         self.primaryUart.connection.write(b'plus 20 -10\n')
         self.primaryUart.waitUntilStringInUart('sum equals 10')
 
-    def testSimpleRadioCommunication(self):
-        self.primaryUart.connection.write(b'emit 1637\n')
-        self.secondaryUart.waitUntilStringInUart('received packet with id 1637')
+    # TODO(aeremin) It currently fails if run after testBeaconRadioCommunication.
+    def test0SingleRadioCommunication(self):
+        self.primaryUart.connection.write(b'emit_once 1637\n')
+        self.secondaryUart.waitUntilStringInUart('received packet with id 1637', 10)
+
+    def testBeaconRadioCommunication(self):
+        self.primaryUart.connection.write(b'emit_beacon 777\n')
+        self.secondaryUart.waitUntilStringInUart('received packet with id 777', 10)
 
     def testCanWriteAndReadEeprom(self):
         self.primaryUart.connection.write(b'eeprom_write 23 178\n')
