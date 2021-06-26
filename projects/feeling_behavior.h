@@ -21,12 +21,18 @@ public:
     void EverySecond() override;
     void OnRadioPacketReceived(const IdOnlyState& packet) override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
+    void OnUartCommand(UartCommand& command) override;
 
 private:
     uint32_t seconds_counter = 0;
     RxTable<IdOnlyState> rx_table;
-    uint8_t LocketType = SLAVE;
+    uint32_t LocketType = SLAVE;
+    uint32_t Color = 0;
     RadioPowerLevel RangeLevel = RadioPowerLevel::MINUS_6_DBM;
+    struct EepromData {
+       uint32_t Color;
+       uint32_t locket_type;
+    };
 };
 
 RadioPowerLevel TypeToEnum(uint8_t level);
