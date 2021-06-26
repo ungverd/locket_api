@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include "rx_table.h"
-#include "kirlits_behavior.h"
+#include "projects/kirlits_behavior/kirlits_behavior.h"
 
 struct KirlitsDummyRadioPacket {
     bool operator==(const KirlitsDummyRadioPacket& other) const {

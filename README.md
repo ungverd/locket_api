@@ -83,33 +83,34 @@ Code in `emulator` is desktop-only, in `embedded` - ARM-only.
 ### Add a new Behavior
 
 * Read comments in [api/behavior.h](api/behavior.h).
-* Create a new behavior target in `projects`:
-  * Add `projects/your_behavior.cpp` and `projects/your_behavior.h` files.
+* Create a new subfolder for your behavior in `projects`:
+* Create a new behavior target in `projects/your_behavior`:
+  * Add `projects/your_behavior/your_behavior.cpp` and `projects/your_behavior/your_behavior.h` files.
   * Add a CMake target `your_behavior` to [projects/CMakeLists.txt](projects/CMakeLists.txt):
 ```cmake
-add_library(your_behavior your_behavior.cpp your_behavior.h)
+add_library(your_behavior your_behavior/your_behavior.cpp your_behavior/your_behavior.h)
 target_link_libraries(your_behavior api)
 ``` 
 
 ### Create an emulator executable
-  * Add `projects/your_behavior_emulator.cpp` file by copying content of 
-  [projects/basic_behavior_emulator.cpp](projects/basic_behavior_emulator.cpp) and changing
+  * Add `projects/your_behavior/your_behavior_emulator.cpp` file by copying content of 
+  [projects/basic_behavior/basic_behavior_emulator.cpp](projects/basic_behavior/basic_behavior_emulator.cpp) and changing
   `BasicBehavior` to your `Behavior`-implementing class.
   * Add a CMake target `your_behavior_emulator` to [projects/CMakeLists.txt](projects/CMakeLists.txt).
   Put it next to the other emulator targets (inside `if` block):
 ```cmake
-    add_executable(your_behavior_emulator your_behavior_emulator.cpp)
+    add_executable(your_behavior_emulator your_behavior/your_behavior_emulator.cpp)
     target_link_libraries(your_behavior_emulator your_behavior_emulator emulator)
 ``` 
 
 ### Create a firmware target
-  * Add `projects/your_behavior_firmware.cpp` file by copying content of 
-  [projects/basic_behavior_firmware.cpp](projects/basic_behavior_firmware.cpp) and changing
+  * Add `projects/your_behavior/your_behavior_firmware.cpp` file by copying content of 
+  [projects/basic_behavior/basic_behavior_firmware.cpp](projects/basic_behavior/basic_behavior_firmware.cpp) and changing
   `BasicBehavior` to your `Behavior`-implementing class.
   * Add a CMake target `your_behavior_firmware` to [projects/CMakeLists.txt](projects/CMakeLists.txt).
   Put it next to the other firmware targets (inside `else` block):
 ```cmake
-    add_firmware(your_behavior.elf your_behavior_firmware.cpp)
+    add_firmware(your_behavior.elf your_behavior/your_behavior_firmware.cpp)
     target_link_libraries(your_behavior.elf your_behavior)
 ``` 
 
