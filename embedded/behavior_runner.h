@@ -88,6 +88,8 @@ public:
         // ==== Radio ====
         radio.Init();
 
+        chThdSleepMilliseconds(1008);
+
         RadioWrapper<typename BehaviorType::RadioPacketParameter> radioWrapper(&radio);
 
         behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper, &radioWrapper, &eepromWrapper);
