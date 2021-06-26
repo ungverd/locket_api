@@ -284,6 +284,7 @@ public:
     void Disable() const { TMR_DISABLE(ITmr); }
     void SetUpdateFrequencyChangingPrescaler(uint32_t FreqHz) const;
     void SetUpdateFrequencyChangingTopValue(uint32_t FreqHz) const;
+    void SetUpdateFrequencyChangingBoth(uint32_t FreqHz) const;
     void SetTopValue(uint32_t Value) const { ITmr->ARR = Value; }
     uint32_t GetTopValue() const { return ITmr->ARR; }
     void EnableArrBuffering()  const { ITmr->CR1 |=  TIM_CR1_ARPE; }
@@ -322,6 +323,13 @@ public:
         ITmr->SMCR = tmp;
     }
 
+    enum InputPresacaler_t{pscDiv1=0UL, pscDiv2=01UL, pscDiv4=2UL, pscDiv8=3UL};
+    void SetupInput1(uint16_t Mode, InputPresacaler_t Psc, RiseFall_t Rsfll) const {
+        ITmr->CCMR1 = (ITmr->CCMR1 & 0xFF00) | ((uint32_t)Psc << 2)  | (Mode << 0);
+        uint16_t bits = (Rsfll == rfRising)? 0b0000U : (Rsfll == rfFalling)? 0b0010U : 0b1010;
+        ITmr->CCER = (ITmr->CCER & ~(0xAU << 0)) | (bits << 0);
+    }
+
     // DMA, Irq, Evt
     void EnableDmaOnTrigger() const { ITmr->DIER |= TIM_DIER_TDE; }
     void EnableDMAOnCapture(uint8_t CaptureReq) const { ITmr->DIER |= (1 << (CaptureReq + 8)); }
@@ -340,6 +348,7 @@ public:
     void ClearCompare3IrqPendingBit() const { ITmr->SR &= ~TIM_SR_CC3IF; }
     void ClearCompare4IrqPendingBit() const { ITmr->SR &= ~TIM_SR_CC4IF; }
     // Check
+    bool IsEnabled() const { return (ITmr->CR1 & TIM_CR1_CEN); }
     bool IsUpdateIrqFired() const { return (ITmr->SR & TIM_SR_UIF); }
     bool IsCompare1IrqFired() const { return (ITmr->SR & TIM_SR_CC1IF); }
     bool IsCompare2IrqFired() const { return (ITmr->SR & TIM_SR_CC2IF); }
