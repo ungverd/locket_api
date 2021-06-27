@@ -43,34 +43,59 @@ enum CCState_t {ccstIdle, ccstRx, ccstTx};
 template <typename TRadioPacket>
 class RadioLevel2 {
 public:
-    EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ{};
-    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets{};
     uint8_t Init();
 
     void ProcessEvent();
-    CCState_t current_state() const { return CCState; };
 
     uint8_t SetBeaconPacketTo(const TRadioPacket& packet) {
-        PktTxBeacon = packet;
+        packet_to_beacon_ = packet;
         return 0;
     }
 
     uint8_t ClearBeaconPacket() {
-        PktTxBeacon = std::nullopt;
+        packet_to_beacon_ = std::nullopt;
         return 0;
     }
 
     uint8_t TransmitOnce(const TRadioPacket& packet) {
-        PktTxOnce = packet;
+        packet_to_transmit_once_ = packet;
         repeats_left = 4;
         return 0;
     }
+
+    TRadioPacket FetchReceivedPacket() {
+        return received_packets_.Fetch(TIME_IMMEDIATE);
+    }
+
+    void AddReceivedPacket(const TRadioPacket& packet) {
+        incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgPktRx));
+        received_packets_.SendNowOrExitI(packet);
+    }
+
+    void ScheduleSleep() {
+        if(state_ != ccstIdle) {
+            incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgEachOthSleep));
+        }
+    }
+
+    void ScheduleTransmission() {
+        incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgEachOthTx));
+    }
+
+    void ScheduleReception() {
+        if(state_ != ccstRx) {
+            incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
+        }
+    }
+
 private:
-    volatile CCState_t CCState = ccstIdle;
-    std::optional<TRadioPacket> PktTxOnce = std::nullopt;
+    volatile CCState_t state_ = ccstIdle;
+    std::optional<TRadioPacket> packet_to_transmit_once_ = std::nullopt;
     int8_t repeats_left = 0;
-    std::optional<TRadioPacket> PktTxBeacon = std::nullopt;
-    uint8_t TxPwr = 0; // 0 means "do not change"
+    std::optional<TRadioPacket> packet_to_beacon_ = std::nullopt;
+    uint8_t transmission_power_ = 0; // 0 means "do not change"
+    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets_{};
+    EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> incoming_message_queue_{};
 };
 
 struct Config {
@@ -105,7 +130,7 @@ public:
             CycleN++;
             if(CycleN >= RCYCLE_CNT) { // New supercycle begins
                 CycleN = 0;
-                radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
+                radio_->ScheduleReception();
                 // Check TimeSrc timeout
                 if(TimeSrcTimeout >= SCYCLES_TO_KEEP_TIMESRC) TimeSrcId = g_config.ID;
                 else TimeSrcTimeout++;
@@ -126,14 +151,14 @@ public:
     void IOnTimerI() override {
         IncTimeSlot();
         // Tx if now is our timeslot
-        if(TimeSlot == g_config.ID) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthTx));
+        if(TimeSlot == g_config.ID) radio_->ScheduleTransmission();
             // Not our timeslot
         else {
             if(CycleN == 0) { // Enter RX if not yet
-                if(radio_->current_state() != ccstRx) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
+                radio_->ScheduleReception();
             }
             else { // CycleN != 0, enter sleep
-                if(radio_->current_state()) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthSleep));
+                radio_->ScheduleSleep();
             }
         }
     }
@@ -146,11 +171,9 @@ void RxCallback(void* user_data) {
     auto* radio_instance = static_cast<RadioLevel2<TRadioPacket>*>(user_data);
     ExpandedRadioPacket<TRadioPacket> PktRx;
     int8_t rssi;
-    // Printf("RxCallback\n");
     if(CC.ReadFIFO(&PktRx, &rssi, sizeof(ExpandedRadioPacket<TRadioPacket>)) == retvOk) {  // if pkt successfully received
         radio_time->AdjustI(PktRx);
-        radio_instance->RMsgQ.SendNowOrExitI(RMsg_t(rmsgPktRx));
-        radio_instance->received_packets.SendNowOrExitI(PktRx);
+        radio_instance->AddReceivedPacket(PktRx);
     }
 }
 
@@ -181,8 +204,8 @@ template <typename TRadioPacket>
 uint8_t RadioLevel2<TRadioPacket>::Init() {
     static THD_WORKING_AREA(warLvl2Thread, 256);
 
-    RMsgQ.Init();
-    received_packets.Init();
+    incoming_message_queue_.Init();
+    received_packets_.Init();
 
     if(CC.Init() == retvOk) {
         Printf("Init ok\n");
@@ -220,43 +243,43 @@ uint8_t RadioLevel2<TRadioPacket>::Init() {
 
 template<typename TRadioPacket>
 void RadioLevel2<TRadioPacket>::ProcessEvent() {
-    RMsg_t msg = RMsgQ.Fetch(TIME_INFINITE);
+    RMsg_t msg = incoming_message_queue_.Fetch(TIME_INFINITE);
     switch(msg.Cmd) {
         case rmsgEachOthTx: {
             CC.EnterIdle();
-            CCState = ccstTx;
+            state_ = ccstTx;
             ExpandedRadioPacket<TRadioPacket> PktTx;
-            if (PktTxOnce) {
-                PktTx = ExpandedRadioPacket<TRadioPacket>(PktTxOnce.value());
+            if (packet_to_transmit_once_) {
+                PktTx = ExpandedRadioPacket<TRadioPacket>(packet_to_transmit_once_.value());
                 if (--repeats_left == 0) {
-                    PktTxOnce = std::nullopt;
+                    packet_to_transmit_once_ = std::nullopt;
                 }
-            } else if (PktTxBeacon) {
-                PktTx = ExpandedRadioPacket<TRadioPacket>(PktTxBeacon.value());
+            } else if (packet_to_beacon_) {
+                PktTx = ExpandedRadioPacket<TRadioPacket>(packet_to_beacon_.value());
             }
             PktTx.ID = g_config.ID;
             PktTx.CycleN = radio_time->CycleN;
             PktTx.TimeSrcID = radio_time->TimeSrcId;
-            if(TxPwr != 0) {
-                CC.SetTxPower(TxPwr);
-                TxPwr = 0;
+            if(transmission_power_ != 0) {
+                CC.SetTxPower(transmission_power_);
+                transmission_power_ = 0;
             }
             CC.Recalibrate();
             CC.Transmit(&PktTx, sizeof(ExpandedRadioPacket<TRadioPacket>));
         } break;
 
         case rmsgEachOthRx:
-            CCState = ccstRx;
+            state_ = ccstRx;
             CC.ReceiveAsync(RxCallback<TRadioPacket>, this);
             break;
 
         case rmsgEachOthSleep:
-            CCState = ccstIdle;
+            state_ = ccstIdle;
             CC.EnterIdle();
             break;
 
         case rmsgPktRx:
-            CCState = ccstIdle;
+            state_ = ccstIdle;
             EvtQMain.SendNowOrExit({evtIdRadioCmd});
             break;
     } // switch

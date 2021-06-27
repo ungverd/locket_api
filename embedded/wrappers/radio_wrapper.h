@@ -59,14 +59,12 @@ public:
     }
 
     void SetPowerLevel(RadioPowerLevel level) override {
-        RMsg_t msg;
-        msg.Cmd = R_MSG_SET_PWR;
-        msg.Value = static_cast<uint8_t>(level);
-        radio->RMsgQ.SendNowOrExit(msg);
+        // TODO(aeremin) Implement.
+        Printf("SetPowerLevel is not yet supported for many-to-many radio\n");
     }
 
     TRadioPacket FetchReceived() override {
-        return radio->received_packets.Fetch(TIME_IMMEDIATE);
+        return radio->FetchReceivedPacket();
     }
 
 private:
