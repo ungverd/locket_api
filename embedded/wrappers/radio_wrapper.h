@@ -59,8 +59,7 @@ public:
     }
 
     void SetPowerLevel(RadioPowerLevel level) override {
-        // TODO(aeremin) Implement.
-        Printf("SetPowerLevel is not yet supported for many-to-many radio\n");
+        radio->SetPower(static_cast<uint8_t>(level));
     }
 
     TRadioPacket FetchReceived() override {

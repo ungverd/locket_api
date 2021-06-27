@@ -5,7 +5,6 @@
 #include "ch.h"
 #include "cc1101.h"
 #include "MsgQ.h"
-#include "cc1101.h"
 #include "shell.h"
 
 struct RadioPacketMetadata {
@@ -37,9 +36,6 @@ struct ExpandedRadioPacket: public TRadioPacket, public RadioPacketMetadata {
 
 #define SCYCLES_TO_KEEP_TIMESRC 4   // After that amount of supercycles, TimeSrcID become self ID
 
-enum RmsgId_t { rmsgEachOthRx, rmsgEachOthTx, rmsgEachOthSleep, rmsgPktRx };
-enum CCState_t {ccstIdle, ccstRx, ccstTx};
-
 template <typename TRadioPacket>
 class RadioLevel2 {
 public:
@@ -68,34 +64,41 @@ public:
     }
 
     void AddReceivedPacket(const TRadioPacket& packet) {
-        incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgPktRx));
+        incoming_message_queue_.SendNowOrExitI(IncomingMessage::PacketReceived);
         received_packets_.SendNowOrExitI(packet);
     }
 
     void ScheduleSleep() {
-        if(state_ != ccstIdle) {
-            incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgEachOthSleep));
+        if(state_ != State::Idle) {
+            incoming_message_queue_.SendNowOrExitI(IncomingMessage::TryToSleep);
         }
     }
 
     void ScheduleTransmission() {
-        incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgEachOthTx));
+        incoming_message_queue_.SendNowOrExitI(IncomingMessage::TryToTransmit);
     }
 
     void ScheduleReception() {
-        if(state_ != ccstRx) {
-            incoming_message_queue_.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
+        if(state_ != State::Rx) {
+            incoming_message_queue_.SendNowOrExitI(IncomingMessage::TryToReceive);
         }
     }
 
+    void SetPower(uint8_t power) {
+        transmission_power_ = power;
+    }
+
 private:
-    volatile CCState_t state_ = ccstIdle;
+    enum class IncomingMessage: uint8_t { TryToReceive, TryToTransmit, TryToSleep, PacketReceived };
+    enum class State {Idle, Rx, Tx};
+
+    volatile State state_ = State::Idle;
     std::optional<TRadioPacket> packet_to_transmit_once_ = std::nullopt;
     int8_t repeats_left = 0;
     std::optional<TRadioPacket> packet_to_beacon_ = std::nullopt;
     uint8_t transmission_power_ = 0; // 0 means "do not change"
     EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets_{};
-    EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> incoming_message_queue_{};
+    EvtMsgQ_t<IncomingMessage, R_MSGQ_LEN> incoming_message_queue_{};
 };
 
 struct Config {
@@ -243,11 +246,10 @@ uint8_t RadioLevel2<TRadioPacket>::Init() {
 
 template<typename TRadioPacket>
 void RadioLevel2<TRadioPacket>::ProcessEvent() {
-    RMsg_t msg = incoming_message_queue_.Fetch(TIME_INFINITE);
-    switch(msg.Cmd) {
-        case rmsgEachOthTx: {
+    switch(incoming_message_queue_.Fetch(TIME_INFINITE)) {
+        case IncomingMessage::TryToTransmit: {
             CC.EnterIdle();
-            state_ = ccstTx;
+            state_ = State::Tx;
             ExpandedRadioPacket<TRadioPacket> PktTx;
             if (packet_to_transmit_once_) {
                 PktTx = ExpandedRadioPacket<TRadioPacket>(packet_to_transmit_once_.value());
@@ -268,18 +270,18 @@ void RadioLevel2<TRadioPacket>::ProcessEvent() {
             CC.Transmit(&PktTx, sizeof(ExpandedRadioPacket<TRadioPacket>));
         } break;
 
-        case rmsgEachOthRx:
-            state_ = ccstRx;
+        case IncomingMessage::TryToReceive:
+            state_ = State::Rx;
             CC.ReceiveAsync(RxCallback<TRadioPacket>, this);
             break;
 
-        case rmsgEachOthSleep:
-            state_ = ccstIdle;
+        case IncomingMessage::TryToSleep:
+            state_ = State::Idle;
             CC.EnterIdle();
             break;
 
-        case rmsgPktRx:
-            state_ = ccstIdle;
+        case IncomingMessage::PacketReceived:
+            state_ = State::Idle;
             EvtQMain.SendNowOrExit({evtIdRadioCmd});
             break;
     } // switch
