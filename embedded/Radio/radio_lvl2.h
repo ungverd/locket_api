@@ -55,7 +55,7 @@ public:
 
     uint8_t TransmitOnce(const TRadioPacket& packet) {
         packet_to_transmit_once_ = packet;
-        repeats_left = 4;
+        repeats_left = RCYCLE_CNT + 1;
         return 0;
     }
 
