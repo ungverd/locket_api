@@ -163,7 +163,7 @@ void IntegrationTestingBehavior::OnUartCommand(UartCommand& command) {
         std::optional<uint32_t> address = command.GetNext();
         std::optional<uint32_t> value = command.GetNext();
         if (address.has_value() && value.has_value()) {
-            if (eeprom->WriteUint32(address.value(), value.value())) {
+            if (eeprom->Write(address.value(), value.value())) {
                 logger->log("failed to write to EEPROM");
             } else {
                 logger->log("EEPROM write success");
@@ -177,7 +177,7 @@ void IntegrationTestingBehavior::OnUartCommand(UartCommand& command) {
     if (command.NameIs("eeprom_read")) {
         std::optional<uint32_t> address = command.GetNext();
         if (address.has_value()) {
-            logger->log("value in EEPROM: %d", eeprom->ReadUint32(address.value()));
+            logger->log("value in EEPROM: %d", eeprom->Read<uint32_t>(address.value()));
         } else {
             logger->log("not enough parameters!");
         }

@@ -1,12 +1,11 @@
 #include "fake_eeprom.h"
+#include <cstring>
 
-uint32_t FakeEeprom::ReadUint32(uint32_t address) {
-    if (address < 0 || address >= 1000 * sizeof(uint32_t) || address % sizeof(uint32_t) != 0) return 0;
-    return memory[address / sizeof(uint32_t)];
+void FakeEeprom::ReadImpl(void* destination, uint32_t size, uint32_t address) {
+    std::memcpy(destination, memory + address, size);
 }
 
-uint8_t FakeEeprom::WriteUint32(uint32_t address, uint32_t value) {
-    if (address < 0 || address >= 1000 * sizeof(uint32_t) || address % sizeof(uint32_t) != 0) return -1;
-    memory[address / sizeof(uint32_t)] = value;
+uint8_t FakeEeprom::WriteImpl(void* source, uint32_t size, uint32_t address) {
+    std::memcpy(memory + address, source, size);
     return 0;
 }

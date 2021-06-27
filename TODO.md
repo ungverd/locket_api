@@ -6,5 +6,5 @@
   * Allow behaviors to handle id changes.
 * Cleanups
   * Move static variables to cpp files.
-  * Templates in EEPROM methods.  
+ 
     

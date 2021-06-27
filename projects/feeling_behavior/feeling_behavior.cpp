@@ -36,8 +36,8 @@ const LedRGBChunk kSlaveStartSequence[] = {
 
 void FeelingBehavior::OnStarted() {
     logger->log("Started execution!");
-    Color = eeprom->ReadUint32(offsetof(EepromData, Color));
-    LocketType = eeprom->ReadUint32(offsetof(EepromData, locket_type));
+    Color = eeprom->Read<uint32_t>(offsetof(EepromData, Color));
+    LocketType = eeprom->Read<uint32_t>(offsetof(EepromData, locket_type));
     if (Color == 0) {
         led->StartOrRestart(kSlaveStartSequence);
     } else {
@@ -48,7 +48,7 @@ void FeelingBehavior::OnStarted() {
     } else {
         vibro->StartOrRestart(kBrrBrrBrr);
     }
-    LocketType = eeprom->ReadUint32(offsetof(EepromData, locket_type));
+    LocketType = eeprom->Read<uint32_t>(offsetof(EepromData, locket_type));
 }
 
 void FeelingBehavior::EverySecond() {
@@ -110,7 +110,7 @@ void FeelingBehavior::OnUartCommand(UartCommand& command) {
         if (color.has_value()) {
             logger->log("Color %d set", color.value());
             Color = color.value();
-            if (eeprom->WriteUint32(offsetof(EepromData, Color), Color)) {
+            if (eeprom->Write(offsetof(EepromData, Color), Color)) {
                 logger->log("failed to write to EEPROM");
             } else {
                 logger->log("EEPROM write success");
@@ -131,7 +131,7 @@ void FeelingBehavior::OnUartCommand(UartCommand& command) {
         if (UartType.has_value()) {
             logger->log("Type %d set", UartType.value());
             LocketType = UartType.value();
-            if (eeprom->WriteUint32(offsetof(EepromData, locket_type), LocketType)) {
+            if (eeprom->Write(offsetof(EepromData, locket_type), LocketType)) {
                 logger->log("failed to write to EEPROM");
             } else {
                 logger->log("EEPROM write success");

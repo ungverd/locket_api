@@ -4,12 +4,10 @@
 #include "api/eeprom.h"
 
 class FakeEeprom: public Eeprom {
-public:
-    uint32_t ReadUint32(uint32_t address) override;
-    uint8_t WriteUint32(uint32_t address, uint32_t value) override;
-
 private:
-    uint32_t memory[1000];
+    void ReadImpl(void* destination, uint32_t size, uint32_t address) override;
+    uint8_t WriteImpl(void* source, uint32_t size, uint32_t address) override;
+    uint8_t memory[1000];
 };
 
 

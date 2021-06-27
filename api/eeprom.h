@@ -14,15 +14,38 @@
 //     uint32_t c;
 // };
 // ...
-// uin32_t a = eeprom->ReadUint32(offsetof(EepromData, a));
+// uin32_t a = eeprom->Read<uin32_t>(offsetof(EepromData, a));
 // uint32_t b = 56;
-// eeprom->WriteUint32(offsetof(EepromData, b), b);
+// eeprom->Write(offsetof(EepromData, b), b);
 class Eeprom {
 public:
-    virtual uint32_t ReadUint32(uint32_t address) = 0;
+    // Reads value of type T.
+    // Example usage:
+    //   uin32_t a = eeprom->Read<uin32_t>(offsetof(EepromData, a));
+    template<typename T> T Read(uint32_t address);
 
+    // Tries to write value of type T.
+    // Example usage:
+    //  uint32_t b = 56;
+    //  eeprom->Write(offsetof(EepromData, b), b);
     // Returns error code (0 on success). Caller must check the return value and handle non-zero error codes.
-    [[nodiscard]] virtual uint8_t WriteUint32(uint32_t address, uint32_t value) = 0;
+    template<typename T> [[nodiscard]] uint8_t Write(uint32_t address, T value);
+
+private:
+    virtual void ReadImpl(void* destination, uint32_t size, uint32_t address) = 0;
+    virtual uint8_t WriteImpl(void* source, uint32_t size, uint32_t address) = 0;
 };
+
+template<typename T>
+T Eeprom::Read(uint32_t address) {
+    T result;
+    ReadImpl(&result, sizeof(T), address);
+    return result;
+}
+
+template<typename T>
+uint8_t Eeprom::Write(uint32_t address, T value) {
+    return WriteImpl(&value, sizeof(T), address);
+}
 
 #endif //LOCKET_API_EEPROM_H

@@ -7,10 +7,10 @@ namespace {
     uint32_t kHighLevelDataOffset = 512;
 }
 
-uint32_t EepromWrapper::ReadUint32(uint32_t address) {
-    return EE::Read32(kHighLevelDataOffset + address);
+void EepromWrapper::ReadImpl(void* destination, uint32_t size, uint32_t address) {
+    return EE::ReadBuf(destination, size, kHighLevelDataOffset + address);
 }
 
-uint8_t EepromWrapper::WriteUint32(uint32_t address, uint32_t value) {
-    return EE::Write32(kHighLevelDataOffset + address, value);
+uint8_t EepromWrapper::WriteImpl(void* source, uint32_t size, uint32_t address) {
+    return EE::WriteBuf(source, size, kHighLevelDataOffset + address);
 }

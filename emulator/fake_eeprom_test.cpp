@@ -11,6 +11,6 @@ struct EepromData {
 
 TEST(FakeEeprom, CanWriteAndReadBack) {
     FakeEeprom eeprom;
-    EXPECT_EQ(eeprom.WriteUint32(offsetof(EepromData, b), 156), 0);
-    EXPECT_EQ(eeprom.ReadUint32(offsetof(EepromData, b)), 156);
+    EXPECT_EQ(eeprom.Write<uint32_t>(offsetof(EepromData, b), 156), 0);
+    EXPECT_EQ(eeprom.Read<uint32_t>(offsetof(EepromData, b)), 156);
 }
