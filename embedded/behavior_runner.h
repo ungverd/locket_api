@@ -24,29 +24,19 @@
 #include "SimpleSensors.h"
 #include "buttons.h"
 
+// Global because it's declared in MsgQ.h and other files rely on it being defined globally.
+EvtMsgQ_t<EvtMsg_t, MAIN_EVT_Q_LEN> EvtQMain;
+
+// Global because it's referenced in shell.cpp.
 const UartParams_t CmdUartParams(115200, CMD_UART_PARAMS);
 CmdUart_t Uart{&CmdUartParams};
-EvtMsgQ_t<EvtMsg_t, MAIN_EVT_Q_LEN> EvtQMain;
-int32_t ID;
-// ==== Periphery ====
-Vibro_t VibroMotor {VIBRO_SETUP};
-VibroWrapper vibroWrapper(&VibroMotor);
 
-Beeper_t Beeper {BEEPER_PIN};
-BeeperWrapper beeperWrapper(&Beeper);
-
-LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
-RgbLedWrapper ledWrapper(&Led);
-LoggerWrapper loggerWrapper(&Uart);
-
-EepromWrapper eepromWrapper;
-
-// ==== Timers ====
+// Global because allocating it locally results in hard fault for some reason.
 TmrKL_t TmrEverySecond {TIME_MS2I(1000), evtIdEverySecond, tktPeriodic};
 
-uint8_t ReadDipSwitch();
-
 namespace embedded {
+
+uint8_t ReadDipSwitch();
 
 namespace radio_strategy {
 // Just type tokens for template resolution
@@ -72,6 +62,15 @@ private:
 
 public:
     [[noreturn]] void Run() {
+        Vibro_t VibroMotor {VIBRO_SETUP};
+        VibroWrapper vibroWrapper(&VibroMotor);
+        Beeper_t Beeper {BEEPER_PIN};
+        BeeperWrapper beeperWrapper(&Beeper);
+        EepromWrapper eepromWrapper;
+        LedRGBwPower_t Led { LED_R_PIN, LED_G_PIN, LED_B_PIN, LED_EN_PIN };
+        RgbLedWrapper ledWrapper(&Led);
+        LoggerWrapper loggerWrapper(&Uart);
+
         // ==== Init Vcore & clock system ====
         SetupVCore(vcore1V5);
         Clk.SetMSI4MHz();
@@ -169,8 +168,6 @@ public:
     }
 };
 
-}
-
 uint8_t ReadDipSwitch() {
     const PinInputSetup_t dip_switch_pins[DIP_SW_CNT] =
             {DIP_SW1, DIP_SW2, DIP_SW3, DIP_SW4, DIP_SW5, DIP_SW6, DIP_SW7, DIP_SW8 };
@@ -183,6 +180,7 @@ uint8_t ReadDipSwitch() {
         PinSetupAnalog(dip_switch_pins[i].PGpio, dip_switch_pins[i].Pin);
     }
     return result;
+}
 }
 
 #endif //LOCKET_API_BEHAVIOR_RUNNER_H
