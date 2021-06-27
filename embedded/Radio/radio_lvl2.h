@@ -4,19 +4,9 @@
 #include "kl_lib.h"
 #include "ch.h"
 #include "cc1101.h"
-#include "kl_buf.h"
-#include "uart.h"
 #include "MsgQ.h"
 #include "cc1101.h"
-#include "uart.h"
-
-#include "led.h"
-
-#include <vector>
-#include "ChunkTypes.h"
-#include <string>
 #include "shell.h"
-
 
 struct RadioPacketMetadata {
     uint8_t ID;
@@ -30,7 +20,6 @@ struct ExpandedRadioPacket: public TRadioPacket, public RadioPacketMetadata {
     explicit ExpandedRadioPacket(const TRadioPacket& packet): TRadioPacket(packet), RadioPacketMetadata({0, 0, 0}) {}
 };
 
-#if 1 // =================== Channels, cycles, Rssi  ===========================
 #define RCHNL_EACH_OTH  7
 
 // Change if CC settings changed, too. Do not touch until you know what you do.
@@ -48,38 +37,49 @@ struct ExpandedRadioPacket: public TRadioPacket, public RadioPacketMetadata {
 
 #define SCYCLES_TO_KEEP_TIMESRC 4   // After that amount of supercycles, TimeSrcID become self ID
 
-#endif
-
-// Message queue
 enum RmsgId_t { rmsgEachOthRx, rmsgEachOthTx, rmsgEachOthSleep, rmsgPktRx };
+enum CCState_t {ccstIdle, ccstRx, ccstTx};
 
 template <typename TRadioPacket>
 class RadioLevel2 {
 public:
-    TRadioPacket* PktTxOnce = nullptr;
-    TRadioPacket* PktTxBeacon = nullptr;
-
-    uint8_t TxPwr = 0; // 0 means "do not change"
-    EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ;
-    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets;
+    EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ{};
+    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets{};
     uint8_t Init();
-    void SetPwr(uint8_t Pwr) { TxPwr = Pwr; }
-};
 
-enum Type_t : uint8_t { typeBlue = 0 };
+    void ProcessEvent();
+    CCState_t current_state() const { return CCState; };
 
-class Config_t {
+    uint8_t SetBeaconPacketTo(const TRadioPacket& packet) {
+        PktTxBeacon = packet;
+        return 0;
+    }
+
+    uint8_t ClearBeaconPacket() {
+        PktTxBeacon = std::nullopt;
+        return 0;
+    }
+
+    uint8_t TransmitOnce(const TRadioPacket& packet) {
+        PktTxOnce = packet;
+        repeats_left = 4;
+        return 0;
+    }
 private:
-public:
-    uint8_t ID = 15;
-    Type_t Type = typeBlue;
+    volatile CCState_t CCState = ccstIdle;
+    std::optional<TRadioPacket> PktTxOnce = std::nullopt;
+    int8_t repeats_left = 0;
+    std::optional<TRadioPacket> PktTxBeacon = std::nullopt;
+    uint8_t TxPwr = 0; // 0 means "do not change"
 };
 
-Config_t Cfg;
+struct Config {
+    uint8_t ID = 0;
+};
+
+Config g_config;
 
 static Timer_t IHwTmr(TIM9);
-
-static volatile enum CCState_t {ccstIdle, ccstRx, ccstTx} CCState = ccstIdle;
 
 class IRadioTime {
 public:
@@ -92,7 +92,7 @@ public:
 template<typename TRadioPacketType>
 class RadioTime_t: public IRadioTime {
 private:
-    uint16_t TimeSrcTimeout;
+    uint16_t TimeSrcTimeout = 0;
 public:
     RadioLevel2<TRadioPacketType>* radio_;
 
@@ -107,7 +107,7 @@ public:
                 CycleN = 0;
                 radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
                 // Check TimeSrc timeout
-                if(TimeSrcTimeout >= SCYCLES_TO_KEEP_TIMESRC) TimeSrcId = Cfg.ID;
+                if(TimeSrcTimeout >= SCYCLES_TO_KEEP_TIMESRC) TimeSrcId = g_config.ID;
                 else TimeSrcTimeout++;
             }
         }
@@ -126,14 +126,14 @@ public:
     void IOnTimerI() override {
         IncTimeSlot();
         // Tx if now is our timeslot
-        if(TimeSlot == Cfg.ID) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthTx));
+        if(TimeSlot == g_config.ID) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthTx));
             // Not our timeslot
         else {
             if(CycleN == 0) { // Enter RX if not yet
-                if(CCState != ccstRx) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
+                if(radio_->current_state() != ccstRx) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthRx));
             }
             else { // CycleN != 0, enter sleep
-                if(CCState != ccstIdle) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthSleep));
+                if(radio_->current_state()) radio_->RMsgQ.SendNowOrExitI(RMsg_t(rmsgEachOthSleep));
             }
         }
     }
@@ -173,45 +173,8 @@ static void rLvl2Thread(void* arg) {
     chRegSetThreadName("rLvl2");
 
     while(true) {
-        RMsg_t msg = radio_instance->RMsgQ.Fetch(TIME_INFINITE);
-        switch(msg.Cmd) {
-            case rmsgEachOthTx: {
-                CC.EnterIdle();
-                CCState = ccstTx;
-                ExpandedRadioPacket<TRadioPacket> PktTx;
-                if (radio_instance->PktTxOnce) {
-                    PktTx = ExpandedRadioPacket<TRadioPacket>(*radio_instance->PktTxOnce);
-                    radio_instance->PktTxOnce = nullptr;
-                } else if (radio_instance->PktTxBeacon) {
-                    PktTx = ExpandedRadioPacket<TRadioPacket>(*radio_instance->PktTxBeacon);
-                }
-                PktTx.ID = Cfg.ID;
-                PktTx.CycleN = radio_time->CycleN;
-                PktTx.TimeSrcID = radio_time->TimeSrcId;
-                if(radio_instance->TxPwr != 0) {
-                    CC.SetTxPower(radio_instance->TxPwr);
-                    radio_instance->TxPwr = 0;
-                }
-                CC.Recalibrate();
-                CC.Transmit(&PktTx, sizeof(ExpandedRadioPacket<TRadioPacket>));
-            } break;
-
-            case rmsgEachOthRx:
-                CCState = ccstRx;
-                CC.ReceiveAsync(RxCallback<TRadioPacket>, arg);
-                break;
-
-            case rmsgEachOthSleep:
-                CCState = ccstIdle;
-                CC.EnterIdle();
-                break;
-
-            case rmsgPktRx:
-                CCState = ccstIdle;
-                EvtQMain.SendNowOrExit({evtIdRadioCmd});
-                break;
-        } // switch
-    } // while true
+        radio_instance->ProcessEvent();
+    }
 }
 
 template <typename TRadioPacket>
@@ -230,7 +193,7 @@ uint8_t RadioLevel2<TRadioPacket>::Init() {
         CC.SetBitrate(CCBitrate500k);
 
         auto rt = new RadioTime_t<TRadioPacket>(this);
-        rt->TimeSrcId = Cfg.ID;
+        rt->TimeSrcId = g_config.ID;
         radio_time = rt;
 
         // Setup HW timer: it generates IRQ at timeslot end
@@ -253,6 +216,51 @@ uint8_t RadioLevel2<TRadioPacket>::Init() {
         return retvOk;
     }
     else return retvFail;
+}
+
+template<typename TRadioPacket>
+void RadioLevel2<TRadioPacket>::ProcessEvent() {
+    RMsg_t msg = RMsgQ.Fetch(TIME_INFINITE);
+    switch(msg.Cmd) {
+        case rmsgEachOthTx: {
+            CC.EnterIdle();
+            CCState = ccstTx;
+            ExpandedRadioPacket<TRadioPacket> PktTx;
+            if (PktTxOnce) {
+                PktTx = ExpandedRadioPacket<TRadioPacket>(PktTxOnce.value());
+                if (--repeats_left == 0) {
+                    PktTxOnce = std::nullopt;
+                }
+            } else if (PktTxBeacon) {
+                PktTx = ExpandedRadioPacket<TRadioPacket>(PktTxBeacon.value());
+            }
+            PktTx.ID = g_config.ID;
+            PktTx.CycleN = radio_time->CycleN;
+            PktTx.TimeSrcID = radio_time->TimeSrcId;
+            if(TxPwr != 0) {
+                CC.SetTxPower(TxPwr);
+                TxPwr = 0;
+            }
+            CC.Recalibrate();
+            CC.Transmit(&PktTx, sizeof(ExpandedRadioPacket<TRadioPacket>));
+        } break;
+
+        case rmsgEachOthRx:
+            CCState = ccstRx;
+            CC.ReceiveAsync(RxCallback<TRadioPacket>, this);
+            break;
+
+        case rmsgEachOthSleep:
+            CCState = ccstIdle;
+            CC.EnterIdle();
+            break;
+
+        case rmsgPktRx:
+            CCState = ccstIdle;
+            EvtQMain.SendNowOrExit({evtIdRadioCmd});
+            break;
+    } // switch
+
 }
 
 #endif //LOCKET_API_RADIO_LVL2_H

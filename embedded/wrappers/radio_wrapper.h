@@ -47,20 +47,15 @@ class RadioWrapperManyToMany: public Radio<TRadioPacket> {
 public:
     explicit RadioWrapperManyToMany(RadioLevel2<TRadioPacket>* radio): radio(radio) {}
     void Transmit(const TRadioPacket& packet) override {
-        packet_to_send_once = packet;
-        radio->PktTxOnce = &packet_to_send_once;
-        RMsg_t msg;
-        msg.Cmd = R_MSG_TRANSMIT;
-        radio->RMsgQ.SendNowOrExit(msg);
+        radio->TransmitOnce(packet);
     }
 
     void SetBeaconPacket(const TRadioPacket& packet) override {
-        packet_beacon = packet;
-        radio->PktTxBeacon = &packet_beacon;
+        radio->SetBeaconPacketTo(packet);
     }
 
     void ClearBeaconPacket() override {
-        radio->PktTxBeacon = nullptr;
+        radio->ClearBeaconPacket();
     }
 
     void SetPowerLevel(RadioPowerLevel level) override {
@@ -76,7 +71,6 @@ public:
 
 private:
     RadioLevel2<TRadioPacket>* radio;
-    TRadioPacket packet_to_send_once, packet_beacon;
 };
 
 #endif //LOCKET_API_RADIO_WRAPPER_H

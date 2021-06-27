@@ -96,7 +96,7 @@ public:
         i2c1.Init();
         PillMgr.Init();
 
-        Cfg.ID = EE::Read32(0);
+        g_config.ID = EE::Read32(0);
 
         // ==== Time and timers ====
         TmrEverySecond.StartOrRestart();
@@ -145,7 +145,7 @@ public:
                     if (wrapper.NameIs("set_id")) {
                         auto maybe_id = wrapper.GetNext();
                         if (maybe_id) {
-                            Cfg.ID = maybe_id.value();
+                            g_config.ID = maybe_id.value();
                             EE::Write32(0, maybe_id.value());
                         }
                     } else {
