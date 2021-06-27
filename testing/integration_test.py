@@ -87,13 +87,14 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         self.primaryUart.connection.write(b'plus 20 -10\n')
         self.primaryUart.waitUntilStringInUart('sum equals 10')
 
-    # TODO(aeremin) It currently fails if run after testBeaconRadioCommunication.
-    def test0SingleRadioCommunication(self):
+    def testSingleRadioCommunication(self):
         self.primaryUart.connection.write(b'emit_once 1637\n')
+        self.primaryUart.waitUntilStringInUart('ack emit_once')
         self.secondaryUart.waitUntilStringInUart('received packet with id 1637', 10)
 
     def testBeaconRadioCommunication(self):
         self.primaryUart.connection.write(b'emit_beacon 777\n')
+        self.primaryUart.waitUntilStringInUart('ack emit_beacon')
         self.secondaryUart.waitUntilStringInUart('received packet with id 777', 10)
 
     def testCanWriteAndReadEeprom(self):

@@ -142,6 +142,7 @@ void IntegrationTestingBehavior::OnUartCommand(UartCommand& command) {
         if (id.has_value()) {
             IdOnlyState s = {static_cast<uint32_t>(id.value())};
             radio->Transmit(s);
+            logger->log("ack emit_once");
         } else {
             logger->log("not enough parameters!");
         }
@@ -153,6 +154,7 @@ void IntegrationTestingBehavior::OnUartCommand(UartCommand& command) {
         if (id.has_value()) {
             IdOnlyState s = {static_cast<uint32_t>(id.value())};
             radio->SetBeaconPacket(s);
+            logger->log("ack emit_beacon");
         } else {
             logger->log("not enough parameters!");
         }

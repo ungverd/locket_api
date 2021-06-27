@@ -48,19 +48,15 @@ public:
     void ProcessEvent();
 
     uint8_t SetBeaconPacketTo(const TRadioPacket& packet) {
-        packet_to_beacon_ = packet;
-        return 0;
+        return incoming_message_queue_.SendNowOrExit({IncomingMessageType::SetBeacon, packet});
     }
 
     uint8_t ClearBeaconPacket() {
-        packet_to_beacon_ = std::nullopt;
-        return 0;
+        return incoming_message_queue_.SendNowOrExit({IncomingMessageType::ClearBeacon, {}});
     }
 
     uint8_t TransmitOnce(const TRadioPacket& packet) {
-        packet_to_transmit_once_ = packet;
-        repeats_left = RCYCLE_CNT + 1;
-        return 0;
+        return incoming_message_queue_.SendNowOrExit({IncomingMessageType::TransmitOnce, packet});
     }
 
     TRadioPacket FetchReceivedPacket() {
@@ -68,23 +64,23 @@ public:
     }
 
     void AddReceivedPacket(const TRadioPacket& packet) {
-        incoming_message_queue_.SendNowOrExitI(IncomingMessage::PacketReceived);
+        incoming_message_queue_.SendNowOrExitI({IncomingMessageType::PacketReceived, {}});
         received_packets_.SendNowOrExitI(packet);
     }
 
     void ScheduleSleep() {
         if(state_ != State::Idle) {
-            incoming_message_queue_.SendNowOrExitI(IncomingMessage::TryToSleep);
+            incoming_message_queue_.SendNowOrExitI({IncomingMessageType::TryToSleep, {}});
         }
     }
 
     void ScheduleTransmission() {
-        incoming_message_queue_.SendNowOrExitI(IncomingMessage::TryToTransmit);
+        incoming_message_queue_.SendNowOrExitI({IncomingMessageType::TryToTransmit, {}});
     }
 
     void ScheduleReception() {
         if(state_ != State::Rx) {
-            incoming_message_queue_.SendNowOrExitI(IncomingMessage::TryToReceive);
+            incoming_message_queue_.SendNowOrExitI({IncomingMessageType::TryToReceive, {}});
         }
     }
 
@@ -93,7 +89,20 @@ public:
     }
 
 private:
-    enum class IncomingMessage: uint8_t { TryToReceive, TryToTransmit, TryToSleep, PacketReceived };
+    enum class IncomingMessageType: uint8_t {
+        TryToReceive,
+        TryToTransmit,
+        TryToSleep,
+        PacketReceived,
+        SetBeacon,
+        ClearBeacon,
+        TransmitOnce,
+    };
+    struct IncomingMessage {
+        IncomingMessageType type;
+        TRadioPacket packet;
+    };
+
     enum class State {Idle, Rx, Tx};
 
     volatile State state_ = State::Idle;
@@ -102,7 +111,7 @@ private:
     std::optional<TRadioPacket> packet_to_beacon_ = std::nullopt;
     uint8_t transmission_power_ = 0; // 0 means "do not change"
     EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets_{};
-    EvtMsgQ_t<IncomingMessage, R_MSGQ_LEN> incoming_message_queue_{};
+    EvtMsgQ_t<IncomingMessage, 2 * R_MSGQ_LEN> incoming_message_queue_{};
 };
 
 struct Config {
@@ -252,8 +261,9 @@ uint8_t RadioLevel2<TRadioPacket>::Init() {
 
 template<typename TRadioPacket>
 void RadioLevel2<TRadioPacket>::ProcessEvent() {
-    switch(incoming_message_queue_.Fetch(TIME_INFINITE)) {
-        case IncomingMessage::TryToTransmit: {
+    auto message = incoming_message_queue_.Fetch(TIME_INFINITE);
+    switch(message.type) {
+        case IncomingMessageType::TryToTransmit: {
             CC.EnterIdle();
             state_ = State::Tx;
             FullRadioPacket<TRadioPacket> PktTx;
@@ -276,19 +286,32 @@ void RadioLevel2<TRadioPacket>::ProcessEvent() {
             CC.Transmit(&PktTx, sizeof(FullRadioPacket<TRadioPacket>));
         } break;
 
-        case IncomingMessage::TryToReceive:
+        case IncomingMessageType::TryToReceive:
             state_ = State::Rx;
             CC.ReceiveAsync(RxCallback<TRadioPacket>, this);
             break;
 
-        case IncomingMessage::TryToSleep:
+        case IncomingMessageType::TryToSleep:
             state_ = State::Idle;
             CC.EnterIdle();
             break;
 
-        case IncomingMessage::PacketReceived:
+        case IncomingMessageType::PacketReceived:
             state_ = State::Idle;
             EvtQMain.SendNowOrExit({evtIdRadioCmd});
+            break;
+
+        case IncomingMessageType::SetBeacon:
+            packet_to_beacon_ =  message.packet;
+            break;
+
+        case IncomingMessageType::ClearBeacon:
+            packet_to_beacon_ = std::nullopt;
+            break;
+
+        case IncomingMessageType::TransmitOnce:
+            packet_to_transmit_once_ =  message.packet;
+            repeats_left = RCYCLE_CNT + 1;
             break;
     } // switch
 
