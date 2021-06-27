@@ -14,9 +14,13 @@ struct RadioPacketMetadata {
 };
 
 template<typename TRadioPacket>
-struct ExpandedRadioPacket: public TRadioPacket, public RadioPacketMetadata {
-    ExpandedRadioPacket(): TRadioPacket(), RadioPacketMetadata({0, 0, 0}) {}
-    explicit ExpandedRadioPacket(const TRadioPacket& packet): TRadioPacket(packet), RadioPacketMetadata({0, 0, 0}) {}
+struct FullRadioPacket {
+    FullRadioPacket() = default;
+    explicit FullRadioPacket(const TRadioPacket& payload): payload(payload), metadata(), payload_present(true) {};
+
+    TRadioPacket payload{};
+    RadioPacketMetadata metadata{};
+    bool payload_present = false;
 };
 
 #define RCHNL_EACH_OTH  7
@@ -172,11 +176,13 @@ IRadioTime* radio_time = nullptr;
 template<typename TRadioPacket>
 void RxCallback(void* user_data) {
     auto* radio_instance = static_cast<RadioLevel2<TRadioPacket>*>(user_data);
-    ExpandedRadioPacket<TRadioPacket> PktRx;
+    FullRadioPacket<TRadioPacket> PktRx;
     int8_t rssi;
-    if(CC.ReadFIFO(&PktRx, &rssi, sizeof(ExpandedRadioPacket<TRadioPacket>)) == retvOk) {  // if pkt successfully received
-        radio_time->AdjustI(PktRx);
-        radio_instance->AddReceivedPacket(PktRx);
+    if(CC.ReadFIFO(&PktRx, &rssi, sizeof(FullRadioPacket<TRadioPacket>)) == retvOk) {  // if pkt successfully received
+        radio_time->AdjustI(PktRx.metadata);
+        if (PktRx.payload_present) {
+            radio_instance->AddReceivedPacket(PktRx.payload);
+        }
     }
 }
 
@@ -212,7 +218,7 @@ uint8_t RadioLevel2<TRadioPacket>::Init() {
 
     if(CC.Init() == retvOk) {
         Printf("Init ok\n");
-        CC.SetPktSize(sizeof(ExpandedRadioPacket<TRadioPacket>));
+        CC.SetPktSize(sizeof(FullRadioPacket<TRadioPacket>));
         CC.DoIdleAfterTx();
         CC.SetChannel(RCHNL_EACH_OTH);
         CC.SetTxPower(CC_PwrMinus10dBm);
@@ -250,24 +256,24 @@ void RadioLevel2<TRadioPacket>::ProcessEvent() {
         case IncomingMessage::TryToTransmit: {
             CC.EnterIdle();
             state_ = State::Tx;
-            ExpandedRadioPacket<TRadioPacket> PktTx;
+            FullRadioPacket<TRadioPacket> PktTx;
             if (packet_to_transmit_once_) {
-                PktTx = ExpandedRadioPacket<TRadioPacket>(packet_to_transmit_once_.value());
+                PktTx = FullRadioPacket<TRadioPacket>(packet_to_transmit_once_.value());
                 if (--repeats_left == 0) {
                     packet_to_transmit_once_ = std::nullopt;
                 }
             } else if (packet_to_beacon_) {
-                PktTx = ExpandedRadioPacket<TRadioPacket>(packet_to_beacon_.value());
+                PktTx = FullRadioPacket<TRadioPacket>(packet_to_beacon_.value());
             }
-            PktTx.ID = g_config.ID;
-            PktTx.CycleN = radio_time->CycleN;
-            PktTx.TimeSrcID = radio_time->TimeSrcId;
+            PktTx.metadata.ID = g_config.ID;
+            PktTx.metadata.CycleN = radio_time->CycleN;
+            PktTx.metadata.TimeSrcID = radio_time->TimeSrcId;
             if(transmission_power_ != 0) {
                 CC.SetTxPower(transmission_power_);
                 transmission_power_ = 0;
             }
             CC.Recalibrate();
-            CC.Transmit(&PktTx, sizeof(ExpandedRadioPacket<TRadioPacket>));
+            CC.Transmit(&PktTx, sizeof(FullRadioPacket<TRadioPacket>));
         } break;
 
         case IncomingMessage::TryToReceive:
