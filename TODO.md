@@ -5,7 +5,6 @@
 * IDs
   * Allow behaviors to handle id changes.
 * Cleanups
-  * Use type traits in `CreateRadioWrapper` instead of current approach.
   * Move static variables to cpp files.
   * Templates in EEPROM methods.  
     

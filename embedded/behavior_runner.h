@@ -50,29 +50,16 @@ namespace embedded {
 
 namespace radio_strategy {
 // Just type tokens for template resolution
-struct Simple {};
-struct ManyToMany {};
+struct Simple {
+    template<typename TRadioPacket> using InternalRadioType= RadioLevel1<TRadioPacket>;
+    template<typename TRadioPacket> using RadioWrapper = RadioWrapperSimple<TRadioPacket>;
+};
+struct ManyToMany {
+    template<typename TRadioPacket> using InternalRadioType= RadioLevel2<TRadioPacket>;
+    template<typename TRadioPacket> using RadioWrapper = RadioWrapperManyToMany<TRadioPacket>;
+};
 
-namespace internal {
-
-template <typename TRadioPacket, typename TRadioStrategy>
-inline typename std::enable_if<std::is_same<TRadioStrategy, Simple>::value, Radio<TRadioPacket>*>::type
-CreateRadioWrapper() {
-    auto radio = new RadioLevel1<TRadioPacket>();
-    radio->Init();
-    return new RadioWrapperSimple(radio);
 }
-
-template <typename TRadioPacket, typename TRadioStrategy>
-inline typename std::enable_if<std::is_same<TRadioStrategy, ManyToMany>::value, Radio<TRadioPacket>*>::type
-CreateRadioWrapper() {
-    auto radio = new RadioLevel2<TRadioPacket>();
-    radio->Init();
-    return new RadioWrapperManyToMany(radio);
-}
-}
-}
-
 
 // BehaviorType must be subtype of Behavior
 template<typename BehaviorType, typename RadioStrategy = radio_strategy::Simple>
@@ -81,6 +68,7 @@ private:
     Behavior<typename BehaviorType::PillStateParameter,
             typename BehaviorType::RadioPacketParameter>* behavior = nullptr;
     PillManagerWrapper<typename BehaviorType::PillStateParameter> pill_manager_wrapper{&PillMgr};
+    typename RadioStrategy::template InternalRadioType<typename BehaviorType::RadioPacketParameter>  radio;
 
 public:
     [[noreturn]] void Run() {
@@ -116,9 +104,11 @@ public:
 
         chThdSleepMilliseconds(1008);
 
-        auto radio_wrapper = radio_strategy::internal::CreateRadioWrapper<typename BehaviorType::RadioPacketParameter, RadioStrategy>();
+        radio.Init();
+        typename RadioStrategy::template RadioWrapper<typename BehaviorType::RadioPacketParameter>  radioWrapper(&radio);
+
         behavior = new BehaviorType(&loggerWrapper, &ledWrapper, &beeperWrapper, &vibroWrapper,
-                                    radio_wrapper , &eepromWrapper);
+                                    &radioWrapper , &eepromWrapper);
         CheckDipSwitch();
         behavior->OnStarted();
 
@@ -146,7 +136,7 @@ public:
                     break;
 
                 case evtIdRadioCmd: {
-                    const auto packet = radio_wrapper->FetchReceived();
+                    const auto packet = radioWrapper.FetchReceived();
                     behavior->OnRadioPacketReceived(packet);
                     break;
                 }
