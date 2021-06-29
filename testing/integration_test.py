@@ -34,22 +34,22 @@ def buildAndUpload(hla: str):
 
 class UartHelper:
     def __init__(self, port):
+        self.port = port
         self.connection = serial.Serial(port, 115200)
 
     def __del__(self):
         self.connection.close()
 
-    def waitUntilStringInUart(self, waitFor: str, timeout: float = 5.0):
+    def waitUntilStringInUart(self, waitFor: str, timeout: float = 5.0, error_handling: str = 'strict'):
         self.connection.timeout = timeout
         deadline = time.time() + timeout
         while time.time() < deadline:
-            if self.connection.readable():
-                line = self.connection.readline().decode('ascii', 'ignore')
-                if line:
-                    print('Received: ' + line, end='')
-                    if waitFor in line:
-                        return
-            time.sleep(0.1)
+            line = self.connection.readline().decode('ascii', error_handling)
+            if line:
+                print(self.port + ': Received: ' + line, end='')
+                if waitFor in line:
+                    return
+            time.sleep(0.001)
         raise TimeoutError('Timeout while waiting for %s to appear in UART' % waitFor)
 
 
@@ -63,8 +63,6 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         cls.secondaryUart = UartHelper(comPortName(SECONDARY_DEVICE_ID))
         buildAndUpload(PRIMARY_DEVICE_ID)
         buildAndUpload(SECONDARY_DEVICE_ID)
-        # cls.primaryUart.connection.write(b'set_id 2\n')
-        # cls.secondaryUart.connection.write(b'set_id 3\n')
 
     @classmethod
     def tearDownClass(cls):
@@ -74,10 +72,12 @@ class TestLocketHardwareLibraries(unittest.TestCase):
     # Next 2 tests have 000 prefix so they are executed first (otherwise other tests will "consume" part of uart
     # log containing "Started execution").
     def test000PrimaryDeviceIsOnline(self):
-        self.primaryUart.waitUntilStringInUart('Started execution')
+        self.primaryUart.waitUntilStringInUart('Started execution', 5, 'ignore')
+        self.primaryUart.connection.write(b'set_id 2\n')
 
     def test000SecondaryDeviceIsOnline(self):
-        self.secondaryUart.waitUntilStringInUart('Started execution')
+        self.secondaryUart.waitUntilStringInUart('Started execution', 5, 'ignore')
+        self.secondaryUart.connection.write(b'set_id 3\n')
 
     def testRespondsToPing(self):
         self.primaryUart.connection.write(b'ping\n')
