@@ -13,7 +13,7 @@ void StateMachineBehavior::OnStarted() {
 void StateMachineBehavior::EverySecond() {
 }
 
-void StateMachineBehavior::OnButtonPressed(uint16_t button_index) {
+void StateMachineBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
     abilityQEvt e;
     e.super.sig = FIRST_BUTTON_PRESSED_SIG;
     // Printf("evtAbility: %d; %d\r", e.super.sig, e.value);

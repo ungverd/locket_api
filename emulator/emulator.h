@@ -89,7 +89,7 @@ public:
                     std::cout << "Button index must be in range 0-2!" << std::endl;
                     continue;
                 }
-                behavior->OnButtonPressed(position);
+                behavior->OnButtonPressed(position, false);
             } else if (command == "dip") {
                 int32_t position, on;
                 input >> position >> on;

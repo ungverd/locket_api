@@ -136,7 +136,7 @@ void GigandaBehavior::OnStarted() {
     }
 }
 
-void GigandaBehavior::OnButtonPressed(uint16_t button_index) {
+void GigandaBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
 
     if (LocketType == LocketEnum::MASTER) {
         master_pill_id = GetNextState(master_pill_id);
