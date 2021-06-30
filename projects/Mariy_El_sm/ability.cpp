@@ -19,24 +19,21 @@
 #include "qhsm.h"
 #include "ability.h"
 #include "eventHandlers.h"
-#include <stdint.h>
+#include "Glue.h"
 //Q_DEFINE_THIS_FILE
 /* global-scope definitions -----------------------------------------*/
 QHsm * const the_ability = (QHsm *) &ability; /* the opaque pointer */
 
 /*$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /* Check for the minimum required QP version */
-#if (QP_VERSION < 650U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
-#error qpc version 6.5.0 or higher required
-#endif
 /*$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 /*$define${SMs::Ability_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Ability_ctor} .....................................................*/
-void Ability_ctor(unsigned int ability_pause, unsigned int ability) {
+void Ability_ctor(RadBehavior* SMBeh, unsigned int ability_pause, unsigned int current_ability) {
     Ability *me = &ability;
          me->ability_pause = ability_pause;
         me->count = 0;
-        me->ability = ability;
+        me->ability = current_ability;
     QHsm_ctor(&me->super, Q_STATE_CAST(&Ability_initial));
 }
 /*$enddef${SMs::Ability_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
@@ -123,7 +120,7 @@ QState Ability_idle(Ability * const me, QEvt const * const e) {
         }
         /*${SMs::Ability::SM::global::ability::idle::PILL_ABILITY} */
         case PILL_ABILITY_SIG: {
-            me->ability = e->id;
+            me->ability = ((abilityQEvt*)e)->value;
             FlashAbilityColor();
             SaveAbility(me->ability);
             status_ = Q_HANDLED();
@@ -165,14 +162,15 @@ QState Ability_active(Ability * const me, QEvt const * const e) {
         case Q_EXIT_SIG: {
             #ifdef DESKTOP
                 printf("Exited state active");
-            #endif /* def DESKTOP */me->ability_pause = ABILITY_PAUSE_M;
+            #endif /* def DESKTOP */
+            me->ability_pause = ABILITY_PAUSE_M;
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S} */
         case TIME_TICK_1S_SIG: {
             /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S::[me->count>=ABILITY_THRESHOLD_1S~} */
-            if (me->count >= ABILITY_THRESHOLD_1S) {
+            if (me->count >= ABILITY_THRESHOLD_S) {
                 status_ = Q_TRAN(&Ability_idle);
             }
             /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S::[else]} */
@@ -197,9 +195,8 @@ QState Ability_final(Ability * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${SMs::Ability::SM::final} */
         case Q_ENTRY_SIG: {
-            printf("
-            Bye! Bye!
-            "); exit(0);
+            printf("Bye! Bye!");
+            exit(0);
             status_ = Q_HANDLED();
             break;
         }

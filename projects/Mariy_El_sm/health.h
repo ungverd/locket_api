@@ -18,10 +18,13 @@
 /*$endhead${.::health.h} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifndef health_h
 #define health_h
+
+#include "mariel_sm.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include "qhsm.h"    /* include own framework tagunil version */
+
 
 //Start of h code from diagram
 #define SIMPLE 0
@@ -72,26 +75,13 @@ typedef struct healthQEvt {
     int damage;
 } healthQEvt;
 
-enum PlayerSignals {
-TICK_SEC_SIG = Q_USER_SIG,
 
-MONSTER_SIGNAl_SIG,
-PILL_HEAL_SIG,
-TIME_TICK_1S_SIG,
-MIDDLE_BUTTON_PRESSED_SIG,
-TIME_TICK_1M_SIG,
-PILL_GOD_SIG,
-RAD_RECEIVED_SIG,
-PILL_RESET_SIG,
-LONG_PRESS_SIG,
-
-LAST_USER_SIG
-};
 extern QHsm * const the_health; /* opaque pointer to the health HSM */
 
 /*$declare${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
 void Health_ctor(
+    RadBehavior *SMBeh,
     unsigned int health,
     unsigned int State,
     unsigned int god_pause);

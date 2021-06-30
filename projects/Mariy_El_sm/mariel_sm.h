@@ -1,5 +1,5 @@
-#ifndef LOCKET_API_SM_BEHAVIOR_H
-#define LOCKET_API_SM_BEHAVIOR_H
+#ifndef LOCKET_API_RAD_BEHAVIOR_H
+#define LOCKET_API_RAD_BEHAVIOR_H
 
 #include "pill_manager.h"
 #include "rx_table.h"

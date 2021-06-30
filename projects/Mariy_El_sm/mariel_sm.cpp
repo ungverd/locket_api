@@ -1,25 +1,28 @@
-#include "sm_behavior.h"
+#include "mariel_sm.h"
 #include "ability.h"
+#include "health.h"
 #include "Glue.h"
 
-void StateMachineBehavior::OnStarted() {
+void RadBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
-    Ability_ctor(this, MUTANT_READY, 0);
+    Ability_ctor(this, 0, 0);
+    QMSM_INIT(the_ability, (QEvt *)0);
+    Health_ctor(this, DEFAULT_HP, SIMPLE, 0);
     QMSM_INIT(the_ability, (QEvt *)0);
 
 }
 
-void StateMachineBehavior::EverySecond() {
+void RadBehavior::EverySecond() {
 }
 
-void StateMachineBehavior::OnButtonPressed(uint16_t button_index) {
+void RadBehavior::OnButtonPressed(uint16_t button_index) {
     abilityQEvt e;
-    e.super.sig = FIRST_BUTTON_PRESSED_SIG;
+    e.super.sig = LONG_PRESS_THIRD_SIG;
     // Printf("evtAbility: %d; %d\r", e.super.sig, e.value);
     QMSM_DISPATCH(the_ability, &(e.super));
 }
 
-void StateMachineBehavior::Flash(unsigned int R, unsigned int G, unsigned int B, unsigned int Timeout) {
+void RadBehavior::Flash(unsigned int R, unsigned int G, unsigned int B, unsigned int Timeout) {
     logger->log("We are flashing furiously");
 };

@@ -15,7 +15,7 @@ void StateMachineBehavior::EverySecond() {
 
 void StateMachineBehavior::OnButtonPressed(uint16_t button_index) {
     abilityQEvt e;
-    e.super.sig = FIRST_BUTTON_PRESSED_SIG;
+    // e.super.sig = LONG_PRESS_THIRD_SIG;
     // Printf("evtAbility: %d; %d\r", e.super.sig, e.value);
     QMSM_DISPATCH(the_ability, &(e.super));
 }

@@ -18,6 +18,8 @@
 /*$endhead${.::ability.h} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifndef ability_h
 #define ability_h
+#include "mariel_sm.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,23 +62,15 @@ static Ability ability; /* the only instance of the Ability class */
 
 typedef struct abilityQEvt {
     QEvt super;
+    unsigned int value;
 } abilityQEvt;
 
-enum PlayerSignals {
-TICK_SEC_SIG = Q_USER_SIG,
 
-TIME_TICK_1M_SIG,
-PILL_ABILITY_SIG,
-LONG_PRESS_THIRD_SIG,
-TIME_TICK_1S_SIG,
-
-LAST_USER_SIG
-};
 extern QHsm * const the_ability; /* opaque pointer to the ability HSM */
 
 /*$declare${SMs::Ability_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Ability_ctor} .....................................................*/
-void Ability_ctor(unsigned int ability_pause, unsigned int ability);
+void Ability_ctor(RadBehavior* SMBeh, unsigned int ability_pause, unsigned int ability);
 /*$enddecl${SMs::Ability_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifdef __cplusplus
 }

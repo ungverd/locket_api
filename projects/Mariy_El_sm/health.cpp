@@ -19,20 +19,18 @@
 #include "qhsm.h"
 #include "health.h"
 #include "eventHandlers.h"
-#include <stdint.h>
+#include "Glue.h"
 //Q_DEFINE_THIS_FILE
 /* global-scope definitions -----------------------------------------*/
 QHsm * const the_health = (QHsm *) &health; /* the opaque pointer */
 
 /*$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /* Check for the minimum required QP version */
-#if (QP_VERSION < 650U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
-#error qpc version 6.5.0 or higher required
-#endif
 /*$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 /*$define${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
 void Health_ctor(
+    RadBehavior *SMBeh,
     unsigned int current_HP,
     unsigned int State,
     unsigned int god_pause)
@@ -74,6 +72,7 @@ void Health_ctor(
 /*${SMs::Health::SM} .......................................................*/
 QState Health_initial(Health * const me, QEvt const * const e) {
     /*${SMs::Health::SM::initial} */
+    return Q_TRAN(me->StartState);
     return Q_TRAN(&Health_simple);
 }
 /*${SMs::Health::SM::global} ...............................................*/
@@ -205,7 +204,7 @@ QState Health_mortal(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED} */
         case RAD_RECEIVED_SIG: {
             /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED::[me->health<=e->damage]} */
-            if (me->health <= e->damage) {
+            if (me->health <= ((healthQEvt*)e)->damage) {
                 status_ = Q_TRAN(&Health_dead);
             }
             else {
@@ -260,7 +259,7 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
             }
             /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[else]} */
             else {
-                Flash(WHITE);
+                Flash(kWhite);
                 status_ = Q_HANDLED();
             }
             break;
@@ -345,9 +344,8 @@ QState Health_final(Health * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${SMs::Health::SM::final} */
         case Q_ENTRY_SIG: {
-            printf("
-            Bye! Bye!
-            "); exit(0);
+            printf("Bye! Bye!");
+            exit(0);
             status_ = Q_HANDLED();
             break;
         }
