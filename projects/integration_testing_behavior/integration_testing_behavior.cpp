@@ -102,7 +102,8 @@ void IntegrationTestingBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
                 GetSwitchState(dip_value_mask, 8));
 }
 
-void IntegrationTestingBehavior::OnButtonPressed(uint16_t button_index) {
+void IntegrationTestingBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
+    logger->log("Button %d pressed, long press: %d", button_index, long_press);
     if (button_index == 0) {
         radio->Transmit({17});
     }

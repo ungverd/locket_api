@@ -20,7 +20,7 @@ public:
     void OnPillConnected(PillManager<IdOnlyState>* manager) override;
     void OnPillDisconnected() override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
-    void OnButtonPressed(uint16_t button_index) override;
+    void OnButtonPressed(uint16_t button_index, bool long_press) override;
     void OnRadioPacketReceived(const IdOnlyState& packet) override;
     void OnUartCommand(UartCommand& command) override;
 

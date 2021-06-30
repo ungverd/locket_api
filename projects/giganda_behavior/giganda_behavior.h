@@ -24,7 +24,7 @@ public:
     void OnStarted() override;
     void OnPillConnected(PillManager<IdOnlyState>* manager) override;
     void OnPillDisconnected() override;
-    void OnButtonPressed(uint16_t button_index) override;
+    void OnButtonPressed(uint16_t button_index, bool long_press) override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
     void EverySecond() override;
 

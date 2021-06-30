@@ -108,7 +108,7 @@ void BasicBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
                 GetSwitchState(dip_value_mask, 8));
 }
 
-void BasicBehavior::OnButtonPressed(uint16_t button_index) {
+void BasicBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
     if (button_index == 0) {
         logger->log("Sent some spam!");
         radio->Transmit({17});

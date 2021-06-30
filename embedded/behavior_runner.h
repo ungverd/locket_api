@@ -122,7 +122,9 @@ public:
                 case evtIdButtons:
                     // TODO(aeremin) Support other button events - long presses, double-clicks, combos, etc.
                     if (Msg.BtnEvtInfo.Type == beShortPress) {
-                        behavior->OnButtonPressed(Msg.BtnEvtInfo.BtnID[0]);
+                        behavior->OnButtonPressed(Msg.BtnEvtInfo.BtnID[0], false);
+                    } else if (Msg.BtnEvtInfo.Type == beLongPress) {
+                        behavior->OnButtonPressed(Msg.BtnEvtInfo.BtnID[0], true);
                     }
                     break;
 

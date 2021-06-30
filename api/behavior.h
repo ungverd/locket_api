@@ -80,8 +80,11 @@ public:
     //
     // Button-handling events.
     //
-    // For now, only single-button presses are supported (no combinations, no long presses, etc).
-    virtual void OnButtonPressed(uint16_t button_index) {}
+    // Long press is true if button was pressed for more than a second.
+    // Note: in case of a long press, there will be 2 calls:
+    //   1) Immediately when button was pressed with long_press = false
+    //   2) Second later with long_press = true
+    virtual void OnButtonPressed(uint16_t button_index, bool long_press) {}
 
     // DIP switch event. Will be called if any of toggles on DIP switch are flipped.
     // To get the ON/OFF state of the specific switch, use GetSwitchState from the utility.h.

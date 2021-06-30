@@ -12,7 +12,7 @@ public:
 
     void OnStarted() override;
     void EverySecond() override;
-    void OnButtonPressed(uint16_t button_index) override;
+    void OnButtonPressed(uint16_t button_index, bool long_press) override;
     void Flash(unsigned int R, unsigned int G, unsigned int B, unsigned int Timeout);
 
 };

@@ -4,13 +4,15 @@ from typing import Optional
 
 import serial
 import subprocess
+import sys
 
 from serial.tools import list_ports
-
 
 PRIMARY_DEVICE_ID = '0672FF555550877067141642'
 SECONDARY_DEVICE_ID = '066FFF534953867067205729'
 
+ALREADY_FLASHED = False
+RUNS_PER_TEST = 10
 
 def comPortName(device_id: str) -> Optional[str]:
     for port in list_ports.comports():
@@ -24,9 +26,9 @@ def buildAndUpload(hla: str):
                                    '-f', 'embedded/openocd.cfg',
                                    '-c', 'hla_serial "%s"' % hla,
                                    '-c', 'tcl_port disabled',
-                                   '-c', 'gdb_port disabled',
-                                   '-c', 'program "cmake-build-debug-arm-native/projects/integration_testing_behavior.elf"',
-                                   '-c', 'init',
+                                   '-c', 'gdb_port disabled'] +
+                                  ([] if ALREADY_FLASHED else ['-c', 'program "cmake-build-debug-arm-native/projects/integration_testing_behavior.elf"']) +
+                                  ['-c', 'init',
                                    '-c', 'reset run',
                                    '-c', 'exit'], cwd='..').decode('utf-8')
     print(out)
@@ -63,6 +65,8 @@ class TestLocketHardwareLibraries(unittest.TestCase):
         cls.secondaryUart = UartHelper(comPortName(SECONDARY_DEVICE_ID))
         buildAndUpload(PRIMARY_DEVICE_ID)
         buildAndUpload(SECONDARY_DEVICE_ID)
+        global ALREADY_FLASHED
+        ALREADY_FLASHED = True
 
     @classmethod
     def tearDownClass(cls):
@@ -105,5 +109,7 @@ class TestLocketHardwareLibraries(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    for iteration in range(RUNS_PER_TEST):
+        if not unittest.main(exit=False).result.wasSuccessful():
+            sys.exit(1)
 
