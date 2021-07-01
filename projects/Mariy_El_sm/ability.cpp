@@ -31,9 +31,9 @@ QHsm * const the_ability = (QHsm *) &ability; /* the opaque pointer */
 /*${SMs::Ability_ctor} .....................................................*/
 void Ability_ctor(RadBehavior* SMBeh, unsigned int ability_pause, unsigned int current_ability) {
     Ability *me = &ability;
-         me->ability_pause = ability_pause;
-        me->count = 0;
-        me->ability = current_ability;
+    me->vars.ability_pause = ability_pause;
+    me->vars.count = 0;
+    me->vars.ability = current_ability;
     QHsm_ctor(&me->super, Q_STATE_CAST(&Ability_initial));
 }
 /*$enddef${SMs::Ability_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
@@ -113,23 +113,23 @@ QState Ability_idle(Ability * const me, QEvt const * const e) {
         }
         /*${SMs::Ability::SM::global::ability::idle::TIME_TICK_1M} */
         case TIME_TICK_1M_SIG: {
-            me->ability_pause--;
+            me->vars.ability_pause--;
             SavePause();
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::idle::PILL_ABILITY} */
         case PILL_ABILITY_SIG: {
-            me->ability = ((abilityQEvt*)e)->value;
+            me->vars.ability = ((abilityQEvt*)e)->value;
             FlashAbilityColor();
-            SaveAbility(me->ability);
+            SaveAbility(me->vars.ability);
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::idle::LONG_PRESS_THIRD} */
         case LONG_PRESS_THIRD_SIG: {
             /*${SMs::Ability::SM::global::ability::idle::LONG_PRESS_THIRD::[me->ability_pause==0]} */
-            if (me->ability_pause == 0) {
+            if (me->vars.ability_pause == 0) {
                 status_ = Q_TRAN(&Ability_active);
             }
             /*${SMs::Ability::SM::global::ability::idle::LONG_PRESS_THIRD::[else]} */
@@ -163,19 +163,19 @@ QState Ability_active(Ability * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Exited state active");
             #endif /* def DESKTOP */
-            me->ability_pause = ABILITY_PAUSE_M;
+            me->vars.ability_pause = ABILITY_PAUSE_M;
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S} */
         case TIME_TICK_1S_SIG: {
             /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S::[me->count>=ABILITY_THRESHOLD_1S~} */
-            if (me->count >= ABILITY_THRESHOLD_S) {
+            if (me->vars.count >= ABILITY_THRESHOLD_S) {
                 status_ = Q_TRAN(&Ability_idle);
             }
             /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S::[else]} */
             else {
-                me->count++;
+                me->vars.count++;
                 status_ = Q_HANDLED();
             }
             break;

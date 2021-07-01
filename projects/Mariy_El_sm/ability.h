@@ -28,6 +28,13 @@ extern "C" {
 //Start of h code from diagram
 #define ABILITY_THRESHOLD_S 30
 #define ABILITY_PAUSE_M 15
+
+class Variables {
+public:
+    unsigned int ability_pause;
+    unsigned int count;
+    unsigned int ability;
+};
 //End of h code from diagram
 
 
@@ -38,9 +45,7 @@ typedef struct {
     QHsm super;
 
 /* public: */
-    unsigned int ability_pause;
-    unsigned int count;
-    unsigned int ability;
+    Variables vars;
 } Ability;
 
 /* protected: */
