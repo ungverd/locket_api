@@ -16,7 +16,7 @@ void RadBehavior::OnStarted() {
 void RadBehavior::EverySecond() {
 }
 
-void RadBehavior::OnButtonPressed(uint16_t button_index) {
+void RadBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
     abilityQEvt e;
     e.super.sig = LONG_PRESS_THIRD_SIG;
     // Printf("evtAbility: %d; %d\r", e.super.sig, e.value);
