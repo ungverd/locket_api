@@ -16,6 +16,7 @@
 * for more details.
 */
 /*$endhead${.::ability.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+#include "api/eeprom.h"
 #include "qhsm.h"
 #include "ability.h"
 #include "eventHandlers.h"
@@ -29,11 +30,9 @@ QHsm * const the_ability = (QHsm *) &ability; /* the opaque pointer */
 /*$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 /*$define${SMs::Ability_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Ability_ctor} .....................................................*/
-void Ability_ctor(RadBehavior* SMBeh, unsigned int ability_pause, unsigned int current_ability) {
+void Ability_ctor(RadBehavior* SMBeh, Eeprom* eeprom) {
     Ability *me = &ability;
-    me->vars.ability_pause = ability_pause;
-    me->vars.count = 0;
-    me->vars.ability = current_ability;
+    me->vars = Variables::Load(eeprom);
     QHsm_ctor(&me->super, Q_STATE_CAST(&Ability_initial));
 }
 /*$enddef${SMs::Ability_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/

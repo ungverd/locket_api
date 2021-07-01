@@ -6,7 +6,7 @@
 void RadBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
-    Ability_ctor(this, 0, 0);
+    Ability_ctor(this, this->eeprom);
     QMSM_INIT(the_ability, (QEvt *)0);
     Health_ctor(this, DEFAULT_HP, SIMPLE, 0);
     QMSM_INIT(the_ability, (QEvt *)0);

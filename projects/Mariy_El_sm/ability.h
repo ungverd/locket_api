@@ -18,6 +18,7 @@
 /*$endhead${.::ability.h} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifndef ability_h
 #define ability_h
+#include "api/eeprom.h"
 #include "mariel_sm.h"
 
 #ifdef __cplusplus
@@ -31,9 +32,19 @@ extern "C" {
 
 class Variables {
 public:
+    static Variables Load(Eeprom* eeprom) {
+        Variables result{};
+        result.eeprom = eeprom;
+        result.ability_pause = eeprom->Read<unsigned int>(offsetof(Variables, ability_pause));
+        result.count = eeprom->Read<unsigned int>(offsetof(Variables, count));
+        result.ability = eeprom->Read<unsigned int>(offsetof(Variables, ability));
+        return result;
+    }
+
     unsigned int ability_pause;
     unsigned int count;
     unsigned int ability;
+    Eeprom* eeprom;
 };
 //End of h code from diagram
 
@@ -75,7 +86,7 @@ extern QHsm * const the_ability; /* opaque pointer to the ability HSM */
 
 /*$declare${SMs::Ability_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Ability_ctor} .....................................................*/
-void Ability_ctor(RadBehavior* SMBeh, unsigned int ability_pause, unsigned int ability);
+void Ability_ctor(RadBehavior* SMBeh, Eeprom* eeprom);
 /*$enddecl${SMs::Ability_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifdef __cplusplus
 }
