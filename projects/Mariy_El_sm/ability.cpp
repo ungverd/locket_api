@@ -112,23 +112,21 @@ QState Ability_idle(Ability * const me, QEvt const * const e) {
         }
         /*${SMs::Ability::SM::global::ability::idle::TIME_TICK_1M} */
         case TIME_TICK_1M_SIG: {
-            me->vars.ability_pause--;
-            SavePause();
+            me->vars.DecrementAbilityPause();
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::idle::PILL_ABILITY} */
         case PILL_ABILITY_SIG: {
-            me->vars.ability = ((abilityQEvt*)e)->value;
+            me->vars.SetAbility(((abilityQEvt*)e)->value);
             FlashAbilityColor();
-            SaveAbility(me->vars.ability);
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::idle::LONG_PRESS_THIRD} */
         case LONG_PRESS_THIRD_SIG: {
             /*${SMs::Ability::SM::global::ability::idle::LONG_PRESS_THIRD::[me->ability_pause==0]} */
-            if (me->vars.ability_pause == 0) {
+            if (me->vars.GetAbilityPause() == 0) {
                 status_ = Q_TRAN(&Ability_active);
             }
             /*${SMs::Ability::SM::global::ability::idle::LONG_PRESS_THIRD::[else]} */
@@ -162,19 +160,19 @@ QState Ability_active(Ability * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Exited state active");
             #endif /* def DESKTOP */
-            me->vars.ability_pause = ABILITY_PAUSE_M;
+            me->vars.SetAbilityPause(ABILITY_PAUSE_M);
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S} */
         case TIME_TICK_1S_SIG: {
             /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S::[me->count>=ABILITY_THRESHOLD_1S~} */
-            if (me->vars.count >= ABILITY_THRESHOLD_S) {
+            if (me->vars.GetCount() >= ABILITY_THRESHOLD_S) {
                 status_ = Q_TRAN(&Ability_idle);
             }
             /*${SMs::Ability::SM::global::ability::active::TIME_TICK_1S::[else]} */
             else {
-                me->vars.count++;
+                me->vars.IncrementCount();
                 status_ = Q_HANDLED();
             }
             break;

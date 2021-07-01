@@ -41,6 +41,49 @@ public:
         return result;
     }
 
+    void DecrementAbilityPause() {
+        --ability_pause;
+        SaveAbilityPause();
+    }
+
+    unsigned int GetAbilityPause() const {
+        return ability_pause;
+    }
+
+    void SetAbility(unsigned int a) {
+        ability = a;
+        SaveAbility();
+    }
+
+    void SetAbilityPause(unsigned int pause) {
+        ability_pause = pause;
+        SaveAbilityPause();
+    }
+
+    void IncrementCount() {
+        ++count;
+        // Count changes every second, only persist it occasionally to prevent
+        // too frequent eeprom writes.
+        if (count % 30 == 0) {
+            SaveCount();
+        }
+    }
+
+    unsigned int GetCount() const {
+        return count;
+    }
+
+private:
+    void SaveAbilityPause() {
+        eeprom->Write(ability_pause, offsetof(Variables, ability_pause));
+    }
+    void SaveCount() {
+        eeprom->Write(count, offsetof(Variables, count));
+    }
+    void SaveAbility() {
+        eeprom->Write(ability, offsetof(Variables, ability));
+    }
+
     unsigned int ability_pause;
     unsigned int count;
     unsigned int ability;
