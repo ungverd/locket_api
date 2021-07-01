@@ -29,7 +29,7 @@ public:
     //  uint32_t b = 56;
     //  eeprom->Write(offsetof(EepromData, b), b);
     // Returns error code (0 on success). Caller must check the return value and handle non-zero error codes.
-    template<typename T> [[nodiscard]] uint8_t Write(uint32_t address, T value);
+    template<typename T> uint8_t Write(uint32_t address, T value);
 
 private:
     virtual void ReadImpl(void* destination, uint32_t size, uint32_t address) = 0;
