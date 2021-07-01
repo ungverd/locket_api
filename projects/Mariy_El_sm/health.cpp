@@ -30,39 +30,30 @@ QHsm * const the_health = (QHsm *) &health; /* the opaque pointer */
 /*$define${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
 void Health_ctor(
-    RadBehavior *SMBeh,
-    unsigned int current_HP,
-    unsigned int State,
-    unsigned int god_pause)
+    RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom)
 {
     Health *me = &health;
-        me->health = current_HP;
-        me->count = 0;
-        me->god_pause = god_pause;
-        switch (State) {
-            case SIMPLE: {
-                me->StartState =
-                (QStateHandler)&Health_simple;
-                break;
-            }
-            case GOD_READY: {
-                me->StartState =
-                (QStateHandler)&Health_god_ready;
-                break;
-            }
-            case GOD: {
-                me->StartState =
-                (QStateHandler)&Health_god;
-                break;
-            }
-            case DEAD: {
-                me->StartState =
-                (QStateHandler)&Health_god;
-                break;
-            }
-            default:
-                me->StartState =
-                (QStateHandler)&Health_simple;
+    me->SMBeh = SMBeh;
+    me->vars = Health_Variables::Load(eeprom);
+    switch (State) {
+        case SIMPLE: {
+            me->StartState = (QStateHandler)&Health_simple;
+            break;
+        }
+        case GOD_READY: {
+            me->StartState = (QStateHandler)&Health_god_ready;
+            break;
+        }
+        case GOD: {
+            me->StartState = (QStateHandler)&Health_god;
+            break;
+        }
+        case DEAD: {
+            me->StartState = (QStateHandler)&Health_dead;
+            break;
+        }
+        default:
+            me->StartState = (QStateHandler)&Health_simple;
         }
     QHsm_ctor(&me->super, Q_STATE_CAST(&Health_initial));
 }
@@ -73,7 +64,6 @@ void Health_ctor(
 QState Health_initial(Health * const me, QEvt const * const e) {
     /*${SMs::Health::SM::initial} */
     return Q_TRAN(me->StartState);
-    return Q_TRAN(&Health_simple);
 }
 /*${SMs::Health::SM::global} ...............................................*/
 QState Health_global(Health * const me, QEvt const * const e) {
@@ -104,6 +94,9 @@ QState Health_alive(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state alive");
             #endif /* def DESKTOP */
+            me->vars.ResetHealth();
+            StartTramsmitForPath();
+            SetColor(kLightGreen);
             status_ = Q_HANDLED();
             break;
         }
@@ -123,7 +116,7 @@ QState Health_alive(Health * const me, QEvt const * const e) {
         }
         /*${SMs::Health::SM::global::alive::PILL_HEAL} */
         case PILL_HEAL_SIG: {
-            SetHealth(DEFAULT_HP);
+            me->vars.ResetHealth();
             ClearPill();
             status_ = Q_HANDLED();
             break;
@@ -149,6 +142,9 @@ QState Health_god(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state god");
             #endif /* def DESKTOP */
+            SetColor(kWhite);
+            me->vars.ResetCount();
+            SaveState(GOD);
             status_ = Q_HANDLED();
             break;
         }
@@ -157,19 +153,19 @@ QState Health_god(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Exited state god");
             #endif /* def DESKTOP */
-            me->god_pause = GOD_PAUSE_M;
+            me->vars.ReSetGodPause();
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Health::SM::global::alive::god::TIME_TICK_1S} */
         case TIME_TICK_1S_SIG: {
             /*${SMs::Health::SM::global::alive::god::TIME_TICK_1S::[me->count>=GOD_THRESHOLD_S]} */
-            if (me->count >= GOD_THRESHOLD_S) {
+            if (me->vars.GetCount() >= GOD_THRESHOLD_S) {
                 status_ = Q_TRAN(&Health_god_ready);
             }
             /*${SMs::Health::SM::global::alive::god::TIME_TICK_1S::[else]} */
             else {
-                me->count++;
+                me->vars.IncrementCount();
                 status_ = Q_HANDLED();
             }
             break;
@@ -204,10 +200,15 @@ QState Health_mortal(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED} */
         case RAD_RECEIVED_SIG: {
             /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED::[me->health<=e->damage]} */
-            if (me->health <= ((healthQEvt*)e)->damage) {
+            if (me->vars.GetHealth() <= ((healthQEvt*)e)->damage) {
                 status_ = Q_TRAN(&Health_dead);
             }
             else {
+                me->vars.DecreaseHealth(((healthQEvt*)e)->damage);
+                //int red =  255*(1 - me->health/DEFAULT_HEALTH);
+                //int green = 255*me->health/DEFAULT_HEALTH
+                //ShowColor(red, green, 0);
+                VibroRadiation();
                 status_ = Q_UNHANDLED();
             }
             break;
@@ -233,6 +234,8 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state god_ready");
             #endif /* def DESKTOP */
+            Flash(kWhite);
+            SaveState(GOD_READY);
             status_ = Q_HANDLED();
             break;
         }
@@ -246,15 +249,16 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
         }
         /*${SMs::Health::SM::global::alive::mortal::god_ready::TIME_TICK_1M} */
         case TIME_TICK_1M_SIG: {
-            me->god_pause--;
-            SaveGodTimer();
+            if (me->vars.GetGodPause() > 0) {
+                me->vars.DecrementGodPause();
+            }
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PRESSED} */
         case MIDDLE_BUTTON_PRESSED_SIG: {
             /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[me->god_pause==0]} */
-            if (me->god_pause == 0) {
+            if (me->vars.GetGodPause() == 0) {
                 status_ = Q_TRAN(&Health_god);
             }
             /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[else]} */
@@ -280,6 +284,7 @@ QState Health_simple(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state simple");
             #endif /* def DESKTOP */
+            SaveState(SIMPLE);
             status_ = Q_HANDLED();
             break;
         }
@@ -293,7 +298,7 @@ QState Health_simple(Health * const me, QEvt const * const e) {
         }
         /*${SMs::Health::SM::global::alive::mortal::simple::PILL_GOD} */
         case PILL_GOD_SIG: {
-            me->god_pause=0;
+            me->vars.ZeroGodPause();
             status_ = Q_TRAN(&Health_god_ready);
             break;
         }
@@ -313,6 +318,9 @@ QState Health_dead(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state dead");
             #endif /* def DESKTOP */
+            SetColor(kWhite);
+            me->vars.ResetCount();
+            SaveState(GOD);
             status_ = Q_HANDLED();
             break;
         }

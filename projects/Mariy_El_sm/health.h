@@ -20,6 +20,9 @@
 #define health_h
 
 #include "mariel_sm.h"
+#include "api/eeprom.h"
+#include "ability.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,15 +42,108 @@ extern "C" {
 
 /*$declare${SMs::Health} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health} ...........................................................*/
+class Health_Variables {
+public:
+    static Health_Variables Load(Eeprom* eeprom) {
+        Health_Variables result{};
+        result.eeprom = eeprom;
+        result.god_pause = eeprom->Read<unsigned int>(offsetof(Health_Variables, god_pause)
+                + sizeof(Ability_Variables));
+        result.count = eeprom->Read<unsigned int>(offsetof(Health_Variables, count)
+                + sizeof(Ability_Variables));
+        result.health = eeprom->Read<unsigned int>(offsetof(Health_Variables, health) +
+                sizeof(Ability_Variables));
+        return result;
+    }
+
+    void DecrementGodPause() {
+        --god_pause;
+        SaveGodPause();
+    }
+
+    unsigned int GetGodPause() const {
+        return god_pause;
+    }
+
+    void SetHealth(unsigned int hp) {
+        health = hp;
+        SaveHealth();
+    }
+
+    void ResetHealth() {
+        health = DEFAULT_HP;
+        SaveHealth();
+    }
+
+    unsigned int GetHealth() const {
+        return health;
+    }
+
+    void DecreaseHealth(unsigned int delta_hp) {
+        if (delta_hp <= health) {
+            health -= delta_hp;
+        } else {
+            health = 0;
+        }
+        SaveHealth();
+    }
+
+    void ReSetGodPause() {
+        god_pause = GOD_PAUSE_M;
+        SaveGodPause();
+    }
+
+    void ZeroGodPause() {
+        god_pause = 0;
+        SaveGodPause();
+    }
+
+    void IncrementCount() {
+        ++count;
+        // Count changes every second, only persist it occasionally to prevent
+        // too frequent eeprom writes.
+        if (count % 30 == 0) {
+            SaveCount();
+        }
+    }
+
+    void ResetCount() {
+        count = 0;
+        SaveCount();
+    }
+
+    unsigned int GetCount() const {
+        return count;
+    }
+
+private:
+    void SaveGodPause() {
+        eeprom->Write(god_pause, offsetof(Health_Variables, god_pause) + sizeof(Ability_Variables));
+    }
+    void SaveCount() {
+        eeprom->Write(count, offsetof(Health_Variables, count));
+    }
+    void SaveHealth() {
+        eeprom->Write(health, offsetof(Health_Variables, health));
+    }
+
+    unsigned int god_pause;
+    unsigned int count;
+    unsigned int health;
+    Eeprom* eeprom;
+};
+
+
+
+
 typedef struct {
 /* protected: */
     QHsm super;
+    RadBehavior* SMBeh;
 
 /* public: */
-    unsigned int health;
     QStateHandler StartState;
-    unsigned int count;
-    unsigned int god_pause;
+    Health_Variables vars;
 } Health;
 
 /* protected: */
@@ -80,11 +176,7 @@ extern QHsm * const the_health; /* opaque pointer to the health HSM */
 
 /*$declare${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
-void Health_ctor(
-    RadBehavior *SMBeh,
-    unsigned int health,
-    unsigned int State,
-    unsigned int god_pause);
+void Health_ctor(RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom);
 /*$enddecl${SMs::Health_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifdef __cplusplus
 }

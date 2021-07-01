@@ -8,8 +8,8 @@ void RadBehavior::OnStarted() {
     led->StartOrRestart(kStartSequence);
     Ability_ctor(this, this->eeprom);
     QMSM_INIT(the_ability, (QEvt *)0);
-    Health_ctor(this, DEFAULT_HP, SIMPLE, 0);
-    QMSM_INIT(the_ability, (QEvt *)0);
+    Health_ctor(this, SIMPLE, this->eeprom);
+    QMSM_INIT(the_health, (QEvt *)0);
 
 }
 

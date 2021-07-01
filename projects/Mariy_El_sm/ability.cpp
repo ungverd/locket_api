@@ -32,7 +32,8 @@ QHsm * const the_ability = (QHsm *) &ability; /* the opaque pointer */
 /*${SMs::Ability_ctor} .....................................................*/
 void Ability_ctor(RadBehavior* SMBeh, Eeprom* eeprom) {
     Ability *me = &ability;
-    me->vars = Variables::Load(eeprom);
+    me->SMBeh = SMBeh;
+    me->vars = Ability_Variables::Load(eeprom);
     QHsm_ctor(&me->super, Q_STATE_CAST(&Ability_initial));
 }
 /*$enddef${SMs::Ability_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
@@ -72,6 +73,8 @@ QState Ability_ability(Ability * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state ability");
             #endif /* def DESKTOP */
+            FlashAbilityColor();
+            me->vars.ResetAbilityPause();
             status_ = Q_HANDLED();
             break;
         }
@@ -112,7 +115,9 @@ QState Ability_idle(Ability * const me, QEvt const * const e) {
         }
         /*${SMs::Ability::SM::global::ability::idle::TIME_TICK_1M} */
         case TIME_TICK_1M_SIG: {
-            me->vars.DecrementAbilityPause();
+            if (me->vars.GetAbilityPause() > 0) {
+                me->vars.DecrementAbilityPause();
+            }
             status_ = Q_HANDLED();
             break;
         }
@@ -152,6 +157,8 @@ QState Ability_active(Ability * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state active");
             #endif /* def DESKTOP */
+            StartAbility();
+            me->vars.ResetCount();
             status_ = Q_HANDLED();
             break;
         }
@@ -160,7 +167,7 @@ QState Ability_active(Ability * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Exited state active");
             #endif /* def DESKTOP */
-            me->vars.SetAbilityPause(ABILITY_PAUSE_M);
+            me->vars.ResetAbilityPause();
             status_ = Q_HANDLED();
             break;
         }

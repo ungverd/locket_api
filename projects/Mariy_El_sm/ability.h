@@ -29,15 +29,16 @@ extern "C" {
 //Start of h code from diagram
 #define ABILITY_THRESHOLD_S 30
 #define ABILITY_PAUSE_M 15
+const unsigned int SAVE_PAUSE = 60;
 
-class Variables {
+class Ability_Variables {
 public:
-    static Variables Load(Eeprom* eeprom) {
-        Variables result{};
+    static Ability_Variables Load(Eeprom* eeprom) {
+        Ability_Variables result{};
         result.eeprom = eeprom;
-        result.ability_pause = eeprom->Read<unsigned int>(offsetof(Variables, ability_pause));
-        result.count = eeprom->Read<unsigned int>(offsetof(Variables, count));
-        result.ability = eeprom->Read<unsigned int>(offsetof(Variables, ability));
+        result.ability_pause = eeprom->Read<unsigned int>(offsetof(Ability_Variables, ability_pause));
+        result.count = eeprom->Read<unsigned int>(offsetof(Ability_Variables, count));
+        result.ability = eeprom->Read<unsigned int>(offsetof(Ability_Variables, ability));
         return result;
     }
 
@@ -55,8 +56,13 @@ public:
         SaveAbility();
     }
 
-    void SetAbilityPause(unsigned int pause) {
-        ability_pause = pause;
+    void ResetAbilityPause() {
+        ability_pause = ABILITY_PAUSE_M;
+        SaveAbilityPause();
+    }
+
+    void ResetCount() {
+        count = 0;
         SaveAbilityPause();
     }
 
@@ -64,7 +70,7 @@ public:
         ++count;
         // Count changes every second, only persist it occasionally to prevent
         // too frequent eeprom writes.
-        if (count % 30 == 0) {
+        if (count % SAVE_PAUSE == 0) {
             SaveCount();
         }
     }
@@ -75,13 +81,13 @@ public:
 
 private:
     void SaveAbilityPause() {
-        eeprom->Write(ability_pause, offsetof(Variables, ability_pause));
+        eeprom->Write(ability_pause, offsetof(Ability_Variables, ability_pause));
     }
     void SaveCount() {
-        eeprom->Write(count, offsetof(Variables, count));
+        eeprom->Write(count, offsetof(Ability_Variables, count));
     }
     void SaveAbility() {
-        eeprom->Write(ability, offsetof(Variables, ability));
+        eeprom->Write(ability, offsetof(Ability_Variables, ability));
     }
 
     unsigned int ability_pause;
@@ -97,9 +103,10 @@ private:
 typedef struct {
 /* protected: */
     QHsm super;
+    RadBehavior* SMBeh;
 
-/* public: */
-    Variables vars;
+    /* public: */
+    Ability_Variables vars;
 } Ability;
 
 /* protected: */
