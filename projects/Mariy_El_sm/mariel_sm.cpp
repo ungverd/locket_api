@@ -1,7 +1,7 @@
 #include "mariel_sm.h"
+#include "Glue.h"
 #include "ability.h"
 #include "health.h"
-#include "Glue.h"
 
 void RadBehavior::OnStarted() {
     logger->log("Started execution!");

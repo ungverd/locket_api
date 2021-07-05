@@ -6,6 +6,7 @@
 #include "behavior.h"
 
 
+
 class RadBehavior: public Behavior<IdOnlyState, IdOnlyState> {
 public:
     using Behavior::Behavior;
