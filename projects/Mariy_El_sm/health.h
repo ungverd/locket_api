@@ -34,10 +34,7 @@ extern "C" {
 #define GOD_READY 1
 #define GOD 2
 #define DEAD 3
-#define DEFAULT_HP 100
 #define GOD_THRESHOLD_S 30
-#define GOD_PAUSE_M 30
-#define HEALTH_SAVE_PAUSE 30
 //End of h code from diagram
 
 

@@ -3,18 +3,17 @@
 //
 
 #include "sm_data.h"
-#include "ability.h"
-#include "health.h"
+
 
 //start of health variables structure functions
 Health_Variables Health_Variables::Load(Eeprom* eeprom) {
     Health_Variables result{};
     result.eeprom = eeprom;
-    result.god_pause = eeprom->Read<unsigned int>(offsetof(EepromMap, vars1)
+    result.god_pause = eeprom->Read<unsigned int>(offsetof(EepromMap, health_vars)
             + offsetof(Health_Variables, god_pause));
-    result.count = eeprom->Read<unsigned int>(offsetof(EepromMap, vars1)
+    result.count = eeprom->Read<unsigned int>(offsetof(EepromMap, health_vars)
             + offsetof(Health_Variables, count));
-    result.health = eeprom->Read<unsigned int>(offsetof(EepromMap, vars1)
+    result.health = eeprom->Read<unsigned int>(offsetof(EepromMap, health_vars)
             + offsetof(Health_Variables, health));
     return result;
 }
@@ -82,13 +81,13 @@ unsigned int Health_Variables::GetCount() const {
 }
 
 void Health_Variables::SaveGodPause() {
-    eeprom->Write(god_pause, offsetof(Health_Variables, god_pause) + offsetof(EepromMap, vars1));
+    eeprom->Write(god_pause, offsetof(Health_Variables, god_pause) + offsetof(EepromMap, health_vars));
 }
 void Health_Variables::SaveCount() {
-    eeprom->Write(count, offsetof(Health_Variables, count) + offsetof(EepromMap, vars1));
+    eeprom->Write(count, offsetof(Health_Variables, count) + offsetof(EepromMap, health_vars));
 }
 void Health_Variables::SaveHealth() {
-    eeprom->Write(health, offsetof(Health_Variables, health) + offsetof(EepromMap, vars1));
+    eeprom->Write(health, offsetof(Health_Variables, health) + offsetof(EepromMap, health_vars));
 }
 //end of Health_Variables functions
 
@@ -96,11 +95,11 @@ void Health_Variables::SaveHealth() {
 Ability_Variables Ability_Variables::Load(Eeprom* eeprom) {
     Ability_Variables result{};
     result.eeprom = eeprom;
-    result.ability_pause = eeprom->Read<unsigned int>(offsetof(EepromMap, vars2)
+    result.ability_pause = eeprom->Read<unsigned int>(offsetof(EepromMap, ability_vars)
             + offsetof(Ability_Variables, ability_pause));
-    result.count = eeprom->Read<unsigned int>(offsetof(EepromMap, vars2)
+    result.count = eeprom->Read<unsigned int>(offsetof(EepromMap, ability_vars)
             + offsetof(Ability_Variables, count));
-    result.ability = eeprom->Read<unsigned int>(offsetof(EepromMap, vars2)
+    result.ability = eeprom->Read<unsigned int>(offsetof(EepromMap, ability_vars)
             + offsetof(Ability_Variables, ability));
     return result;
 }
@@ -143,11 +142,20 @@ unsigned int Ability_Variables::GetCount() const {
 }
 
 void Ability_Variables::SaveAbilityPause() {
-    eeprom->Write(ability_pause, offsetof(EepromMap, vars2) + offsetof(Ability_Variables, ability_pause));
+    eeprom->Write(ability_pause, offsetof(EepromMap, ability_vars) + offsetof(Ability_Variables, ability_pause));
 }
 void Ability_Variables::SaveCount() {
-    eeprom->Write(count, offsetof(EepromMap, vars2) + offsetof(Ability_Variables, count));
+    eeprom->Write(count, offsetof(EepromMap, ability_vars) + offsetof(Ability_Variables, count));
 }
 void Ability_Variables::SaveAbility() {
-    eeprom->Write(ability, offsetof(EepromMap, vars2) + offsetof(Ability_Variables, ability));
+    eeprom->Write(ability, offsetof(EepromMap, ability_vars) + offsetof(Ability_Variables, ability));
+}
+
+
+void SaveHealthState(Eeprom* eeprom, unsigned int State) {
+    eeprom->Write(State, offsetof(EepromMap, health_state));
+}
+
+void SaveAbilityState(Eeprom* eeprom, unsigned int State) {
+    eeprom->Write(State, offsetof(EepromMap, ability_state));
 }

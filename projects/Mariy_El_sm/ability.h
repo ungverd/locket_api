@@ -29,9 +29,6 @@ extern "C" {
 
 //Start of h code from diagram
 #define ABILITY_THRESHOLD_S 30
-#define ABILITY_PAUSE_M 15
-const unsigned int ABILUTY_SAVE_PAUSE = 60;
-
 
 //End of h code from diagram
 

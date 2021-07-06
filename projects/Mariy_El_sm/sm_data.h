@@ -7,6 +7,14 @@
 
 #include "api/eeprom.h"
 
+const unsigned int ABILUTY_SAVE_PAUSE = 60;
+const unsigned int HEALTH_SAVE_PAUSE = 60;
+const unsigned int DEFAULT_HP = 100;
+const unsigned int GOD_PAUSE_M = 30;
+const unsigned int ABILITY_PAUSE_M = 15;
+
+
+
 class Health_Variables {
 public:
     static Health_Variables Load(Eeprom* eeprom);
@@ -57,11 +65,14 @@ private:
 
 
 struct EepromMap {
-    Health_Variables vars1;
-    Ability_Variables  vars2;
+    Health_Variables health_vars;
+    Ability_Variables  ability_vars;
     uint32_t ability_state;
     uint32_t health_state;
 };
+
+void SaveHealthState(Eeprom* eeprom, uint32_t State);
+void SaveAbilityState(Eeprom* eeprom, uint32_t State);
 
 
 #endif //LOCKET_API_SM_DATA_CPP_H
