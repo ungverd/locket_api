@@ -115,7 +115,7 @@ enum PlayerSignals {
     PILL_MUTANT_SIG,
 
     TERMINATE_SIG,
-    LAST_USER_SIG
+    LAST_USER_SIG [[maybe_unused]]
 };
 
 

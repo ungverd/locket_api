@@ -50,10 +50,11 @@ typedef struct {
     QStateHandler StartState;
     Health_Variables vars;
     Eeprom* eeprom;
+    Logger* logger;
 } Health;
 
 /* protected: */
-QState Health_initial(Health * const me, QEvt const * const e);
+QState Health_initial(Health * const me, [[maybe_unused]] QEvt const * const e);
 QState Health_global(Health * const me, QEvt const * const e);
 QState Health_alive(Health * const me, QEvt const * const e);
 QState Health_god(Health * const me, QEvt const * const e);
@@ -82,7 +83,7 @@ extern QHsm * const the_health; /* opaque pointer to the health HSM */
 
 /*$declare${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
-void Health_ctor(RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom);
+void Health_ctor(RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom, Logger* logger);
 /*$enddecl${SMs::Health_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifdef __cplusplus
 }

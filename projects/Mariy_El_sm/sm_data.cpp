@@ -92,66 +92,6 @@ void Health_Variables::SaveHealth() {
 }
 //end of Health_Variables functions
 
-//start of Ability_Variables functions
-Ability_Variables Ability_Variables::Load(Eeprom* eeprom) {
-    Ability_Variables result{};
-    result.eeprom = eeprom;
-    result.ability_pause = eeprom->Read<unsigned int>(offsetof(EepromMap, ability_vars)
-            + offsetof(Ability_Variables, ability_pause));
-    result.count = eeprom->Read<unsigned int>(offsetof(EepromMap, ability_vars)
-            + offsetof(Ability_Variables, count));
-    result.ability = eeprom->Read<unsigned int>(offsetof(EepromMap, ability_vars)
-            + offsetof(Ability_Variables, ability));
-    return result;
-}
-
-void Ability_Variables::DecrementAbilityPause() {
-    --ability_pause;
-    SaveAbilityPause();
-}
-
-unsigned int Ability_Variables::GetAbilityPause() const {
-    return ability_pause;
-}
-
-void Ability_Variables::SetAbility(unsigned int a) {
-    ability = a;
-    SaveAbility();
-}
-
-void Ability_Variables::ResetAbilityPause() {
-    ability_pause = ABILITY_PAUSE_M;
-    SaveAbilityPause();
-}
-
-void Ability_Variables::ResetCount() {
-    count = 0;
-    SaveAbilityPause();
-}
-
-void Ability_Variables::IncrementCount() {
-    ++count;
-    // Count changes every second, only persist it occasionally to prevent
-    // too frequent eeprom writes.
-    if (count % ABILUTY_SAVE_PAUSE == 0) {
-        SaveCount();
-    }
-}
-
-unsigned int Ability_Variables::GetCount() const {
-    return count;
-}
-
-void Ability_Variables::SaveAbilityPause() {
-    eeprom->Write(ability_pause, offsetof(EepromMap, ability_vars) + offsetof(Ability_Variables, ability_pause));
-}
-void Ability_Variables::SaveCount() {
-    eeprom->Write(count, offsetof(EepromMap, ability_vars) + offsetof(Ability_Variables, count));
-}
-void Ability_Variables::SaveAbility() {
-    eeprom->Write(ability, offsetof(EepromMap, ability_vars) + offsetof(Ability_Variables, ability));
-}
-
 
 void SaveHealthState(Eeprom* eeprom, uint32_t State) {
     eeprom->Write(State, offsetof(EepromMap, health_state));

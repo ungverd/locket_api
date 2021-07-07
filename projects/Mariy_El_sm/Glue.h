@@ -7,7 +7,6 @@ enum PlayerSignals {
 
     TIME_TICK_1M_SIG,
     TIME_TICK_1S_SIG,
-    PILL_ABILITY_SIG,
     PILL_HEAL_SIG,
     PILL_RESET_SIG,
     PILL_GOD_SIG,
@@ -16,7 +15,7 @@ enum PlayerSignals {
     LONG_PRESS_SIG,
     RAD_RECEIVED_SIG,
     MONSTER_SIGNAl_SIG,
-    LAST_USER_SIG
+    LAST_USER_SIG [[maybe_unused]]
 };
 
 #endif /* GLUE_H_ */
