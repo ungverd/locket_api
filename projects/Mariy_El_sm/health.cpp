@@ -20,6 +20,8 @@
 #include "health.h"
 #include "eventHandlers.h"
 #include "Glue.h"
+#include "sm_data.h"
+
 //Q_DEFINE_THIS_FILE
 /* global-scope definitions -----------------------------------------*/
 QHsm * const the_health = (QHsm *) &health; /* the opaque pointer */
@@ -33,6 +35,7 @@ void Health_ctor(
     RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom)
 {
     Health *me = &health;
+    me->eeprom = eeprom;
     me->SMBeh = SMBeh;
     me->vars = Health_Variables::Load(eeprom);
     switch (State) {
@@ -144,7 +147,7 @@ QState Health_god(Health * const me, QEvt const * const e) {
             #endif /* def DESKTOP */
             SetColor(kWhite);
             me->vars.ResetCount();
-            SaveState(GOD);
+            SaveHealthState(me->eeprom, GOD);
             status_ = Q_HANDLED();
             break;
         }
@@ -235,7 +238,7 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
                 printf("Entered state god_ready");
             #endif /* def DESKTOP */
             Flash(kWhite);
-            SaveState(GOD_READY);
+            SaveHealthState(me->eeprom, GOD_READY);
             status_ = Q_HANDLED();
             break;
         }
@@ -284,7 +287,7 @@ QState Health_simple(Health * const me, QEvt const * const e) {
             #ifdef DESKTOP
                 printf("Entered state simple");
             #endif /* def DESKTOP */
-            SaveState(SIMPLE);
+            SaveHealthState(me->eeprom, SIMPLE);
             status_ = Q_HANDLED();
             break;
         }
@@ -320,7 +323,7 @@ QState Health_dead(Health * const me, QEvt const * const e) {
             #endif /* def DESKTOP */
             SetColor(kWhite);
             me->vars.ResetCount();
-            SaveState(GOD);
+            SaveHealthState(me->eeprom, DEAD);
             status_ = Q_HANDLED();
             break;
         }

@@ -32,6 +32,7 @@ QHsm * const the_ability = (QHsm *) &ability; /* the opaque pointer */
 /*${SMs::Ability_ctor} .....................................................*/
 void Ability_ctor(RadBehavior* SMBeh, Eeprom* eeprom) {
     Ability *me = &ability;
+    me->eeprom = eeprom;
     me->SMBeh = SMBeh;
     me->vars = Ability_Variables::Load(eeprom);
     QHsm_ctor(&me->super, Q_STATE_CAST(&Ability_initial));

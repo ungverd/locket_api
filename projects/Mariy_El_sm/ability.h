@@ -41,6 +41,8 @@ typedef struct {
     RadBehavior* SMBeh;
 
     /* public: */
+    Eeprom* eeprom;
+    unsigned int ability_state;
     Ability_Variables vars;
 } Ability;
 

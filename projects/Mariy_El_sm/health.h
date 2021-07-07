@@ -30,11 +30,11 @@ extern "C" {
 
 
 //Start of h code from diagram
-#define SIMPLE 0
-#define GOD_READY 1
-#define GOD 2
-#define DEAD 3
-#define GOD_THRESHOLD_S 30
+const uint32_t SIMPLE = 0;
+const uint32_t  GOD_READY = 1;
+const uint32_t  GOD = 2;
+const uint32_t  DEAD = 3;
+const uint32_t  GOD_THRESHOLD_S=30;
 //End of h code from diagram
 
 
@@ -49,6 +49,7 @@ typedef struct {
 /* public: */
     QStateHandler StartState;
     Health_Variables vars;
+    Eeprom* eeprom;
 } Health;
 
 /* protected: */

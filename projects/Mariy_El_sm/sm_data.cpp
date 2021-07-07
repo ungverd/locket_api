@@ -3,6 +3,7 @@
 //
 
 #include "sm_data.h"
+#include <cstddef>
 
 
 //start of health variables structure functions
@@ -152,10 +153,6 @@ void Ability_Variables::SaveAbility() {
 }
 
 
-void SaveHealthState(Eeprom* eeprom, unsigned int State) {
+void SaveHealthState(Eeprom* eeprom, uint32_t State) {
     eeprom->Write(State, offsetof(EepromMap, health_state));
-}
-
-void SaveAbilityState(Eeprom* eeprom, unsigned int State) {
-    eeprom->Write(State, offsetof(EepromMap, ability_state));
 }

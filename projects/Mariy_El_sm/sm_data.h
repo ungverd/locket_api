@@ -72,7 +72,6 @@ struct EepromMap {
 };
 
 void SaveHealthState(Eeprom* eeprom, uint32_t State);
-void SaveAbilityState(Eeprom* eeprom, uint32_t State);
 
 
 #endif //LOCKET_API_SM_DATA_CPP_H
