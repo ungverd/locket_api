@@ -31,10 +31,15 @@ extern "C" {
 
 //Start of h code from diagram
 const uint32_t SIMPLE = 0;
-const uint32_t  GOD_READY = 1;
-const uint32_t  GOD = 2;
-const uint32_t  DEAD = 3;
-const uint32_t  GOD_THRESHOLD_S=30;
+const uint32_t GOD_READY = 1;
+const uint32_t GOD = 2;
+const uint32_t DEAD = 3;
+const uint32_t GOD_THRESHOLD_S=30;
+const uint32_t PILL_RESET = 0;
+const uint32_t PILL_HEALTH = 1;
+const uint32_t PILL_GOD = 2;
+
+
 //End of h code from diagram
 
 
@@ -54,7 +59,7 @@ typedef struct {
 } Health;
 
 /* protected: */
-QState Health_initial(Health * const me, [[maybe_unused]] QEvt const * const e);
+QState Health_initial(Health * const me, QEvt const * const e);
 QState Health_global(Health * const me, QEvt const * const e);
 QState Health_alive(Health * const me, QEvt const * const e);
 QState Health_god(Health * const me, QEvt const * const e);

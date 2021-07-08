@@ -94,6 +94,7 @@ const LedRGBChunk kFailureSequence[] = {
         {ChunkType::kEnd}
 };
 
+
 // Short single beep.
 const BeepChunk kShortBeep[] = {
         {ChunkType::kSetup, 1, 1975},

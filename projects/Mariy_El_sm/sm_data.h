@@ -6,6 +6,7 @@
 #define LOCKET_API_SM_DATA_CPP_H
 
 #include "api/eeprom.h"
+#include "color.h"
 
 const unsigned int HEALTH_SAVE_PAUSE = 60;
 const unsigned int DEFAULT_HP = 100;
@@ -26,6 +27,7 @@ public:
     void ZeroGodPause();
     void IncrementCount();
     void ResetCount();
+    [[nodiscard]] Color GetHealthColor() const;
     [[nodiscard]] unsigned int GetCount() const;
 
 private:

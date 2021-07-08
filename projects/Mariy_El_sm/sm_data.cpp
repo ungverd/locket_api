@@ -81,6 +81,13 @@ unsigned int Health_Variables::GetCount() const {
     return count;
 }
 
+Color Health_Variables::GetHealthColor() const{
+    uint8_t red =  255 - 255*health/DEFAULT_HP;
+    uint8_t green = 255*health/DEFAULT_HP;
+    Color CurrentHealthColor = Color(red, green,0);
+    return CurrentHealthColor;
+}
+
 void Health_Variables::SaveGodPause() {
     eeprom->Write(god_pause, offsetof(Health_Variables, god_pause) + offsetof(EepromMap, health_vars));
 }

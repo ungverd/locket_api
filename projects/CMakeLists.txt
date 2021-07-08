@@ -16,7 +16,7 @@ target_link_libraries(kirlits_behavior api)
 add_library(sm_behavior sm_behavior/sm_behavior.cpp sm_behavior/eventHandlers.cpp sm_behavior/ability.cpp)
 target_link_libraries(sm_behavior api qhsm)
 
-add_library(Mariy_El_behavior Mariy_El_sm/mariel_sm.cpp Mariy_El_sm/eventHandlers.cpp Mariy_El_sm/health.cpp Mariy_El_sm/sm_data.cpp)
+add_library(Mariy_El_behavior Mariy_El_sm/mariel_sm.cpp Mariy_El_sm/health.cpp Mariy_El_sm/sm_data.cpp)
 target_link_libraries(Mariy_El_behavior api qhsm)
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)

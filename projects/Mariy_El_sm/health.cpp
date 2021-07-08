@@ -18,8 +18,8 @@
 /*$endhead${.::health.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #include "qhsm.h"
 #include "health.h"
-#include "eventHandlers.h"
 #include "Glue.h"
+#include "color.h"
 
 //Q_DEFINE_THIS_FILE
 /* global-scope definitions -----------------------------------------*/
@@ -96,8 +96,8 @@ QState Health_alive(Health * const me, QEvt const * const e) {
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state alive");
             me->vars.ResetHealth();
-            StartTramsmitForPath();
-            SetColor(kLightGreen);
+            me->SMBeh->StartTransmitForPath();
+            me->SMBeh->SetColor(kLightGreen);
             status_ = Q_HANDLED();
             break;
         }
@@ -109,14 +109,14 @@ QState Health_alive(Health * const me, QEvt const * const e) {
         }
         /*${SMs::Health::SM::global::alive::MONSTER_SIGNAl} */
         case MONSTER_SIGNAl_SIG: {
-            MonsterVibro();
+            me->SMBeh->MonsterVibro();
             status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Health::SM::global::alive::PILL_HEAL} */
         case PILL_HEAL_SIG: {
             me->vars.ResetHealth();
-            ClearPill();
+            me->SMBeh->MakePillUsed();
             status_ = Q_HANDLED();
             break;
         }
@@ -139,7 +139,7 @@ QState Health_god(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::alive::god} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state god");
-            SetColor(kWhite);
+            me->SMBeh->SetColor(kWhite);
             me->vars.ResetCount();
             SaveHealthState(me->eeprom, GOD);
             status_ = Q_HANDLED();
@@ -196,10 +196,8 @@ QState Health_mortal(Health * const me, QEvt const * const e) {
             }
             else {
                 me->vars.DecreaseHealth(((healthQEvt*)e)->damage);
-                //int red =  255*(1 - me->health/DEFAULT_HEALTH);
-                //int green = 255*me->health/DEFAULT_HEALTH
-                //ShowColor(red, green, 0);
-                VibroRadiation();
+                me->SMBeh->SetColor(me->vars.GetHealthColor());
+                me->SMBeh->RadiationVibro();
                 status_ = Q_UNHANDLED();
             }
             break;
@@ -223,7 +221,7 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::alive::mortal::god_ready} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state god_ready");
-            Flash(kWhite);
+            me->SMBeh->Flash(kWhite, me->vars.GetHealthColor());
             SaveHealthState(me->eeprom, GOD_READY);
             status_ = Q_HANDLED();
             break;
@@ -250,7 +248,7 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
             }
             /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[else]} */
             else {
-                Flash(kWhite);
+                me->SMBeh->Flash(kWhite, me->vars.GetHealthColor());
                 status_ = Q_HANDLED();
             }
             break;
@@ -299,7 +297,7 @@ QState Health_dead(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::dead} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state dead");
-            SetColor(kWhite);
+            me->SMBeh->SetColor(kWhite);
             me->vars.ResetCount();
             SaveHealthState(me->eeprom, DEAD);
             status_ = Q_HANDLED();
