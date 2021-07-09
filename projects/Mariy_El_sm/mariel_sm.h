@@ -20,6 +20,7 @@ public:
 
     //methods for logic
     void StartTransmitForPath();
+    void StopTransmitForPath();
     void SetColor(Color color);
     void MonsterVibro();
     void MakePillUsed();

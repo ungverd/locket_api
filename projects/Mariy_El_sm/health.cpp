@@ -297,9 +297,10 @@ QState Health_dead(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::dead} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state dead");
-            me->SMBeh->SetColor(kWhite);
+            me->SMBeh->SetColor(kRed);
             me->vars.ResetCount();
             SaveHealthState(me->eeprom, DEAD);
+            me->SMBeh->StopTransmitForPath();
             status_ = Q_HANDLED();
             break;
         }
