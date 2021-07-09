@@ -36,8 +36,9 @@ const uint32_t GOD = 2;
 const uint32_t DEAD = 3;
 const uint32_t GOD_THRESHOLD_S=30;
 const uint32_t PILL_RESET = 0;
-const uint32_t PILL_HEALTH = 1;
+const uint32_t PILL_HEAL = 1;
 const uint32_t PILL_GOD = 2;
+const uint32_t DEFAULT_DAMAGE = 1;
 
 
 //End of h code from diagram
@@ -80,7 +81,6 @@ static Health health; /* the only instance of the Health class */
 
 typedef struct healthQEvt {
     QEvt super;
-    int damage;
 } healthQEvt;
 
 

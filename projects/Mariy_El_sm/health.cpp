@@ -191,19 +191,19 @@ QState Health_mortal(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED} */
         case RAD_RECEIVED_SIG: {
             /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED::[me->health<=e->damage]} */
-            if (me->vars.GetHealth() <= ((healthQEvt*)e)->damage) {
+            if (me->vars.GetHealth() <= DEFAULT_DAMAGE) {
                 status_ = Q_TRAN(&Health_dead);
             }
             else {
-                me->vars.DecreaseHealth(((healthQEvt*)e)->damage);
+                me->vars.DecreaseHealth(DEFAULT_DAMAGE);
                 me->SMBeh->SetColor(me->vars.GetHealthColor());
                 me->SMBeh->RadiationVibro();
                 status_ = Q_UNHANDLED();
             }
             break;
         }
-        /*${SMs::Health::SM::global::alive::mortal::LONG_PRESS} */
-        case LONG_PRESS_SIG: {
+        /*${SMs::Health::SM::global::alive::mortal::DEAD_BUTTON_LONGPRESS} */
+        case DEAD_BUTTON_LONGPRESS: {
             status_ = Q_TRAN(&Health_dead);
             break;
         }
@@ -240,8 +240,8 @@ QState Health_god_ready(Health * const me, QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PRESSED} */
-        case MIDDLE_BUTTON_PRESSED_SIG: {
+        /*${SMs::Health::SM::global::alive::mortal::god_ready::GOD_BUTTON_LONGPRESS} */
+        case GOD_BUTTON_LONGPRESS: {
             /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[me->god_pause==0]} */
             if (me->vars.GetGodPause() == 0) {
                 status_ = Q_TRAN(&Health_god);

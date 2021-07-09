@@ -33,12 +33,6 @@ unsigned int Health_Variables::GetGodPause() const {
     return god_pause;
 }
 
-void Health_Variables::SetHealth(unsigned int hp) {
-    health = hp;
-    SaveHealth();
-}
-
-
 unsigned int Health_Variables::GetHealth() const {
     return health;
 }

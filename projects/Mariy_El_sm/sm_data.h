@@ -19,7 +19,6 @@ public:
     static Health_Variables Load(Eeprom* eeprom);
     void DecrementGodPause();
     [[nodiscard]] unsigned int GetGodPause() const;
-    void SetHealth(unsigned int hp);
     void ResetHealth();
     [[nodiscard]] unsigned int GetHealth() const;
     void DecreaseHealth(unsigned int delta_hp);
@@ -43,7 +42,8 @@ private:
 
 struct EepromMap {
     Health_Variables health_vars;
-    uint32_t health_state;
+    //used to save health sm state to EEPROM
+    [[maybe_unused]] uint32_t health_state;
 };
 
 void SaveHealthState(Eeprom* eeprom, uint32_t State);

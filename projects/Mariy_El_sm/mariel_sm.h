@@ -16,6 +16,7 @@ public:
     void OnButtonPressed(uint16_t button_index, bool long_press) override;
     void OnPillConnected(PillManager<IdOnlyState>* manager) override;
     void OnPillDisconnected() override;
+    void OnRadioPacketReceived(const IdOnlyState& packet) override;
 
     //methods for logic
     void StartTransmitForPath();
@@ -27,8 +28,13 @@ public:
 
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;
-    const unsigned int path_id = 1;
-    const unsigned int used_pill_id = 10;
+    RxTable<IdOnlyState> rx_table;
+    const uint32_t path_id = 1;
+    const uint32_t used_pill_id = 10;
+    unsigned int s_counter = 0;
+    unsigned int radio_counter = 0;
+    const uint32_t monster_id = 2;
+    const uint32_t rad_id = 3;
 };
 
 #endif //LOCKET_API_SM_BEHAVIOR_H
