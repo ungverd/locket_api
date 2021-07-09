@@ -2,11 +2,25 @@
 #include "Glue.h"
 #include "health.h"
 
+LedRGBChunk kRadFlashSequence[] = {
+        {{ChunkType::kSetup, {0}}, kWhite},
+        {{ChunkType::kWait, {500}}},
+        {{ChunkType::kSetup, {0}}, kBlack},
+        {{ChunkType::kWait, {100}}},
+        {{ChunkType::kGoto, {2}}},
+};
+
+LedRGBChunk kRadSequence[] = {
+        {{ChunkType::kSetup, {0}}, kWhite},
+        {{ChunkType::kWait, {100}}},
+        {{ChunkType::kGoto, {0}}},
+};
+
 void RadBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
     vibro->StartOrRestart(kBrrBrrBrr);
-    Health_ctor(this, SIMPLE, this->eeprom, this->logger);
+    Health_ctor(this, this->eeprom, this->logger);
     QMSM_INIT(the_health, (QEvt *)nullptr);
 
 }
@@ -48,9 +62,8 @@ void RadBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
             logger->log("God signal sent");
             e.super.sig = GOD_BUTTON_LONGPRESS;
         }
-        QMsm_dispatch(the_health, &(e.super));
     }
-    QMSM_DISPATCH(the_health, &(e.super));
+    QMsm_dispatch(the_health, &(e.super));
 }
 
 void RadBehavior::OnPillConnected(PillManager<IdOnlyState> *manager) {
@@ -103,11 +116,8 @@ void RadBehavior::StopTransmitForPath() {
 }
 
 void RadBehavior::SetColor(Color color) {
-    const LedRGBChunk kRadSequence[] = {
-            {ChunkType::kSetup, 0, color},
-            {ChunkType::kWait, 100},
-            {ChunkType::kGoto, 0},
-    };
+    kRadSequence[0].color = color;
+    led->Stop();
     led->StartOrRestart(kRadSequence);
 }
 
@@ -125,12 +135,8 @@ void RadBehavior::RadiationVibro() {
 }
 
 void RadBehavior::Flash(Color color_new, Color color_old) {
-    const LedRGBChunk kRadFlashSequence[] = {
-            {ChunkType::kSetup, 0, color_new},
-            {ChunkType::kWait, 500},
-            {ChunkType::kSetup, 0, color_old},
-            {ChunkType::kWait, 100},
-            {ChunkType::kGoto, 2},
-    };
+    kRadFlashSequence[0].color = color_new;
+    kRadFlashSequence[2].color = color_old;
+    led->Stop();
     led->StartOrRestart(kRadFlashSequence);
 };

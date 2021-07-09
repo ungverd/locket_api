@@ -31,12 +31,13 @@ QHsm * const the_health = (QHsm *) &health; /* the opaque pointer */
 /*$define${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
 void Health_ctor(
-    RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom, Logger* logger)
+    RadBehavior *SMBeh, Eeprom* eeprom, Logger* logger)
 {
     Health *me = &health;
     me->eeprom = eeprom;
     me->logger = logger;
     me->SMBeh = SMBeh;
+    unsigned int State = eeprom->Read<unsigned int>(offsetof(EepromMap, health_state));
     me->vars = Health_Variables::Load(eeprom);
     switch (State) {
         case SIMPLE: {

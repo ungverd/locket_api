@@ -88,7 +88,7 @@ extern QHsm * const the_health; /* opaque pointer to the health HSM */
 
 /*$declare${SMs::Health_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*${SMs::Health_ctor} ......................................................*/
-void Health_ctor(RadBehavior *SMBeh, unsigned int State, Eeprom* eeprom, Logger* logger);
+void Health_ctor(RadBehavior *SMBeh, Eeprom* eeprom, Logger* logger);
 /*$enddecl${SMs::Health_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 #ifdef __cplusplus
 }
