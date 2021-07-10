@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err58-cpp"
 #ifndef LOCKET_API_COLOR_H
 #define LOCKET_API_COLOR_H
 
@@ -71,6 +73,7 @@ const Color kRed = {255, 0, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kGreen = {0, 255, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kLightGreen = {0, 127, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kBlue = {0, 0, 255}; // NOLINT(bugprone-dynamic-static-initializers)
+const Color kLightBlue = {0, 0, 255}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kYellow = {255, 255, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kMagenta = {255, 0, 255}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kLightMagenta = {100, 0, 100}; // NOLINT(bugprone-dynamic-static-initializers)
@@ -78,3 +81,5 @@ const Color kWhite = {255, 255, 255}; // NOLINT(bugprone-dynamic-static-initiali
 
 #endif //LOCKET_API_COLOR_H
 
+
+#pragma clang diagnostic pop

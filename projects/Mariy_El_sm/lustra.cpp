@@ -1,24 +1,25 @@
 //
-// Created by juice on 10.07.2021.
+// Created by juice on 11.07.2021.
 //
+
 #include "sequences.h"
-#include "monster.h"
+#include "lustra.h"
 #include "utility.h"
 
 const LedRGBChunk StartOnceLedSequence[] = {
-        {{ChunkType::kSetup, {0}}, kLightBlue},
+        {{ChunkType::kSetup, {0}}, kLightMagenta},
         {{ChunkType::kWait, {1000}}},
         {{ChunkType::kGoto, {2}}}
 };
 
-void MonsterBehavior::OnStarted() {
+void LustraBehavior::OnStarted() {
     // мы считаем, что здесь вызвался OnDipSwitchChanged
     led->StartOrRestart(StartOnceLedSequence);
-    vibro->StartOrRestart(kBrrBrrBrr);
-    radio->SetBeaconPacket({monster_id});
+    vibro->StartOrRestart(kBrrBrr);
+    radio->SetBeaconPacket({lustra_id});
 }
 
-void MonsterBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
+void LustraBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
     uint8_t first_range = GetSwitchState(dip_value_mask, 5);
     uint8_t second_range = GetSwitchState(dip_value_mask, 6);
     uint8_t third_range = GetSwitchState(dip_value_mask, 7);

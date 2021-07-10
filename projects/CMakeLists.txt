@@ -17,7 +17,7 @@ add_library(sm_behavior sm_behavior/sm_behavior.cpp sm_behavior/eventHandlers.cp
 target_link_libraries(sm_behavior api qhsm)
 
 add_library(Mariy_El_behavior Mariy_El_sm/player_device.cpp Mariy_El_sm/health.cpp Mariy_El_sm/sm_data.cpp
-        Mariy_El_sm/monster.cpp)
+        Mariy_El_sm/monster.cpp Mariy_El_sm/lustra.cpp)
 target_link_libraries(Mariy_El_behavior api qhsm)
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
