@@ -83,17 +83,17 @@ Color Health_Variables::GetHealthColor() const{
 }
 
 void Health_Variables::SaveGodPause() {
-    eeprom->Write(god_pause, offsetof(Health_Variables, god_pause) + offsetof(EepromMap, health_vars));
+    eeprom->Write(offsetof(Health_Variables, god_pause) + offsetof(EepromMap, health_vars), god_pause);
 }
 void Health_Variables::SaveCount() {
-    eeprom->Write(count, offsetof(Health_Variables, count) + offsetof(EepromMap, health_vars));
+    eeprom->Write(offsetof(Health_Variables, count) + offsetof(EepromMap, health_vars),count);
 }
 void Health_Variables::SaveHealth() {
-    eeprom->Write(health, offsetof(Health_Variables, health) + offsetof(EepromMap, health_vars));
+    eeprom->Write(offsetof(Health_Variables, health) + offsetof(EepromMap, health_vars), health);
 }
 //end of Health_Variables functions
 
 
 void SaveHealthState(Eeprom* eeprom, uint32_t State) {
-    eeprom->Write(State, offsetof(EepromMap, health_state));
+    eeprom->Write(offsetof(EepromMap, health_state), State);
 }

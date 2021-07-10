@@ -19,7 +19,7 @@
 #ifndef health_h
 #define health_h
 
-#include "mariel_sm.h"
+#include "player_device.h"
 #include "api/eeprom.h"
 #include "sm_data.h"
 
