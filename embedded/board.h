@@ -18,9 +18,17 @@
 
 // LED
 #define LED_EN_PIN      { GPIOB, 2, omPushPull }
+
+#ifdef FALLOUT_DEVICE
+#define LED_G_PIN       { GPIOB, 1, TIM3, 4, invNotInverted, omPushPull, 255 }
+#define LED_B_PIN       { GPIOB, 0, TIM3, 3, invNotInverted, omPushPull, 255 }
+#define LED_R_PIN       { GPIOB, 5, TIM3, 2, invNotInverted, omPushPull, 255 }
+#else
 #define LED_G_PIN       { GPIOB, 1, TIM3, 4, invInverted, omOpenDrain, 255 }
 #define LED_B_PIN       { GPIOB, 0, TIM3, 3, invInverted, omOpenDrain, 255 }
-#define LED_R_PIN       { GPIOB, 5, TIM3, 2, invInverted, omOpenDrain, 255 }
+#define LED_R_PIN       { GPIOB, 5, TIM3, 2, invInverted, omOpenDrain , 255 }
+#endif
+
 
 // Buttons
 #define BTN1_PIN        GPIOA, 0, pudPullDown

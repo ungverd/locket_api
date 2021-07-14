@@ -115,7 +115,9 @@ public:
             EvtMsg_t Msg = EvtQMain.Fetch(TIME_INFINITE);
             switch (Msg.ID) {
                 case evtIdEverySecond:
+#ifndef FALLOUT_DEVICE
                     PillMgr.Check();
+#endif
                     CheckDipSwitch();
                     behavior->EverySecond();
                     break;
