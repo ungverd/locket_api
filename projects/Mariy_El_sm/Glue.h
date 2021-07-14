@@ -2,6 +2,8 @@
 #ifndef GLUE_H_
 #define GLUE_H_
 
+const uint32_t path_id = 1;
+
 enum PlayerSignals {
     TICK_SEC_SIG = Q_USER_SIG,
 

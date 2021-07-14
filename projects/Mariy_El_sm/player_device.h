@@ -31,7 +31,6 @@ public:
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;
     RxTable<IdOnlyState> rx_table;
-    const uint32_t path_id = 1;
     const uint32_t used_pill_id = 10;
     unsigned int s_counter = 0;
     unsigned int radio_counter = 0;

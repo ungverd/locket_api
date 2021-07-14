@@ -303,6 +303,7 @@ QState Health_dead(Health * const me, QEvt const * const e) {
             me->vars.ResetCount();
             SaveHealthState(me->eeprom, DEAD);
             me->SMBeh->StopTransmitForPath();
+            me->SMBeh->DeathVibro();
             status_ = Q_HANDLED();
             break;
         }
