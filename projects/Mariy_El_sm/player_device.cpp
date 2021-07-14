@@ -1,6 +1,7 @@
 #include "player_device.h"
 #include "Glue.h"
 #include "health.h"
+#include "sequences.h"
 
 LedRGBChunk kRadFlashSequence[] = {
         {{ChunkType::kSetup, {0}}, kWhite},
@@ -16,6 +17,14 @@ LedRGBChunk kRadSequence[] = {
         {{ChunkType::kGoto, {0}}},
 };
 
+const VibroChunk kLongBrrForDeath[] = {
+        {ChunkType::kSetup, kVibroVolume},
+        {ChunkType::kWait, 5000},
+        {ChunkType::kSetup, 0},
+        {ChunkType::kWait, kVibroRepeatPeriod},
+        {ChunkType::kEnd}
+};
+
 void RadBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kStartSequence);
@@ -28,7 +37,7 @@ void RadBehavior::OnStarted() {
 void RadBehavior::EverySecond() {
     healthQEvt e;
     //time events
-    s_counter++;
+    ++s_counter;
     e.super.sig = TIME_TICK_1S_SIG;
     QMsm_dispatch(the_health, &(e.super));
     if (s_counter % 60 == 0) {
@@ -39,12 +48,24 @@ void RadBehavior::EverySecond() {
     //radio events
     if (rx_table.HasPacketWithId(monster_id)) {
         logger->log("Monster");
-        e.super.sig = MONSTER_SIGNAl_SIG;
-        QMsm_dispatch(the_health, &(e.super));
+        ++monster_s_counter;
+        //every five seconds to avoid too frequent vibro
+        if (monster_s_counter % 5 == 0) {
+            monster_s_counter = 0;
+            e.super.sig = MONSTER_SIGNAl_SIG;
+            QMsm_dispatch(the_health, &(e.super));
+            logger->log("Monster");
+        }
     } else if (rx_table.HasPacketWithId(rad_id)) {
         logger->log("Radiation");
-        e.super.sig = RAD_RECEIVED_SIG;
-        QMsm_dispatch(the_health, &(e.super));
+        ++rad_s_counter;
+        //every five seconds to avoid too frequent vibro
+        if (rad_s_counter % 5 == 0) {
+            rad_s_counter = 0;
+            e.super.sig = RAD_RECEIVED_SIG;
+            QMsm_dispatch(the_health, &(e.super));
+            logger->log("Radiation dispatched");
+        }
     }
     rx_table.Clear();
 }
@@ -140,3 +161,7 @@ void RadBehavior::Flash(Color color_new, Color color_old) {
     led->Stop();
     led->StartOrRestart(kRadFlashSequence);
 };
+
+void RadBehavior::DeathVibro() {
+    vibro->StartOrRestart(kLongBrrForDeath);
+}

@@ -108,15 +108,10 @@ QState Health_alive(Health * const me, QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
-        /*${SMs::Health::SM::global::alive::MONSTER_SIGNAl} */
-        case MONSTER_SIGNAl_SIG: {
-            me->SMBeh->MonsterVibro();
-            status_ = Q_HANDLED();
-            break;
-        }
         /*${SMs::Health::SM::global::alive::PILL_HEAL} */
         case PILL_HEAL_SIG: {
             me->vars.ResetHealth();
+            me->SMBeh->SetColor(me->vars.GetHealthColor());
             me->SMBeh->MakePillUsed();
             status_ = Q_HANDLED();
             break;
@@ -201,6 +196,12 @@ QState Health_mortal(Health * const me, QEvt const * const e) {
                 me->SMBeh->RadiationVibro();
                 status_ = Q_UNHANDLED();
             }
+            break;
+        }
+        /*${SMs::Health::SM::global::alive::mortal::MONSTER_SIGNAl} */
+        case MONSTER_SIGNAl_SIG: {
+            me->SMBeh->MonsterVibro();
+            status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Health::SM::global::alive::mortal::DEAD_BUTTON_LONGPRESS} */

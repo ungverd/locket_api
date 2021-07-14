@@ -5,10 +5,6 @@
 #ifndef LOCKET_API_LUSTRA_H
 #define LOCKET_API_LUSTRA_H
 
-//
-// Created by juice on 10.07.2021.
-//
-
 #include "rx_table.h"
 #include "behavior.h"
 

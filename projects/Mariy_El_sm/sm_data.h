@@ -9,7 +9,8 @@
 #include "color.h"
 
 const unsigned int HEALTH_SAVE_PAUSE = 60;
-const unsigned int DEFAULT_HP = 100;
+//we decrease health every 5 seconds in radiation
+const unsigned int DEFAULT_HP = 70;
 const unsigned int GOD_PAUSE_M = 30;
 
 
