@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <cstdint>
 
 // Table to store received radio packets.
 // Typical usage pattern is the following:
