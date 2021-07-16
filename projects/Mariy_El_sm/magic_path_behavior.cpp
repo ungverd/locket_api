@@ -2,9 +2,15 @@
 #include "Glue.h"
 
 const LedRGBChunk kPathSequence[] = {
-        {{ChunkType::kSetup, {100}}, kBlue},
+        {{ChunkType::kSetup, {1000}}, kRed},
         {{ChunkType::kWait, {1000}}},
         {{ChunkType::kGoto, {1}}},
+};
+
+const LedRGBChunk kStopSequence[] = {
+        {{ChunkType::kSetup, {1000}}, kBlack},
+        {{ChunkType::kWait, {1000}}},
+        {{ChunkType::kEnd}},
 };
 
 void MagicPathBehavior::OnStarted() {
@@ -13,10 +19,14 @@ void MagicPathBehavior::OnStarted() {
 }
 
 void MagicPathBehavior::EverySecond() {
-    if (rx_table.HasPacketWithId(path_id)) {
-        led->StartOrRestart(kPathSequence);
-    } else {
-        led->Stop();
+    ++count;
+    if (count % 4) {
+        count = 0;
+        if (rx_table.HasPacketWithId(path_id)) {
+            led->StartOrRestart(kPathSequence);
+        } else {
+            led->StartOrRestart(kStopSequence);
+        }
     }
     rx_table.Clear();
 }

@@ -18,7 +18,6 @@ public:
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
 
 private:
-    const uint32_t monster_id = 2;
     RadioPowerLevel range_level = RadioPowerLevel::MINUS_6_DBM;
 };
 

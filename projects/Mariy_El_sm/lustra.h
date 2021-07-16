@@ -15,7 +15,6 @@ public:
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
 
 private:
-    const uint32_t lustra_id = 3;
     RadioPowerLevel range_level = RadioPowerLevel::MINUS_6_DBM;
 };
 

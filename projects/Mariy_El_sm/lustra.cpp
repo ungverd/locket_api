@@ -5,6 +5,7 @@
 #include "sequences.h"
 #include "lustra.h"
 #include "utility.h"
+#include "Glue.h"
 
 const LedRGBChunk StartOnceLedSequence[] = {
         {{ChunkType::kSetup, {0}}, kLightMagenta},
@@ -16,7 +17,7 @@ void LustraBehavior::OnStarted() {
     // мы считаем, что здесь вызвался OnDipSwitchChanged
     led->StartOrRestart(StartOnceLedSequence);
     vibro->StartOrRestart(kBrrBrr);
-    radio->SetBeaconPacket({lustra_id});
+    radio->SetBeaconPacket({rad_id});
 }
 
 void LustraBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {

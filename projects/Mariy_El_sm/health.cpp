@@ -96,9 +96,8 @@ QState Health_alive(Health * const me, QEvt const * const e) {
         /*${SMs::Health::SM::global::alive} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state alive");
-            me->vars.ResetHealth();
             me->SMBeh->StartTransmitForPath();
-            me->SMBeh->SetColor(kLightGreen);
+            me->SMBeh->SetColor(me->vars.GetHealthColor());
             status_ = Q_HANDLED();
             break;
         }
@@ -116,8 +115,16 @@ QState Health_alive(Health * const me, QEvt const * const e) {
             status_ = Q_HANDLED();
             break;
         }
+        /*${SMs::Health::SM::global::alive::MONSTER_SIGNAl} */
+        case MONSTER_SIGNAl_SIG: {
+            me->SMBeh->MonsterVibro();
+            status_ = Q_HANDLED();
+            break;
+        }
         /*${SMs::Health::SM::global::alive::PILL_RESET} */
         case PILL_RESET_SIG: {
+            me->vars.ResetHealth();
+            me->SMBeh->SetColor(me->vars.GetHealthColor());
             status_ = Q_TRAN(&Health_simple);
             break;
         }
@@ -136,6 +143,7 @@ QState Health_god(Health * const me, QEvt const * const e) {
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state god");
             me->SMBeh->SetColor(kWhite);
+            me->SMBeh->GodVibro();
             me->vars.ResetCount();
             SaveHealthState(me->eeprom, GOD);
             status_ = Q_HANDLED();
@@ -145,6 +153,7 @@ QState Health_god(Health * const me, QEvt const * const e) {
         case Q_EXIT_SIG: {
             me->logger->log("Exited state god");
             me->vars.ReSetGodPause();
+            me->SMBeh->GodVibro();
             status_ = Q_HANDLED();
             break;
         }
@@ -196,12 +205,6 @@ QState Health_mortal(Health * const me, QEvt const * const e) {
                 me->SMBeh->RadiationVibro();
                 status_ = Q_UNHANDLED();
             }
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal::MONSTER_SIGNAl} */
-        case MONSTER_SIGNAl_SIG: {
-            me->SMBeh->MonsterVibro();
-            status_ = Q_HANDLED();
             break;
         }
         /*${SMs::Health::SM::global::alive::mortal::DEAD_BUTTON_LONGPRESS} */
@@ -315,6 +318,8 @@ QState Health_dead(Health * const me, QEvt const * const e) {
         }
         /*${SMs::Health::SM::global::dead::PILL_RESET} */
         case PILL_RESET_SIG: {
+            me->vars.ResetHealth();
+            me->SMBeh->SetColor(me->vars.GetHealthColor());
             status_ = Q_TRAN(&Health_simple);
             break;
         }

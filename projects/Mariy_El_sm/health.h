@@ -38,7 +38,7 @@ const uint32_t GOD_THRESHOLD_S = 60;
 const uint32_t PILL_RESET = 0;
 const uint32_t PILL_HEAL = 1;
 const uint32_t PILL_GOD = 2;
-const uint32_t DEFAULT_DAMAGE = 1;
+const uint32_t DEFAULT_DAMAGE = 5;
 
 
 //End of h code from diagram

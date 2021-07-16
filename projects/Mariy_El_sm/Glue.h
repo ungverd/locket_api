@@ -3,6 +3,8 @@
 #define GLUE_H_
 
 const uint32_t path_id = 1;
+const uint32_t monster_id = 2;
+const uint32_t rad_id = 3;
 
 enum PlayerSignals {
     TICK_SEC_SIG = Q_USER_SIG,

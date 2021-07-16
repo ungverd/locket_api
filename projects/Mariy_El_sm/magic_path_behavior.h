@@ -14,6 +14,7 @@ public:
 
 private:
     RxTable<IdOnlyState> rx_table;
+    unsigned int count = 0;
 };
 
 #endif //LOCKET_API_MAGIC_PATH_BEHAVIOR_H

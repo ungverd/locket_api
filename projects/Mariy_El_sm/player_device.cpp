@@ -2,6 +2,7 @@
 #include "Glue.h"
 #include "health.h"
 #include "sequences.h"
+#include "utility.h"
 
 LedRGBChunk kRadFlashSequence[] = {
         {{ChunkType::kSetup, {0}}, kWhite},
@@ -20,6 +21,14 @@ LedRGBChunk kRadSequence[] = {
 const VibroChunk kLongBrrForDeath[] = {
         {ChunkType::kSetup, kVibroVolume},
         {ChunkType::kWait, 5000},
+        {ChunkType::kSetup, 0},
+        {ChunkType::kWait, kVibroRepeatPeriod},
+        {ChunkType::kEnd}
+};
+
+const VibroChunk kLongBrrForGod[] = {
+        {ChunkType::kSetup, kVibroVolume},
+        {ChunkType::kWait, 1000},
         {ChunkType::kSetup, 0},
         {ChunkType::kWait, kVibroRepeatPeriod},
         {ChunkType::kEnd}
@@ -56,7 +65,8 @@ void RadBehavior::EverySecond() {
             QMsm_dispatch(the_health, &(e.super));
             logger->log("Monster");
         }
-    } else if (rx_table.HasPacketWithId(rad_id)) {
+    }
+    if (rx_table.HasPacketWithId(rad_id)) {
         logger->log("Radiation");
         ++rad_s_counter;
         //every five seconds to avoid too frequent vibro
@@ -83,8 +93,9 @@ void RadBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
             logger->log("God signal sent");
             e.super.sig = GOD_BUTTON_LONGPRESS;
         }
+        QMsm_dispatch(the_health, &(e.super));
     }
-    QMsm_dispatch(the_health, &(e.super));
+
 }
 
 void RadBehavior::OnPillConnected(PillManager<IdOnlyState> *manager) {
@@ -118,6 +129,28 @@ void RadBehavior::OnPillConnected(PillManager<IdOnlyState> *manager) {
     }
 }
 
+void RadBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
+    uint8_t first_range = GetSwitchState(dip_value_mask, 5);
+    uint8_t second_range = GetSwitchState(dip_value_mask, 6);
+    uint8_t third_range = GetSwitchState(dip_value_mask, 7);
+    uint8_t fourth_range = GetSwitchState(dip_value_mask, 8);
+    uint8_t range = 8 * first_range + 4 * second_range + 2 * third_range + fourth_range;
+    if (range > 11) {
+        range = 11;
+    }
+    range_level = IdToRadioEnum(range);
+    radio->SetPowerLevel(range_level);
+    logger->log("DIP switch changed to %d%d%d%d%d%d%d%d",
+                GetSwitchState(dip_value_mask, 1),
+                GetSwitchState(dip_value_mask, 2),
+                GetSwitchState(dip_value_mask, 3),
+                GetSwitchState(dip_value_mask, 4),
+                GetSwitchState(dip_value_mask, 5),
+                GetSwitchState(dip_value_mask, 6),
+                GetSwitchState(dip_value_mask, 7),
+                GetSwitchState(dip_value_mask, 8));
+}
+
 void RadBehavior::OnPillDisconnected() {
     pill_manager = nullptr;
 }
@@ -137,8 +170,8 @@ void RadBehavior::StopTransmitForPath() {
 }
 
 void RadBehavior::SetColor(Color color) {
-    kRadSequence[0].color = color;
     led->Stop();
+    kRadSequence[0].color = color;
     led->StartOrRestart(kRadSequence);
 }
 
@@ -153,15 +186,20 @@ void RadBehavior::MakePillUsed() {
 
 void RadBehavior::RadiationVibro() {
    vibro->StartOrRestart(kBrrBrr);
+   beeper->StartOrRestart(kShortBeep);
 }
 
 void RadBehavior::Flash(Color color_new, Color color_old) {
+    led->Stop();
     kRadFlashSequence[0].color = color_new;
     kRadFlashSequence[2].color = color_old;
-    led->Stop();
     led->StartOrRestart(kRadFlashSequence);
 };
 
 void RadBehavior::DeathVibro() {
     vibro->StartOrRestart(kLongBrrForDeath);
+}
+
+void RadBehavior::GodVibro() {
+    vibro->StartOrRestart(kLongBrrForGod);
 }

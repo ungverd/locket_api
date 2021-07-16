@@ -4,6 +4,7 @@
 #include "sequences.h"
 #include "monster.h"
 #include "utility.h"
+#include "glue.h"
 
 const LedRGBChunk StartOnceLedSequence[] = {
         {{ChunkType::kSetup, {0}}, kLightBlue},
