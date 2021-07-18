@@ -23,7 +23,7 @@ target_link_libraries(Mariy_El_behavior api qhsm)
 add_library(Mariy_El_magic_path_behavior Mariy_El_sm/magic_path_behavior.cpp Mariy_El_sm/magic_path_behavior.h)
 target_link_libraries(Mariy_El_magic_path_behavior api)
 
-add_library(test_behaviour test_behaviour/test_behaviour.h feeling_behavior/feeling_behavior.cpp)
+add_library(test_behaviour test_behaviour/test_behaviour.h test_behaviour/test_behaviour.cpp)
 target_link_libraries(test_behaviour api)
 
 
