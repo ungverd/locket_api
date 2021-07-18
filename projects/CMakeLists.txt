@@ -23,6 +23,10 @@ target_link_libraries(Mariy_El_behavior api qhsm)
 add_library(Mariy_El_magic_path_behavior Mariy_El_sm/magic_path_behavior.cpp Mariy_El_sm/magic_path_behavior.h)
 target_link_libraries(Mariy_El_magic_path_behavior api)
 
+add_library(test_behaviour test_behaviour/test_behaviour.h feeling_behavior/feeling_behavior.cpp)
+target_link_libraries(test_behaviour api)
+
+
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(basic_behavior_emulator basic_behavior/basic_behavior_emulator.cpp)
     target_link_libraries(basic_behavior_emulator basic_behavior emulator)
@@ -63,8 +67,11 @@ else()
     add_firmware(Mariy_El.elf Mariy_El_sm/Mariy_El_firmware.cpp)
     target_link_libraries(Mariy_El.elf Mariy_El_behavior)
 
-    add_firmware(Mariy_El_fd.elf Mariy_El_sm/magic_path_firmware.cpp)
+    add_firmware(Mariy_El_fd.elf test_behaviour/test_behaviour_firmware.cpp)
     target_link_libraries(Mariy_El_fd.elf Mariy_El_magic_path_behavior)
+
+    add_firmware(test_behaviour.elf test_behaviour/test_behaviour.cpp)
+    target_link_libraries(test_behaviour.elf test_behaviour)
 endif()
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
