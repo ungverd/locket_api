@@ -311,6 +311,14 @@ QState Health_dead(Health * const me, QEvt const * const e) {
             break;
         }
         /*${SMs::Health::SM::global::dead} */
+        case PILL_HEAL_SIG: {
+            me->vars.ResetHealth();
+            me->SMBeh->SetColor(me->vars.GetHealthColor());
+            me->SMBeh->MakePillUsed();
+            status_ = Q_TRAN(&Health_simple);
+            break;
+        }
+        /*${SMs::Health::SM::global::dead} */
         case Q_EXIT_SIG: {
             me->logger->log("Exited state dead");
             status_ = Q_HANDLED();

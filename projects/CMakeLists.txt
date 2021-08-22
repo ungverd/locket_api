@@ -23,7 +23,7 @@ target_link_libraries(Mariy_El_behavior api qhsm)
 add_library(Mariy_El_magic_path_behavior Mariy_El_sm/magic_path_behavior.cpp Mariy_El_sm/magic_path_behavior.h)
 target_link_libraries(Mariy_El_magic_path_behavior api)
 
-add_library(test_behaviour test_behaviour/test_behaviour.h test_behaviour/test_behaviour.cpp)
+add_library(test_behaviour test_behaviour/test_behaviour.cpp)
 target_link_libraries(test_behaviour api)
 
 
@@ -67,10 +67,10 @@ else()
     add_firmware(Mariy_El.elf Mariy_El_sm/Mariy_El_firmware.cpp)
     target_link_libraries(Mariy_El.elf Mariy_El_behavior)
 
-    add_firmware(Mariy_El_fd.elf test_behaviour/test_behaviour_firmware.cpp)
+    add_firmware(Mariy_El_fd.elf Mariy_El_sm/magic_path_firmware.cpp)
     target_link_libraries(Mariy_El_fd.elf Mariy_El_magic_path_behavior)
 
-    add_firmware(test_behaviour.elf test_behaviour/test_behaviour.cpp)
+    add_firmware(test_behaviour.elf test_behaviour/test_behaviour_firmware.cpp)
     target_link_libraries(test_behaviour.elf test_behaviour)
 endif()
 

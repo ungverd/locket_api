@@ -8,6 +8,7 @@
 const LedRGBChunk kButtonSequence[] = {
         {ChunkType::kSetup, 0, kBlue},
         {ChunkType::kWait, 207},
+        {ChunkType::kSetup, 0, kBlack},
         {ChunkType::kEnd},
 };
 
