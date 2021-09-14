@@ -59,13 +59,13 @@ public:
         return incoming_message_queue_.SendNowOrExit({IncomingMessageType::TransmitOnce, packet});
     }
 
-    TRadioPacket FetchReceivedPacket() {
+    std::pair<TRadioPacket, int8_t> FetchReceivedPacket() {
         return received_packets_.Fetch(TIME_IMMEDIATE);
     }
 
-    void AddReceivedPacket(const TRadioPacket& packet) {
+    void AddReceivedPacket(const TRadioPacket& packet, int8_t rssi) {
         incoming_message_queue_.SendNowOrExitI({IncomingMessageType::PacketReceived, {}});
-        received_packets_.SendNowOrExitI(packet);
+        received_packets_.SendNowOrExitI({packet, rssi});
     }
 
     void ScheduleSleep() {
@@ -110,7 +110,7 @@ private:
     int8_t repeats_left = 0;
     std::optional<TRadioPacket> packet_to_beacon_ = std::nullopt;
     uint8_t transmission_power_ = 0; // 0 means "do not change"
-    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets_{};
+    EvtMsgQ_t<std::pair<TRadioPacket, int8_t>, R_MSGQ_LEN> received_packets_{};
     EvtMsgQ_t<IncomingMessage, 2 * R_MSGQ_LEN> incoming_message_queue_{};
 };
 
@@ -190,7 +190,7 @@ void RxCallback(void* user_data) {
     if(CC.ReadFIFO(&PktRx, &rssi, sizeof(FullRadioPacket<TRadioPacket>)) == retvOk) {  // if pkt successfully received
         radio_time->AdjustI(PktRx.metadata);
         if (PktRx.payload_present) {
-            radio_instance->AddReceivedPacket(PktRx.payload);
+            radio_instance->AddReceivedPacket(PktRx.payload, rssi);
         }
     }
 }

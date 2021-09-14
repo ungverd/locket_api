@@ -123,7 +123,7 @@ void BasicBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
     }
 }
 
-void BasicBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+void BasicBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     logger->log("Received radio packet with id = %d", packet.id);
     rx_table.AddPacket(packet);
 }

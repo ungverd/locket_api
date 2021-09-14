@@ -140,7 +140,7 @@ public:
 
                 case evtIdRadioCmd: {
                     const auto packet = radioWrapper.FetchReceived();
-                    behavior->OnRadioPacketReceived(packet);
+                    behavior->OnRadioPacketReceived(packet.first, packet.second);
                     break;
                 }
                 case evtIdShellCmd: {

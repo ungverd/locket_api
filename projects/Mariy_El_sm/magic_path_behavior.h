@@ -10,7 +10,7 @@ public:
 
     void OnStarted() override;
     void EverySecond() override;
-    void OnRadioPacketReceived(const IdOnlyState& packet) override;
+    void OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) override;
 
 private:
     RxTable<IdOnlyState> rx_table;

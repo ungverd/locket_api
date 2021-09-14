@@ -19,7 +19,7 @@ public:
     void OnStarted() override;
     void EverySecond() override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
-    void OnRadioPacketReceived(const IdAndTypeState& packet) override;
+    void OnRadioPacketReceived(const IdAndTypeState& packet, int8_t rssi) override;
 
 private:
     uint32_t seconds_counter = 0;

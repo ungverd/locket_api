@@ -33,7 +33,7 @@ public:
         radio->RMsgQ.SendNowOrExit(msg);
     }
 
-    TRadioPacket FetchReceived() override {
+    std::pair<TRadioPacket, int8_t> FetchReceived() override {
         return radio->received_packets.Fetch(TIME_IMMEDIATE);
     }
 
@@ -62,7 +62,7 @@ public:
         radio->SetPower(static_cast<uint8_t>(level));
     }
 
-    TRadioPacket FetchReceived() override {
+    std::pair<TRadioPacket, int8_t> FetchReceived() override {
         return radio->FetchReceivedPacket();
     }
 

@@ -155,7 +155,7 @@ void RadBehavior::OnPillDisconnected() {
     pill_manager = nullptr;
 }
 
-void RadBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+void RadBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     rx_table.AddPacket(packet);
 }
 

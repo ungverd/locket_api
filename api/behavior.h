@@ -99,7 +99,7 @@ public:
     // In this approach, RxTable is used to deduplicate packets with same id. Also, we don't process incoming packets
     // immediately and independently, but instead process all packets received during recent second. This simplifies
     // implementation of more complex behaviors
-    virtual void OnRadioPacketReceived(const RadioPacket& packet) {}
+    virtual void OnRadioPacketReceived(const RadioPacket& packet, int8_t rssi) {}
 
     // Will be called when received command via UART.
     // Use `command` methods to figure out what the command is.

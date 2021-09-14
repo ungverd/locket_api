@@ -31,7 +31,7 @@ void MagicPathBehavior::EverySecond() {
     rx_table.Clear();
 }
 
-void MagicPathBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+void MagicPathBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     rx_table.AddPacket(packet);
 }
 

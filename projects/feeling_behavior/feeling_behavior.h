@@ -19,7 +19,7 @@ public:
 
     void OnStarted() override;
     void EverySecond() override;
-    void OnRadioPacketReceived(const IdOnlyState& packet) override;
+    void OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
     void OnUartCommand(UartCommand& command) override;
 

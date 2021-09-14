@@ -37,7 +37,7 @@ template <typename TRadioPacket>
 class RadioLevel1 {
 public:
     EvtMsgQ_t<RMsg_t, R_MSGQ_LEN> RMsgQ;
-    EvtMsgQ_t<TRadioPacket, R_MSGQ_LEN> received_packets;
+    EvtMsgQ_t<std::pair<TRadioPacket, int8_t>, R_MSGQ_LEN> received_packets;
     TRadioPacket* PktTxOnce = nullptr;
     TRadioPacket* PktTxBeacon = nullptr;
     uint8_t Init();
@@ -75,7 +75,7 @@ static void rLvl1Thread(void* arg) {
         TRadioPacket PktRx;
         if(CC.Receive(360, &PktRx, sizeof(TRadioPacket), &Rssi) == retvOk) {
             EvtQMain.SendNowOrExit({evtIdRadioCmd});
-            radio_instance->received_packets.SendNowOrExit(PktRx);
+            radio_instance->received_packets.SendNowOrExit({PktRx, Rssi});
         }
 
         // vyzradio_instance->TryToSleep(300);

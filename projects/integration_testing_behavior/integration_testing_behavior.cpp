@@ -117,7 +117,7 @@ void IntegrationTestingBehavior::OnButtonPressed(uint16_t button_index, bool lon
     }
 }
 
-void IntegrationTestingBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+void IntegrationTestingBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     rx_table.AddPacket(packet);
 }
 

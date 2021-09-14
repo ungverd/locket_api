@@ -128,7 +128,7 @@ void KirlitsBehavior::EverySecond() {
     }
 }
 
-void KirlitsBehavior::OnRadioPacketReceived(const IdAndTypeState& packet) {
+void KirlitsBehavior::OnRadioPacketReceived(const IdAndTypeState& packet, int8_t rssi) {
     rx_table.AddPacket(packet);
 }
 

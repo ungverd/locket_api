@@ -63,7 +63,7 @@ void FeelingBehavior::EverySecond() {
     }
 }
 
-void FeelingBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
+void FeelingBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     rx_table.AddPacket(packet);
 }
 
