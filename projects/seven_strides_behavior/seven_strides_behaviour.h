@@ -28,6 +28,7 @@ private:
     RxTable<IdOnlyState> rx_table;
     uint32_t LocketType = LOCKET_RX;
     RadioPowerLevel RangeLevel = RadioPowerLevel::MINUS_6_DBM;
+    bool working = false;
 };
 
 RadioPowerLevel TypeToEnum(uint8_t level);

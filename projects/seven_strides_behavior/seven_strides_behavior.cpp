@@ -8,10 +8,31 @@
 #include "seven_strides_behaviour.h"
 #include "utility.h"
 
+const unsigned int WorkLightLengthMS = 120000;
+const unsigned int WorkTransmitLengthS = 180;
+
 const LedRGBChunk kBackgroundRXSequence[] = {
-        {ChunkType::kSetup, 200, kExtraLightBlue},
-        {ChunkType::kWait, 299},
-        {ChunkType::kGoto, 1}
+        {{ChunkType::kSetup, {200}}, kExtraLightRed},
+        {{ChunkType::kWait, {299}}},
+        {{ChunkType::kGoto, {1}}}
+};
+
+const LedRGBChunk kBackgroundTXSequence[] = {
+        {{ChunkType::kSetup, {200}}, kExtraLightBlue},
+        {{ChunkType::kWait, {299}}},
+        {{ChunkType::kGoto, {1}}}
+};
+
+const LedRGBChunk kBackgroundRXTXSequence[] = {
+        {{ChunkType::kSetup, {200}}, kExtraLightMagenta},
+        {{ChunkType::kWait, {299}}},
+        {{ChunkType::kGoto, {1}}}
+};
+
+const LedRGBChunk kWorkingSequence[] = {
+        {{ChunkType::kSetup, {300}}, kGreen},
+        {{ChunkType::kWait, {WorkLightLength}}},
+        {{ChunkType::kGoto, {1}}}
 };
 
 
@@ -20,14 +41,43 @@ void SevenStridesBehavior::OnStarted() {
 }
 
 void SevenStridesBehavior::EverySecond() {
-
+    if ((LocketType != LOCKET_TX) and working) {
+        seconds_counter++;
+        if (seconds_counter >= 180) {
+            radio->ClearBeaconPacket();
+            working = false;
+        }
+    }
+    if (LocketType )
 }
 
 void SevenStridesBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
-    rx_table.AddPacket(packet);
+    if (LocketType != LOCKET_RX and not working) {
+        rx_table.AddPacket(packet);
+    }
 }
 
 void SevenStridesBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
+    uint8_t first_type = GetSwitchState(dip_value_mask, 1);
+    uint8_t second_type = GetSwitchState(dip_value_mask, 2);
+    switch (2*first_type + second_type) {
+        case 1:
+            LocketType = LOCKET_RX;
+            led->StartOrRestart(kBackgroundRXSequence);
+            break;
+        case 2:
+            LocketType = LOCKET_TX;
+            led->StartOrRestart(kBackgroundTXSequence);
+            break;
+        case 3:
+            LocketType = LOCKET_RXTX;
+            led->StartOrRestart(kBackgroundRXTXSequence);
+            break;
+        default:
+            LocketType = LOCKET_RX;
+            led->StartOrRestart(kBackgroundRXSequence);
+
+    }
     uint8_t first_range = GetSwitchState(dip_value_mask, 5);
     uint8_t second_range = GetSwitchState(dip_value_mask, 6);
     uint8_t third_range = GetSwitchState(dip_value_mask, 7);
