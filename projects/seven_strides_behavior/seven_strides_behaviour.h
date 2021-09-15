@@ -20,11 +20,13 @@ public:
 
     void OnStarted() override;
     void EverySecond() override;
-    void OnRadioPacketReceived(const IdOnlyState& packet) override;
+    void OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) override;
+    void OnButtonPressed(uint16_t button_index, bool long_press) override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
 
 private:
-    uint32_t seconds_counter = 0;
+    uint32_t rx_seconds_counter = 0;
+    uint32_t tx_seconds_counter = 0;
     RxTable<IdOnlyState> rx_table;
     uint32_t LocketType = LOCKET_RX;
     RadioPowerLevel RangeLevel = RadioPowerLevel::MINUS_6_DBM;

@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cert-err58-cpp"
 //
 // Created by juice on 02.08.2020.
 //
@@ -252,5 +250,3 @@ uint8_t GigandaBehavior::GetNextState(uint8_t pill_id) {
     led->StartOrRestart(MasterSequences[pill_id + 1]);
     return pill_id + 1;
 }
-
-#pragma clang diagnostic pop

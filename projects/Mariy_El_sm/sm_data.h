@@ -43,7 +43,7 @@ private:
 struct EepromMap {
     Health_Variables health_vars;
     //used to save health sm state to EEPROM
-    [[maybe_unused]] uint32_t health_state;
+    uint32_t health_state;
 };
 
 void SaveHealthState(Eeprom* eeprom, uint32_t State);

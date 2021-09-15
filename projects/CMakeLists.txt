@@ -26,6 +26,9 @@ target_link_libraries(Mariy_El_magic_path_behavior api)
 add_library(test_behaviour test_behaviour/test_behaviour.cpp)
 target_link_libraries(test_behaviour api)
 
+add_library(seven_strides_behavior seven_strides_behavior/seven_strides_behavior.cpp)
+target_link_libraries(seven_strides_behavior api)
+
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(basic_behavior_emulator basic_behavior/basic_behavior_emulator.cpp)
@@ -45,6 +48,9 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 
     add_executable(Mariy_El_emulator Mariy_El_sm/Mariy_El_emulator.cpp)
     target_link_libraries(Mariy_El_emulator Mariy_El_behavior emulator)
+
+    add_executable(seven_strides_emulator seven_strides_behavior/seven_strides_behavior_emulator.cpp)
+    target_link_libraries(seven_strides_emulator seven_strides_behavior emulator)
 else()
     add_firmware(giganda.elf giganda_behavior/giganda_firmware.cpp)
     target_link_libraries(giganda.elf giganda_behaviour)
@@ -72,6 +78,9 @@ else()
 
     add_firmware(test_behaviour.elf test_behaviour/test_behaviour_firmware.cpp)
     target_link_libraries(test_behaviour.elf test_behaviour)
+
+    add_firmware(seven_strides_behavior.elf seven_strides_behavior/seven_strides_behavior_firmware.cpp)
+    target_link_libraries(seven_strides_behavior.elf seven_strides_behavior)
 endif()
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)

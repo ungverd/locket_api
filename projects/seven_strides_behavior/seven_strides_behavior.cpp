@@ -31,7 +31,7 @@ const LedRGBChunk kBackgroundRXTXSequence[] = {
 
 const LedRGBChunk kWorkingSequence[] = {
         {{ChunkType::kSetup, {300}}, kGreen},
-        {{ChunkType::kWait, {WorkLightLength}}},
+        {{ChunkType::kWait, {WorkLightLengthMS}}},
         {{ChunkType::kGoto, {1}}}
 };
 
@@ -41,19 +41,35 @@ void SevenStridesBehavior::OnStarted() {
 }
 
 void SevenStridesBehavior::EverySecond() {
-    if ((LocketType != LOCKET_TX) and working) {
-        seconds_counter++;
-        if (seconds_counter >= 180) {
+    if ((LocketType != LOCKET_RX) and working) {
+        tx_seconds_counter++;
+        if (tx_seconds_counter >= 180) {
             radio->ClearBeaconPacket();
             working = false;
+            tx_seconds_counter = 0;
         }
     }
-    if (LocketType )
+    if (LocketType != LOCKET_TX and not working) {
+        rx_seconds_counter++;
+        if (rx_seconds_counter % 3 == 0) {
+            rx_seconds_counter = 0;
+            vibro->StartOrRestart(kBrrBrrBrr);
+        }
+    }
 }
 
-void SevenStridesBehavior::OnRadioPacketReceived(const IdOnlyState& packet) {
-    if (LocketType != LOCKET_RX and not working) {
+void SevenStridesBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
+    if (LocketType != LOCKET_TX and not working) {
         rx_table.AddPacket(packet);
+    }
+}
+
+void SevenStridesBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
+    if (LocketType != LOCKET_RX) {
+        working = true;
+        tx_seconds_counter = 0;
+        led->StartOrRestart(kWorkingSequence);
+        radio->SetBeaconPacket({1});
     }
 }
 

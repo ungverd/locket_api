@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cert-err58-cpp"
 #ifndef LOCKET_API_COLOR_H
 #define LOCKET_API_COLOR_H
 
@@ -85,6 +83,3 @@ const Color kWhite = {255, 255, 255}; // NOLINT(bugprone-dynamic-static-initiali
 
 
 #endif //LOCKET_API_COLOR_H
-
-
-#pragma clang diagnostic pop
