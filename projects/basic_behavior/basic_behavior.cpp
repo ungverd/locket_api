@@ -130,7 +130,7 @@ void BasicBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi
 
 void BasicBehavior::OnUartCommand(UartCommand& command) {
    if (command.NameIs("ping")) {
-       logger->log("pong");
+       logger->log("ack 0");
        return;
    }
 
@@ -142,6 +142,11 @@ void BasicBehavior::OnUartCommand(UartCommand& command) {
         } else {
             logger->log("not enough parameters!");
         }
+        return;
+    }
+
+    if (command.NameIs("version")) {
+        logger->log("Basic Behaviour Locket Api");
         return;
     }
 }

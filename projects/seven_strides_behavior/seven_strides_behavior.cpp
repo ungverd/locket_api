@@ -8,23 +8,23 @@
 #include "seven_strides_behaviour.h"
 #include "utility.h"
 
-const unsigned int WorkLightLengthMS = 120000;
+const unsigned int WorkLightLengthMS = 60000;
 const unsigned int WorkTransmitLengthS = 180;
 
 const LedRGBChunk kBackgroundRXSequence[] = {
-        {{ChunkType::kSetup, {200}}, kExtraLightRed},
+        {{ChunkType::kSetup, {1000}}, kExtraLightRed},
         {{ChunkType::kWait, {299}}},
         {{ChunkType::kGoto, {1}}}
 };
 
 const LedRGBChunk kBackgroundTXSequence[] = {
-        {{ChunkType::kSetup, {200}}, kExtraLightBlue},
+        {{ChunkType::kSetup, {1000}}, kExtraLightBlue},
         {{ChunkType::kWait, {299}}},
         {{ChunkType::kGoto, {1}}}
 };
 
 const LedRGBChunk kBackgroundRXTXSequence[] = {
-        {{ChunkType::kSetup, {200}}, kExtraLightMagenta},
+        {{ChunkType::kSetup, {1000}}, kExtraLightMagenta},
         {{ChunkType::kWait, {299}}},
         {{ChunkType::kGoto, {1}}}
 };
@@ -32,7 +32,7 @@ const LedRGBChunk kBackgroundRXTXSequence[] = {
 const LedRGBChunk kWorkingSequence[] = {
         {{ChunkType::kSetup, {300}}, kGreen},
         {{ChunkType::kWait, {WorkLightLengthMS}}},
-        {{ChunkType::kGoto, {1}}}
+        {{ChunkType::kEnd}}
 };
 
 
@@ -43,17 +43,25 @@ void SevenStridesBehavior::OnStarted() {
 void SevenStridesBehavior::EverySecond() {
     if ((LocketType != LOCKET_RX) and working) {
         tx_seconds_counter++;
-        if (tx_seconds_counter >= 180) {
+        if (tx_seconds_counter >= WorkTransmitLengthS) {
             radio->ClearBeaconPacket();
             working = false;
             tx_seconds_counter = 0;
         }
+        if (tx_seconds_counter*1000 == WorkLightLengthMS) {
+            if (LocketType == LOCKET_RXTX) {
+                led->StartOrRestart(kBackgroundRXTXSequence);
+            } else {
+                led->StartOrRestart(kBackgroundTXSequence);
+            }
+        }
     }
-    if (LocketType != LOCKET_TX and not working) {
+    if (LocketType != LOCKET_TX and not working and rx_table.HasPacketWithId(1)) {
         rx_seconds_counter++;
         if (rx_seconds_counter % 3 == 0) {
             rx_seconds_counter = 0;
             vibro->StartOrRestart(kBrrBrrBrr);
+            rx_table.Clear();
         }
     }
 }

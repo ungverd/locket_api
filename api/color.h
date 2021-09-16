@@ -68,17 +68,17 @@ private:
 
 const Color kBlack = {0, 0, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kRed = {255, 0, 0}; // NOLINT(bugprone-dynamic-static-initializers)
-const Color kExtraLightRed{32, 0, 0}; // NOLINT(bugprone-dynamic-static-initializers)
+const Color kExtraLightRed{1, 0, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kGreen = {0, 255, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kLightGreen = {0, 127, 0}; // NOLINT(bugprone-dynamic-static-initializers)
-const Color kExtraLightGreen{0, 32, 0}; // NOLINT(bugprone-dynamic-static-initializers)
+const Color kExtraLightGreen{0, 1, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kBlue = {0, 0, 255}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kLightBlue = {0, 0, 255}; // NOLINT(bugprone-dynamic-static-initializers)
-const Color kExtraLightBlue{0, 0, 32}; // NOLINT(bugprone-dynamic-static-initializers)
+const Color kExtraLightBlue{0, 0, 1}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kYellow = {255, 255, 0}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kMagenta = {255, 0, 255}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kLightMagenta = {100, 0, 100}; // NOLINT(bugprone-dynamic-static-initializers)
-const Color kExtraLightMagenta{32, 0, 32}; // NOLINT(bugprone-dynamic-static-initializers)
+const Color kExtraLightMagenta{1, 0, 1}; // NOLINT(bugprone-dynamic-static-initializers)
 const Color kWhite = {255, 255, 255}; // NOLINT(bugprone-dynamic-static-initializers)
 
 
