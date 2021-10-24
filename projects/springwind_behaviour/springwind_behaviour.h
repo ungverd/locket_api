@@ -5,6 +5,9 @@
 #include "rx_table.h"
 #include "behavior.h"
 
+uint32_t FiveMinThreshold = 300;
+uint32_t FifteenThreshold = 900;
+uint32_t HalfAnHourThreshold = 1800;
 
 class WindsBehavior: public Behavior<IdOnlyState, IdOnlyState> {
 public:
@@ -17,8 +20,9 @@ public:
     enum class State {
         kIdle = 0,
         kFive = 1,
-        kFiveteen = 2,
+        kFifteen = 2,
         kHalfAnHour = 3,
+        kActivated = 4
     };
     using Behavior::Behavior;
 
@@ -31,6 +35,7 @@ public:
 
 private:
     uint32_t seconds_counter = 0;
+    uint32_t current_threshold = 0;
     Mode mode = Mode::kPlayer;
     State state = State::kIdle;
     RxTable<IdOnlyState> rx_table;
