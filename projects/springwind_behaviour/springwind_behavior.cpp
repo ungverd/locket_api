@@ -34,10 +34,44 @@ void WindsBehavior::EverySecond() {
 
 
 void WindsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
+
+    // get locket type: Player, Master or Lady Lu
     uint8_t first_type = GetSwitchState(dip_value_mask, 1);
     uint8_t second_type = GetSwitchState(dip_value_mask, 2);
     switch (2*first_type + second_type) {
+        case 0:
+            mode = Mode::kPlayer;
+            state = State::kIdle;
+            led->StartOrRestart(kPlayerStart);
+            break;
         case 1:
+            mode = Mode::kMasterSos;
+            led->StartOrRestart(kMasterStart);
+            break;
+        case 2:
+            mode = Mode::kLadyLu;
+            led->StartOrRestart(kLadyLuStart);
+            break;
+        default:
+            mode = Mode::kPlayer;
+            state = State::kIdle;
+            led->StartOrRestart(kPlayerStart);
+            break;
+    }
+
+    // set radio level
+    uint8_t first_range = GetSwitchState(dip_value_mask, 5);
+    uint8_t second_range = GetSwitchState(dip_value_mask, 6);
+    uint8_t third_range = GetSwitchState(dip_value_mask, 7);
+    uint8_t fourth_range = GetSwitchState(dip_value_mask, 8);
+    uint8_t range = 8*first_range + 4*second_range + 2*third_range + fourth_range;
+    if (range > 11) {
+        range = 11;
+    }
+    RangeLevel = TypeToEnum(range);
+    radio->SetPowerLevel(RangeLevel);
+
+
     logger->log("DIP switch changed to %d%d%d%d%d%d%d%d",
                 GetSwitchState(dip_value_mask, 1),
                 GetSwitchState(dip_value_mask, 2),

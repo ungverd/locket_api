@@ -34,6 +34,7 @@ private:
     Mode mode = Mode::kPlayer;
     State state = State::kIdle;
     RxTable<IdOnlyState> rx_table;
+    RadioPowerLevel RangeLevel;
 };
 
 #endif //LOCKET_API_BASIC_BEHAVIOR_H
