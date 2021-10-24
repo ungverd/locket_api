@@ -1,4 +1,4 @@
-#include "springwind_behaviour.h"
+#include "springwind_behavior.h"
 #include "utility.h"
 #include "sequences.h"
 
@@ -32,16 +32,23 @@ void WindsBehavior::OnStarted() {
 }
 
 void WindsBehavior::EverySecond() {
-    if (mode == Mode::kMasterSos and rx_table.HasPacketWithId(1)) {
+
+    // receiving sos
+    if (mode == Mode::kMasterSos and rx_table.HasPacketWithId(sos_id)) {
         vibro->StartOrRestart(kBrrBrrBrr);
     }
+
+    //sending sos
     if (mode == Mode::kMasterSos and state == State::kActivated) {
         seconds_counter++;
         if (seconds_counter % 3 == 0) {
             seconds_counter = 0;
             rx_table.Clear();
+            state = State::kIdle;
         }
     }
+
+    //timer changed for player
     if (mode == Mode::kPlayer and state != State::kIdle) {
         seconds_counter++;
         if (seconds_counter >= current_threshold) {
@@ -58,8 +65,14 @@ void WindsBehavior::EverySecond() {
         }
 
     }
+    if (mode == Mode::kLadyLu and state != State::kActivated) {
+        seconds_counter ++;
+        if (seconds_counter >= LadyLuThreshold) {
+            seconds_counter = 0;
+            radio->ClearBeaconPacket();
+        }
+    }
 }
-
 
 void WindsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
 
@@ -111,12 +124,48 @@ void WindsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
 }
 
 void WindsBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
-
+    switch (mode) {
+        case Mode::kMasterSos:
+            seconds_counter = 0;
+            state = State::kActivated;
+            radio->SetBeaconPacket({sos_id});
+            break;
+        case Mode::kLadyLu:
+            if (long_press) {
+                state = State::kActivated;
+                radio ->SetBeaconPacket({path_id});
+            }
+            break;
+        case Mode::kPlayer:
+            if (long_press) {
+                switch (button_index) {
+                    case 0:
+                        state = State::kFive;
+                        current_threshold = FiveMinThreshold;
+                        break;
+                    case 1:
+                        state = State::kFifteen;
+                        current_threshold = FifteenThreshold;
+                        break;
+                    case 2:
+                        state = State::kHalfAnHour;
+                        current_threshold = HalfAnHourThreshold;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void WindsBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     logger->log("Received radio packet with id = %d", packet.id);
-    rx_table.AddPacket(packet);
+    if (mode == Mode::kMasterSos) {
+        rx_table.AddPacket(packet);
+    }
 }
 
 void WindsBehavior::OnUartCommand(UartCommand& command) {

@@ -8,6 +8,10 @@
 uint32_t FiveMinThreshold = 300;
 uint32_t FifteenThreshold = 900;
 uint32_t HalfAnHourThreshold = 1800;
+uint32_t LadyLuThreshold = 300;
+uint8_t path_id = 1;
+uint8_t sos_id = 2;
+
 
 class WindsBehavior: public Behavior<IdOnlyState, IdOnlyState> {
 public:
