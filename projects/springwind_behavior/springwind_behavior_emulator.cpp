@@ -2,5 +2,5 @@
 #include "emulator.h"
 
 int main() {
-    emulator::BehaviorRunner<r>().Run();
+    emulator::BehaviorRunner<WindsBehavior>().Run();
 }

@@ -29,6 +29,9 @@ target_link_libraries(test_behaviour api)
 add_library(seven_strides_behavior seven_strides_behavior/seven_strides_behavior.cpp)
 target_link_libraries(seven_strides_behavior api)
 
+add_library(springwind_behavior springwind_behavior/springwind_behavior.cpp)
+target_link_libraries(springwind_behavior api)
+
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(basic_behavior_emulator basic_behavior/basic_behavior_emulator.cpp)
@@ -51,6 +54,9 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 
     add_executable(seven_strides_emulator seven_strides_behavior/seven_strides_behavior_emulator.cpp)
     target_link_libraries(seven_strides_emulator seven_strides_behavior emulator)
+
+    add_executable(springwind_behavior_emulator springwind_behavior/springwind_behavior_emulator.cpp)
+    target_link_libraries(springwind_behavior_emulator springwind_behavior emulator)
 else()
     add_firmware(giganda.elf giganda_behavior/giganda_firmware.cpp)
     target_link_libraries(giganda.elf giganda_behaviour)
@@ -81,6 +87,9 @@ else()
 
     add_firmware(seven_strides_behavior.elf seven_strides_behavior/seven_strides_behavior_firmware.cpp)
     target_link_libraries(seven_strides_behavior.elf seven_strides_behavior)
+
+    add_firmware(springwind_behavior.elf springwind_behavior/springwind_behavior_firmware.cpp)
+    target_link_libraries(springwind_behavior.elf springwind_behavior)
 endif()
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
