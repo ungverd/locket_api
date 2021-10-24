@@ -23,10 +23,12 @@ public:
     void OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) override;
     void OnButtonPressed(uint16_t button_index, bool long_press) override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
+    void OnUartCommand(UartCommand& command) override;
 
 private:
     uint32_t rx_seconds_counter = 0;
     uint32_t tx_seconds_counter = 0;
+    int8_t rssi_level = -120;
     RxTable<IdOnlyState> rx_table;
     uint32_t LocketType = LOCKET_RX;
     RadioPowerLevel RangeLevel = RadioPowerLevel::MINUS_6_DBM;

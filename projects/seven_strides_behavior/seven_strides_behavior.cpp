@@ -12,19 +12,13 @@ const unsigned int WorkLightLengthMS = 60000;
 const unsigned int WorkTransmitLengthS = 180;
 
 const LedRGBChunk kBackgroundRXSequence[] = {
-        {{ChunkType::kSetup, {1000}}, kExtraLightRed},
+        {{ChunkType::kSetup, {1000}}, kExtraLightMagenta},
         {{ChunkType::kWait, {299}}},
         {{ChunkType::kGoto, {1}}}
 };
 
 const LedRGBChunk kBackgroundTXSequence[] = {
         {{ChunkType::kSetup, {1000}}, kExtraLightBlue},
-        {{ChunkType::kWait, {299}}},
-        {{ChunkType::kGoto, {1}}}
-};
-
-const LedRGBChunk kBackgroundRXTXSequence[] = {
-        {{ChunkType::kSetup, {1000}}, kExtraLightMagenta},
         {{ChunkType::kWait, {299}}},
         {{ChunkType::kGoto, {1}}}
 };
@@ -50,7 +44,7 @@ void SevenStridesBehavior::EverySecond() {
         }
         if (tx_seconds_counter*1000 == WorkLightLengthMS) {
             if (LocketType == LOCKET_RXTX) {
-                led->StartOrRestart(kBackgroundRXTXSequence);
+                led->StartOrRestart(kBackgroundRXSequence);
             } else {
                 led->StartOrRestart(kBackgroundTXSequence);
             }
@@ -60,7 +54,13 @@ void SevenStridesBehavior::EverySecond() {
         rx_seconds_counter++;
         if (rx_seconds_counter % 3 == 0) {
             rx_seconds_counter = 0;
-            vibro->StartOrRestart(kBrrBrrBrr);
+            if (rssi_level > -75) {
+                vibro->StartOrRestart(kBrrBrrBrr);
+            } else if (rssi_level > -90) {
+                vibro->StartOrRestart(kBrrBrr);
+            } else if (rssi_level > -100) {
+                vibro->StartOrRestart(kBrr);
+            }
             rx_table.Clear();
         }
     }
@@ -69,6 +69,8 @@ void SevenStridesBehavior::EverySecond() {
 void SevenStridesBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) {
     if (LocketType != LOCKET_TX and not working) {
         rx_table.AddPacket(packet);
+        // logger->log("RSSI: %d\n", rssi);
+        rssi_level = rssi;
     }
 }
 
@@ -95,7 +97,7 @@ void SevenStridesBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
             break;
         case 3:
             LocketType = LOCKET_RXTX;
-            led->StartOrRestart(kBackgroundRXTXSequence);
+            led->StartOrRestart(kBackgroundRXSequence);
             break;
         default:
             LocketType = LOCKET_RX;
@@ -121,6 +123,17 @@ void SevenStridesBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
                 GetSwitchState(dip_value_mask, 6),
                 GetSwitchState(dip_value_mask, 7),
                 GetSwitchState(dip_value_mask, 8));
+}
+
+void SevenStridesBehavior::OnUartCommand(UartCommand& command) {
+    if (command.NameIs("ping")) {
+        logger->log("ack 0");
+        return;
+    }
+    if (command.NameIs("version")) {
+        logger->log("7 strides Behaviour Locket Api");
+        return;
+    }
 }
 
 

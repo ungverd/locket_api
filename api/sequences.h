@@ -130,7 +130,7 @@ const VibroChunk kBrrBrr[] = {
 };
 
 // Triple vibration
-const VibroChunk kBrrBrrBrr[] = {
+const VibroChunk    kBrrBrrBrr[] = {
         {ChunkType::kSetup, kVibroVolume},
         {ChunkType::kWait, kVibroShortDelayMs},
         {ChunkType::kSetup, 0},
