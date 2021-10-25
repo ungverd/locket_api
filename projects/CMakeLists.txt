@@ -90,6 +90,7 @@ else()
 
     add_firmware(springwind_behavior.elf springwind_behavior/springwind_behavior_firmware.cpp)
     target_link_libraries(springwind_behavior.elf springwind_behavior)
+
 endif()
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)

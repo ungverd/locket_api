@@ -5,12 +5,12 @@
 #include "rx_table.h"
 #include "behavior.h"
 
-uint32_t FiveMinThreshold = 300;
-uint32_t FifteenThreshold = 900;
-uint32_t HalfAnHourThreshold = 1800;
-uint32_t LadyLuThreshold = 300;
-uint8_t path_id = 1;
-uint8_t sos_id = 2;
+const uint32_t FiveMinThreshold = 300;
+const uint32_t FifteenThreshold = 900;
+const uint32_t HalfAnHourThreshold = 1800;
+const uint32_t LadyLuThreshold = 300;
+const uint8_t path_id = 1;
+const uint8_t sos_id = 2;
 
 
 class WindsBehavior: public Behavior<IdOnlyState, IdOnlyState> {

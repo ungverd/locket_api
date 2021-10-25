@@ -3,27 +3,27 @@
 #include "sequences.h"
 
 const LedRGBChunk kPlayerStart[] = {
-        {ChunkType::kSetup, 300, kExtraLightGreen},
-        {ChunkType::kWait, 300},
-        {ChunkType::kEnd},
+        {{ChunkType::kSetup, {300}}, kExtraLightGreen},
+        {{ChunkType::kWait, {300}}},
+        {{ChunkType::kEnd}},
 };
 
 const LedRGBChunk kMasterStart[] = {
-        {ChunkType::kSetup, 300, kExtraLightMagenta},
-        {ChunkType::kWait, 300},
-        {ChunkType::kEnd},
+        {{ChunkType::kSetup, {300}}, kExtraLightMagenta},
+        {{ChunkType::kWait, {300}}},
+        {{ChunkType::kEnd}},
 };
 
 const LedRGBChunk kLadyLuStart[] = {
-        {ChunkType::kSetup, 300, kExtraLightBlue},
-        {ChunkType::kWait, 300},
-        {ChunkType::kEnd},
+        {{ChunkType::kSetup, {300}}, kExtraLightBlue},
+        {{ChunkType::kWait, {300}}},
+        {{ChunkType::kEnd}},
 };
 
-const LedRGBChunk kPlayerCurrent[] = {
-        {ChunkType::kSetup, 0, kExtraLightGreen},
-        {ChunkType::kWait, 1000},
-        {ChunkType::kEnd},
+LedRGBChunk kPlayerCurrent[] = {
+        {{ChunkType::kSetup, {0}}, kExtraLightGreen},
+        {{ChunkType::kWait, {1000}}},
+        {{ChunkType::kEnd}},
 };
 
 void WindsBehavior::OnStarted() {
@@ -36,6 +36,7 @@ void WindsBehavior::EverySecond() {
     // receiving sos
     if (mode == Mode::kMasterSos and rx_table.HasPacketWithId(sos_id)) {
         vibro->StartOrRestart(kBrrBrrBrr);
+        rx_table.Clear();
     }
 
     //sending sos
@@ -43,7 +44,7 @@ void WindsBehavior::EverySecond() {
         seconds_counter++;
         if (seconds_counter % 3 == 0) {
             seconds_counter = 0;
-            rx_table.Clear();
+            radio->ClearBeaconPacket();
             state = State::kIdle;
         }
     }
@@ -55,8 +56,10 @@ void WindsBehavior::EverySecond() {
             current_threshold = 0;
             state = State::kIdle;
             seconds_counter = 0;
+            vibro->StartOrRestart(kBrrBrrBrr);
             led->StartOrRestart(kPlayerStart);
         } else {
+            led->Stop();
             uint8_t red_part = 255*(current_threshold - seconds_counter)/current_threshold;
             uint8_t green_part = 255 - red_part;
             Color current_color = Color(red_part, green_part, 0);
@@ -109,7 +112,7 @@ void WindsBehavior::OnDipSwitchChanged(uint16_t dip_value_mask) {
     if (range > 11) {
         range = 11;
     }
-    RangeLevel = TypeToEnum(range);
+    RangeLevel = IdToRadioEnum(range);
     radio->SetPowerLevel(RangeLevel);
 
     logger->log("DIP switch changed to %d%d%d%d%d%d%d%d",
@@ -142,13 +145,16 @@ void WindsBehavior::OnButtonPressed(uint16_t button_index, bool long_press) {
                     case 0:
                         state = State::kFive;
                         current_threshold = FiveMinThreshold;
+                        seconds_counter = 0;
                         break;
                     case 1:
                         state = State::kFifteen;
+                        seconds_counter = 0;
                         current_threshold = FifteenThreshold;
                         break;
                     case 2:
                         state = State::kHalfAnHour;
+                        seconds_counter = 0;
                         current_threshold = HalfAnHourThreshold;
                         break;
                     default:
@@ -177,36 +183,5 @@ void WindsBehavior::OnUartCommand(UartCommand& command) {
     if (command.NameIs("version")) {
         logger->log("Wind Of Spring Locket Code based on aeremin locket api for Ostranna Creative Group");
         return;
-    }
-}
-
-RadioPowerLevel TypeToEnum(uint8_t id) {
-    switch (id) {
-        case 0:
-            return RadioPowerLevel::MINUS_30_DBM;
-        case 1:
-            return RadioPowerLevel::MINUS_27_DBM;
-        case 2:
-            return RadioPowerLevel::MINUS_25_DBM;
-        case 3:
-            return RadioPowerLevel::MINUS_20_DBM;
-        case 4:
-            return RadioPowerLevel::MINUS_15_DBM;
-        case 5:
-            return RadioPowerLevel::MINUS_10_DBM;
-        case 6:
-            return RadioPowerLevel::MINUS_6_DBM;
-        case 7:
-            return RadioPowerLevel::PLUS_0_DBM;
-        case 8:
-            return RadioPowerLevel::PLUS_5_DBM;
-        case 9:
-            return RadioPowerLevel::PLUS_7_DBM;
-        case 10:
-            return RadioPowerLevel::PLUS_10_DBM;
-        case 11:
-            return RadioPowerLevel::PLUS_12_DBM;
-        default:
-            return RadioPowerLevel::PLUS_0_DBM;
     }
 }
