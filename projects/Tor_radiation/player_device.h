@@ -18,8 +18,8 @@ public:
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
 
     //methods for logic
-    //void SetColor(Color color);
-    void DeathVibro();
+    void SetColor(Color color);
+    void LongVibro();
 
 private:
     PillManager<IdOnlyState>* pill_manager = nullptr;

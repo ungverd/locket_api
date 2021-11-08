@@ -16,8 +16,8 @@ Health_Variables Health_Variables::Load(Eeprom* eeprom) {
 }
 
 
-void Health_Variables::IncrementCount() {
-    ++count;
+void Health_Variables::DecrementCount() {
+    --count;
     // Count changes every second, only persist it occasionally to prevent
     // too frequent eeprom writes.
     if (count % SAVE_COUNT_PAUSE == 0) {
@@ -25,9 +25,13 @@ void Health_Variables::IncrementCount() {
     }
 }
 
-void Health_Variables::ResetCount() {
-    count = 0;
+void Health_Variables::SetCount(unsigned int new_count) {
+    count = new_count;
     SaveCount();
+}
+
+bool Health_Variables::IsPositive() {
+    return (count > 0);
 }
 
 void Health_Variables::SaveCount() {

@@ -13,8 +13,9 @@ const unsigned int SAVE_COUNT_PAUSE=60;
 class Health_Variables {
 public:
     static Health_Variables Load(Eeprom* eeprom);
-    void IncrementCount();
-    void ResetCount();
+    void DecrementCount();
+    void SetCount(unsigned int new_count);
+    bool IsPositive();
 
 private:
     void SaveCount();

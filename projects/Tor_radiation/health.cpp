@@ -15,16 +15,12 @@ void Health_ctor(
     unsigned int State = eeprom->Read<unsigned int>(offsetof(EepromMap, health_state));
     me->vars = Health_Variables::Load(eeprom);
     switch (State) {
-        case SIMPLE: {
-            me->StartState = (QStateHandler)&Health_simple;
+        case HEALTH: {
+            me->StartState = (QStateHandler)&Health_health;
             break;
         }
-        case GOD_READY: {
-            me->StartState = (QStateHandler)&Health_god_ready;
-            break;
-        }
-        case GOD: {
-            me->StartState = (QStateHandler)&Health_god;
+        case DAMAGED: {
+            me->StartState = (QStateHandler)&Health_damaged;
             break;
         }
         case DEAD: {
@@ -32,14 +28,11 @@ void Health_ctor(
             break;
         }
         default:
-            me->StartState = (QStateHandler)&Health_simple;
+            me->StartState = (QStateHandler)&Health_health;
         }
     QHsm_ctor(&me->super, Q_STATE_CAST(&Health_initial));
 }
-/*$enddef${SMs::Health_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
-/*$define${SMs::Health} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
-/*${SMs::Health} ...........................................................*/
-/*${SMs::Health::SM} .......................................................*/
+
 QState Health_initial(Health * const me, [[maybe_unused]] QEvt const * const e) {
     /*${SMs::Health::SM::initial} */
     return Q_TRAN(me->StartState);
@@ -56,7 +49,10 @@ QState Health_global(Health * const me, QEvt const * const e) {
             break;
         }
 #endif /* def DESKTOP */
-
+        case BTN_RESET_SIG: {
+            status_ = Q_TRAN(&Health_health);
+            break;
+        }
         default: {
             status_ = Q_SUPER(&QHsm_top);
             break;
@@ -64,43 +60,33 @@ QState Health_global(Health * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${SMs::Health::SM::global::alive} ........................................*/
-QState Health_alive(Health * const me, QEvt const * const e) {
+
+QState Health_damaged(Health * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${SMs::Health::SM::global::alive} */
         case Q_ENTRY_SIG: {
-            me->logger->log("Entered state alive");
-            me->SMBeh->StartTransmitForPath();
-            me->SMBeh->SetColor(me->vars.GetHealthColor());
+            me->logger->log("Entered state damaged");
             status_ = Q_HANDLED();
+            // todo add randomizer
+            unsigned int new_count = MIN_TIMEOUT_S;
+            me->vars.SetCount(new_count);
+            me->SMBeh->SetColor(kLightGreen);
+            me->SMBeh->LongVibro();
+            SaveHealthState(me->eeprom, DAMAGED);
             break;
         }
-        /*${SMs::Health::SM::global::alive} */
         case Q_EXIT_SIG: {
-            me->logger->log("Exited state alive");
+            me->logger->log("Exited state damaged");
             status_ = Q_HANDLED();
             break;
         }
-        /*${SMs::Health::SM::global::alive::PILL_HEAL} */
-        case PILL_HEAL_SIG: {
-            me->vars.ResetHealth();
-            me->SMBeh->SetColor(me->vars.GetHealthColor());
-            me->SMBeh->MakePillUsed();
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::MONSTER_SIGNAl} */
-        case MONSTER_SIGNAl_SIG: {
-            me->SMBeh->MonsterVibro();
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::PILL_RESET} */
-        case PILL_RESET_SIG: {
-            me->vars.ResetHealth();
-            me->SMBeh->SetColor(me->vars.GetHealthColor());
-            status_ = Q_TRAN(&Health_simple);
+        case RAD_RECEIVED_SIG: {
+            me->vars.DecrementCount();
+            if (not(me->vars.IsPositive())) {
+                status_ = Q_TRAN(&Health_dead);
+            } else {
+                status_ = Q_HANDLED();
+            }
             break;
         }
         default: {
@@ -110,161 +96,36 @@ QState Health_alive(Health * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${SMs::Health::SM::global::alive::god} ...................................*/
-QState Health_god(Health * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${SMs::Health::SM::global::alive::god} */
-        case Q_ENTRY_SIG: {
-            me->logger->log("Entered state god");
-            me->SMBeh->SetColor(kWhite);
-            me->SMBeh->GodVibro();
-            me->vars.ResetCount();
-            SaveHealthState(me->eeprom, GOD);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::god} */
-        case Q_EXIT_SIG: {
-            me->logger->log("Exited state god");
-            me->vars.ReSetGodPause();
-            me->SMBeh->GodVibro();
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::god::TIME_TICK_1S} */
-        case TIME_TICK_1S_SIG: {
-            /*${SMs::Health::SM::global::alive::god::TIME_TICK_1S::[me->count>=GOD_THRESHOLD_S]} */
-            if (me->vars.GetCount() >= GOD_THRESHOLD_S) {
-                status_ = Q_TRAN(&Health_god_ready);
-            }
-            /*${SMs::Health::SM::global::alive::god::TIME_TICK_1S::[else]} */
-            else {
-                me->vars.IncrementCount();
-                status_ = Q_HANDLED();
-            }
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&Health_alive);
-            break;
-        }
-    }
-    return status_;
-}
-/*${SMs::Health::SM::global::alive::mortal} ................................*/
-QState Health_mortal(Health * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${SMs::Health::SM::global::alive::mortal} */
-        case Q_ENTRY_SIG: {
-            me->logger->log("Entered state mortal");
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal} */
-        case Q_EXIT_SIG: {
-            me->logger->log("Exited state mortal");
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED} */
-        case RAD_RECEIVED_SIG: {
-            /*${SMs::Health::SM::global::alive::mortal::RAD_RECEIVED::[me->health<=e->damage]} */
-            if (me->vars.GetHealth() <= DEFAULT_DAMAGE) {
-                status_ = Q_TRAN(&Health_dead);
-            }
-            else {
-                me->vars.DecreaseHealth(DEFAULT_DAMAGE);
-                me->SMBeh->SetColor(me->vars.GetHealthColor());
-                me->SMBeh->RadiationVibro();
-                status_ = Q_UNHANDLED();
-            }
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal::DEAD_BUTTON_LONGPRESS} */
-        case DEAD_BUTTON_LONGPRESS: {
-            status_ = Q_TRAN(&Health_dead);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&Health_alive);
-            break;
-        }
-    }
-    return status_;
-}
-/*${SMs::Health::SM::global::alive::mortal::god_ready} .....................*/
-QState Health_god_ready(Health * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${SMs::Health::SM::global::alive::mortal::god_ready} */
-        case Q_ENTRY_SIG: {
-            me->logger->log("Entered state god_ready");
-            me->SMBeh->Flash(kWhite, me->vars.GetHealthColor());
-            SaveHealthState(me->eeprom, GOD_READY);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal::god_ready} */
-        case Q_EXIT_SIG: {
-            me->logger->log("Exited state god_ready");
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal::god_ready::TIME_TICK_1M} */
-        case TIME_TICK_1M_SIG: {
-            if (me->vars.GetGodPause() > 0) {
-                me->vars.DecrementGodPause();
-            }
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::alive::mortal::god_ready::GOD_BUTTON_LONGPRESS} */
-        case GOD_BUTTON_LONGPRESS: {
-            /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[me->god_pause==0]} */
-            if (me->vars.GetGodPause() == 0) {
-                status_ = Q_TRAN(&Health_god);
-            }
-            /*${SMs::Health::SM::global::alive::mortal::god_ready::MIDDLE_BUTTON_PR~::[else]} */
-            else {
-                me->SMBeh->Flash(kWhite, me->vars.GetHealthColor());
-                status_ = Q_HANDLED();
-            }
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&Health_mortal);
-            break;
-        }
-    }
-    return status_;
-}
-/*${SMs::Health::SM::global::alive::mortal::simple} ........................*/
 QState Health_simple(Health * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${SMs::Health::SM::global::alive::mortal::simple} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state simple");
-            SaveHealthState(me->eeprom, SIMPLE);
+            // todo add randomizer
+            unsigned int new_count = MIN_TIMEOUT_S;
+            me->vars.SetCount(new_count);
+            me->SMBeh->SetColor(kLightBlue);
+            me->SMBeh->LongVibro();
+            SaveHealthState(me->eeprom, HEALTH);
             status_ = Q_HANDLED();
             break;
         }
-        /*${SMs::Health::SM::global::alive::mortal::simple} */
         case Q_EXIT_SIG: {
             me->logger->log("Exited state simple");
             status_ = Q_HANDLED();
             break;
         }
-        /*${SMs::Health::SM::global::alive::mortal::simple::PILL_GOD} */
-        case PILL_GOD_SIG: {
-            me->vars.ZeroGodPause();
-            status_ = Q_TRAN(&Health_god_ready);
+        case RAD_RECEIVED_SIG: {
+            me->vars.DecrementCount();
+            if (not(me->vars.IsPositive())) {
+                status_ = Q_TRAN(&Health_damaged);
+            } else {
+                status_ = Q_HANDLED();
+            }
             break;
         }
         default: {
-            status_ = Q_SUPER(&Health_mortal);
+            status_ = Q_SUPER(&Health_global);
             break;
         }
     }
@@ -274,36 +135,17 @@ QState Health_simple(Health * const me, QEvt const * const e) {
 QState Health_dead(Health * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${SMs::Health::SM::global::dead} */
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state dead");
-            me->SMBeh->SetColor(kRed);
-            me->vars.ResetCount();
+            me->SMBeh->SetColor(kLightRed);
             SaveHealthState(me->eeprom, DEAD);
-            me->SMBeh->StopTransmitForPath();
-            me->SMBeh->DeathVibro();
+            me->SMBeh->LongVibro();
             status_ = Q_HANDLED();
             break;
         }
-        /*${SMs::Health::SM::global::dead} */
-        case PILL_HEAL_SIG: {
-            me->vars.ResetHealth();
-            me->SMBeh->SetColor(me->vars.GetHealthColor());
-            me->SMBeh->MakePillUsed();
-            status_ = Q_TRAN(&Health_simple);
-            break;
-        }
-        /*${SMs::Health::SM::global::dead} */
         case Q_EXIT_SIG: {
             me->logger->log("Exited state dead");
             status_ = Q_HANDLED();
-            break;
-        }
-        /*${SMs::Health::SM::global::dead::PILL_RESET} */
-        case PILL_RESET_SIG: {
-            me->vars.ResetHealth();
-            me->SMBeh->SetColor(me->vars.GetHealthColor());
-            status_ = Q_TRAN(&Health_simple);
             break;
         }
         default: {

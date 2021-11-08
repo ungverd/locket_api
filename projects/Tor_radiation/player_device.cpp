@@ -11,18 +11,6 @@ LedRGBChunk kHealthSequence[] = {
         {{ChunkType::kGoto, {0}}},
 };
 
-LedRGBChunk kFirstSequence[] = {
-        {{ChunkType::kSetup, {0}}, kLightYellow},
-        {{ChunkType::kWait, {100}}},
-        {{ChunkType::kGoto, {0}}},
-};
-
-LedRGBChunk kSecondSequence[] = {
-        {{ChunkType::kSetup, {0}}, kLightRed},
-        {{ChunkType::kWait, {100}}},
-        {{ChunkType::kGoto, {0}}},
-};
-
 const VibroChunk kLongBrr[] = {
         {{ChunkType::kSetup, {kVibroVolume}}},
         {{ChunkType::kWait, {1000}}},
@@ -107,3 +95,8 @@ void RadBehavior::DeathVibro() {
     vibro->StartOrRestart(kLongBrr);
 }
 
+void RadBehavior::SetColor(Color color) {
+    led->Stop();
+    kHealthSequence[0].color = color;
+    led->StartOrRestart(kHealthSequence);
+}

@@ -1,15 +1,11 @@
 #include "player_device.h"
-#include "monster.h"
 #include "lustra.h"
 #include "embedded/behavior_runner.h"
 #include "utility.h"
 
 int main() {
     uint8_t first_dip = GetSwitchState(embedded::ReadDipSwitch(), 1);
-    uint8_t second_dip = GetSwitchState(embedded::ReadDipSwitch(), 2);
-    if ( (!first_dip) && second_dip) {
-        embedded::BehaviorRunner<MonsterBehavior>().Run();
-    } else if (first_dip && (!second_dip)) {
+    if (first_dip) {
         embedded::BehaviorRunner<LustraBehavior>().Run();
     } else {
         embedded::BehaviorRunner<RadBehavior>().Run();
