@@ -16,6 +16,7 @@ public:
 
 private:
     RadioPowerLevel range_level = RadioPowerLevel::MINUS_6_DBM;
+    uint8_t lustra_id = 0;
 };
 
 

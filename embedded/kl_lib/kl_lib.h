@@ -221,7 +221,7 @@ namespace Random {
 //uint32_t last = 1;
 // Generate pseudo-random value
 static inline long int Generate(long int LowInclusive, long int HighInclusive) {
-    uint32_t last = random();
+    uint32_t last = rand();
     return (last % (HighInclusive + 1 - LowInclusive)) + LowInclusive;
 }
 // Seed pseudo-random generator with new seed

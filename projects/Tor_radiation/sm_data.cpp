@@ -30,6 +30,11 @@ void Health_Variables::SetCount(unsigned int new_count) {
     SaveCount();
 }
 
+
+unsigned int Health_Variables::GetCount() {
+    return count;
+}
+
 bool Health_Variables::IsPositive() {
     return (count > 0);
 }

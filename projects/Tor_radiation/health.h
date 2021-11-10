@@ -15,7 +15,7 @@ extern "C" {
 const uint32_t HEALTH = 0;
 const uint32_t DAMAGED = 1;
 const uint32_t DEAD = 2;
-const uint32_t MIN_TIMEOUT_S = 6000;
+const uint32_t MIN_TIMEOUT_S = 100*60;
 const uint32_t MAX_TIMEOUT_S = 170*60;
 
 

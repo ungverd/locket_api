@@ -3,6 +3,12 @@
 #include "Glue.h"
 #include "color.h"
 
+// Generate pseudo-random value
+static inline long int Generate(long int LowInclusive, long int HighInclusive) {
+    uint32_t last = rand();
+    return (last % (HighInclusive + 1 - LowInclusive)) + LowInclusive;
+}
+
 QHsm * const the_health = (QHsm *) &health; /* the opaque pointer */
 
 void Health_ctor(
@@ -50,6 +56,9 @@ QState Health_global(Health * const me, QEvt const * const e) {
         }
 #endif /* def DESKTOP */
         case BTN_RESET_SIG: {
+            unsigned int new_count = Generate(MIN_TIMEOUT_S, MAX_TIMEOUT_S);
+            me->logger->log("New_count %i", new_count);
+            me->vars.SetCount(new_count);
             status_ = Q_TRAN(&Health_health);
             break;
         }
@@ -67,9 +76,6 @@ QState Health_damaged(Health * const me, QEvt const * const e) {
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state damaged");
             status_ = Q_HANDLED();
-            // todo add randomizer
-            unsigned int new_count = MIN_TIMEOUT_S;
-            me->vars.SetCount(new_count);
             me->SMBeh->SetColor(kLightGreen);
             me->SMBeh->LongVibro();
             SaveHealthState(me->eeprom, DAMAGED);
@@ -82,6 +88,7 @@ QState Health_damaged(Health * const me, QEvt const * const e) {
         }
         case RAD_RECEIVED_SIG: {
             me->vars.DecrementCount();
+            me->logger->log("Now %d count", me->vars.GetCount());
             if (not(me->vars.IsPositive())) {
                 status_ = Q_TRAN(&Health_dead);
             } else {
@@ -96,14 +103,11 @@ QState Health_damaged(Health * const me, QEvt const * const e) {
     }
     return status_;
 }
-QState Health_simple(Health * const me, QEvt const * const e) {
+QState Health_health(Health * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
         case Q_ENTRY_SIG: {
             me->logger->log("Entered state simple");
-            // todo add randomizer
-            unsigned int new_count = MIN_TIMEOUT_S;
-            me->vars.SetCount(new_count);
             me->SMBeh->SetColor(kLightBlue);
             me->SMBeh->LongVibro();
             SaveHealthState(me->eeprom, HEALTH);
@@ -117,7 +121,11 @@ QState Health_simple(Health * const me, QEvt const * const e) {
         }
         case RAD_RECEIVED_SIG: {
             me->vars.DecrementCount();
+            me->logger->log("Now %d count", me->vars.GetCount());
             if (not(me->vars.IsPositive())) {
+                unsigned int new_count = Generate(MIN_TIMEOUT_S, MAX_TIMEOUT_S);
+                me->logger->log("New_count %i", new_count);
+                me->vars.SetCount(new_count);
                 status_ = Q_TRAN(&Health_damaged);
             } else {
                 status_ = Q_HANDLED();

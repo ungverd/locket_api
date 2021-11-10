@@ -32,6 +32,10 @@ target_link_libraries(seven_strides_behavior api)
 add_library(springwind_behavior springwind_behavior/springwind_behavior.cpp)
 target_link_libraries(springwind_behavior api)
 
+add_library(tor_behavior Tor_radiation/player_device.cpp Tor_radiation/health.cpp Tor_radiation/sm_data.cpp
+        Tor_radiation/lustra.cpp)
+target_link_libraries(tor_behavior api qhsm)
+
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(basic_behavior_emulator basic_behavior/basic_behavior_emulator.cpp)
@@ -57,6 +61,9 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 
     add_executable(springwind_behavior_emulator springwind_behavior/springwind_behavior_emulator.cpp)
     target_link_libraries(springwind_behavior_emulator springwind_behavior emulator)
+
+    add_executable(tor_emulator Tor_radiation/tor_radiation_emulator.cpp)
+    target_link_libraries(tor_emulator tor_behavior emulator)
 else()
     add_firmware(giganda.elf giganda_behavior/giganda_firmware.cpp)
     target_link_libraries(giganda.elf giganda_behaviour)
@@ -90,6 +97,9 @@ else()
 
     add_firmware(springwind_behavior.elf springwind_behavior/springwind_behavior_firmware.cpp)
     target_link_libraries(springwind_behavior.elf springwind_behavior)
+
+    add_firmware(tor_behavior.elf Tor_radiation/tor_radiation_firmware.cpp)
+    target_link_libraries(tor_behavior.elf tor_behavior)
 
 endif()
 

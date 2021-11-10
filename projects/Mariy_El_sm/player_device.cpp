@@ -196,7 +196,7 @@ void RadBehavior::Flash(Color color_new, Color color_old) {
     led->StartOrRestart(kRadFlashSequence);
 };
 
-void RadBehavior::LongVibro() {
+void RadBehavior::DeathVibro() {
     vibro->StartOrRestart(kLongBrr);
 }
 

@@ -3,7 +3,16 @@
 #include "health.h"
 #include "sequences.h"
 #include "utility.h"
+#include <cstdlib>
 
+#define UNIQ_ID_BASE    0x1FF80050
+
+// Seed pseudo-random generator with new seed
+static inline void Seed(unsigned int Seed) { srand(Seed); }
+
+static inline uint32_t GetUniqID3() {
+    return *((uint32_t*)(UNIQ_ID_BASE + 0x14));
+}
 
 LedRGBChunk kHealthSequence[] = {
         {{ChunkType::kSetup, {0}}, kExtraLightGreen},
@@ -23,6 +32,7 @@ void RadBehavior::OnStarted() {
     logger->log("Started execution!");
     led->StartOrRestart(kHealthSequence);
     vibro->StartOrRestart(kBrrBrrBrr);
+    Seed(GetUniqID3());
     Health_ctor(this, this->eeprom, this->logger);
     QMSM_INIT(the_health, (QEvt *)nullptr);
 
@@ -40,11 +50,17 @@ void RadBehavior::EverySecond() {
         QMsm_dispatch(the_health, &(e.super));
     }
     //radio events
-    if (rx_table.HasPacketWithId(rad_id)) {
-        logger->log("Radiation");
-        e.super.sig = RAD_RECEIVED_SIG;
-        QMsm_dispatch(the_health, &(e.super));
-        logger->log("Radiation dispatched");
+    int LustraNear[16] = {};
+    for (const IdOnlyState &packet: rx_table.Raw()) {
+        LustraNear[packet.id] += 1;
+    }
+    for (const int lustra_id: LustraNear) {
+        if (lustra_id > 0) {
+            logger->log("Radiation");
+            e.super.sig = RAD_RECEIVED_SIG;
+            QMsm_dispatch(the_health, &(e.super));
+            logger->log("Radiation dispatched");
+        }
     }
     rx_table.Clear();
 }
@@ -91,7 +107,7 @@ void RadBehavior::OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) 
     rx_table.AddPacket(packet);
 }
 
-void RadBehavior::DeathVibro() {
+void RadBehavior::LongVibro() {
     vibro->StartOrRestart(kLongBrr);
 }
 

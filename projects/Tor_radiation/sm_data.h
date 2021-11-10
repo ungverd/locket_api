@@ -15,6 +15,7 @@ public:
     static Health_Variables Load(Eeprom* eeprom);
     void DecrementCount();
     void SetCount(unsigned int new_count);
+    unsigned int GetCount();
     bool IsPositive();
 
 private:
