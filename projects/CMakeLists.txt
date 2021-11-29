@@ -38,6 +38,10 @@ target_link_libraries(my_behavior api)
 add_library(vetta_behavior vetta_behavior/vetta_behavior.cpp)
 target_link_libraries(vetta_behavior api)
 
+add_library(tor_behavior Tor_radiation/player_device.cpp Tor_radiation/health.cpp Tor_radiation/sm_data.cpp
+        Tor_radiation/lustra.cpp)
+target_link_libraries(tor_behavior api qhsm)
+
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(basic_behavior_emulator basic_behavior/basic_behavior_emulator.cpp)
     target_link_libraries(basic_behavior_emulator basic_behavior emulator)
@@ -68,6 +72,10 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 
     add_executable(vetta_behavior_emulator vetta_behavior/vetta_behavior_emulator.cpp)
     target_link_libraries(vetta_behavior_emulator vetta_behavior emulator)
+
+    add_executable(tor_emulator Tor_radiation/tor_radiation_emulator.cpp)
+    target_link_libraries(tor_emulator tor_behavior emulator)
+
 else()
     add_firmware(giganda.elf giganda_behavior/giganda_firmware.cpp)
     target_link_libraries(giganda.elf giganda_behaviour)
@@ -107,6 +115,9 @@ else()
 
     add_firmware(vetta_behavior.elf vetta_behavior/vetta_behavior_firmware.cpp)
     target_link_libraries(vetta_behavior.elf vetta_behavior)
+
+    add_firmware(tor_behavior.elf Tor_radiation/tor_radiation_firmware.cpp)
+    target_link_libraries(tor_behavior.elf tor_behavior)
 
 endif()
 

@@ -18,9 +18,9 @@ LedRGBChunk kRadSequence[] = {
         {{ChunkType::kGoto, {0}}},
 };
 
-const VibroChunk kLongBrrForDeath[] = {
+const VibroChunk kLongBrr[] = {
         {ChunkType::kSetup, kVibroVolume},
-        {ChunkType::kWait, 5000},
+        {ChunkType::kWait, 3000},
         {ChunkType::kSetup, 0},
         {ChunkType::kWait, kVibroRepeatPeriod},
         {ChunkType::kEnd}
@@ -197,7 +197,7 @@ void RadBehavior::Flash(Color color_new, Color color_old) {
 };
 
 void RadBehavior::DeathVibro() {
-    vibro->StartOrRestart(kLongBrrForDeath);
+    vibro->StartOrRestart(kLongBrr);
 }
 
 void RadBehavior::GodVibro() {

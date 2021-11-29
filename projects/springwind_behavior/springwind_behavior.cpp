@@ -68,11 +68,12 @@ void WindsBehavior::EverySecond() {
         }
 
     }
-    if (mode == Mode::kLadyLu and state != State::kActivated) {
+    if (mode == Mode::kLadyLu and state == State::kActivated) {
         seconds_counter ++;
         if (seconds_counter >= LadyLuThreshold) {
             seconds_counter = 0;
             radio->ClearBeaconPacket();
+            state = State::kIdle;
         }
     }
 }
