@@ -32,6 +32,11 @@ target_link_libraries(seven_strides_behavior api)
 add_library(springwind_behavior springwind_behavior/springwind_behavior.cpp)
 target_link_libraries(springwind_behavior api)
 
+add_library(my_behavior my_behavior/my_behavior.cpp)
+target_link_libraries(my_behavior api)
+
+add_library(vetta_behavior vetta_behavior/vetta_behavior.cpp)
+target_link_libraries(vetta_behavior api)
 
 if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
     add_executable(basic_behavior_emulator basic_behavior/basic_behavior_emulator.cpp)
@@ -57,6 +62,12 @@ if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
 
     add_executable(springwind_behavior_emulator springwind_behavior/springwind_behavior_emulator.cpp)
     target_link_libraries(springwind_behavior_emulator springwind_behavior emulator)
+
+    add_executable(my_behavior_emulator my_behavior/my_behavior_emulator.cpp)
+    target_link_libraries(my_behavior_emulator my_behavior emulator)
+
+    add_executable(vetta_behavior_emulator vetta_behavior/vetta_behavior_emulator.cpp)
+    target_link_libraries(vetta_behavior_emulator vetta_behavior emulator)
 else()
     add_firmware(giganda.elf giganda_behavior/giganda_firmware.cpp)
     target_link_libraries(giganda.elf giganda_behaviour)
@@ -90,6 +101,12 @@ else()
 
     add_firmware(springwind_behavior.elf springwind_behavior/springwind_behavior_firmware.cpp)
     target_link_libraries(springwind_behavior.elf springwind_behavior)
+
+    add_firmware(my_behavior.elf my_behavior/my_behavior_firmware.cpp)
+    target_link_libraries(my_behavior.elf my_behavior)
+
+    add_firmware(vetta_behavior.elf vetta_behavior/vetta_behavior_firmware.cpp)
+    target_link_libraries(vetta_behavior.elf vetta_behavior)
 
 endif()
 
