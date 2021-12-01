@@ -21,6 +21,7 @@ private:
     RxTable<IdOnlyState> rx_table;
     uint16_t dip_value;
     std::vector<IdOnlyState> ids;
+    int counter;
 };
 
 #endif //LOCKET_API_VETTA_BEHAVIOR_H
