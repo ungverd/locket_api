@@ -58,19 +58,26 @@ void VettaBehavior::OnStarted() {
     led->StartOrRestart(kStartSequence);
     radio->SetPowerLevel(RadioPowerLevel::MINUS_15_DBM);
     counter = 0;
+    receivedPreviousSecond = false;
 }
 
 void VettaBehavior::EverySecond() {
-    ids = rx_table.Raw();
-    if(ids.size() > 0) {
-        uint8_t max_id = 0;
-        for(auto& val: ids) {
-            if(val.id > max_id) {
-                max_id = val.id;
-            }
-        }
+    if(receivedPreviousSecond) {
         rx_table.Clear();
-        counter = max_id;
+        receivedPreviousSecond = false;
+    } else {
+        ids = rx_table.Raw();
+        if(ids.size() > 0) {
+            receivedPreviousSecond = true;
+            uint8_t max_id = 0;
+            for (auto& val: ids) {
+                if (val.id > max_id) {
+                    max_id = val.id;
+                }
+            }
+            rx_table.Clear();
+            counter = max_id;
+        }
     }
     switch(counter) {
         case 0:

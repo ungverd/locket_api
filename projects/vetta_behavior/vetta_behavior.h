@@ -22,6 +22,7 @@ private:
     uint16_t dip_value;
     std::vector<IdOnlyState> ids;
     int counter;
+    bool receivedPreviousSecond;
 };
 
 #endif //LOCKET_API_VETTA_BEHAVIOR_H
