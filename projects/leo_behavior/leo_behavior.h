@@ -5,30 +5,39 @@
 #include "rx_table.h"
 #include "behavior.h"
 
+struct IdAndLampParameters {
+    uint8_t id;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    uint16_t delay;
+};
 
-class LeoBehavior: public Behavior<IdOnlyState, IdOnlyState> {
+
+class LeoBehavior: public Behavior<IdOnlyState, IdAndLampParameters> {
 public:
     enum class Mode {
-        kAnnoying = 0,
-        kNotAnnoying = 1,
+        lamp = 0,
+        control = 1,
     };
 
     using Behavior::Behavior;
 
     void OnStarted() override;
     void EverySecond() override;
-    void OnPillConnected(PillManager<IdOnlyState>* manager) override;
-    void OnPillDisconnected() override;
     void OnDipSwitchChanged(uint16_t dip_value_mask) override;
     void OnButtonPressed(uint16_t button_index, bool long_press) override;
-    void OnRadioPacketReceived(const IdOnlyState& packet, int8_t rssi) override;
+    void OnRadioPacketReceived(const IdAndLampParameters& packet, int8_t rssi) override;
     void OnUartCommand(UartCommand& command) override;
 
 private:
-    PillManager<IdOnlyState>* pill_manager = nullptr;
-    uint32_t seconds_counter = 0;
-    Mode mode = Mode::kAnnoying; // If true, beep and vibrate every bunch of seconds.
-    RxTable<IdOnlyState> rx_table;
+    Mode mode = Mode::lamp;
+    RxTable<IdAndLampParameters> rx_table;
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+    uint8_t probability = 0;
+    uint16_t delay = 0;
 };
 
 #endif //LOCKET_API_LEO_BEHAVIOR_H
